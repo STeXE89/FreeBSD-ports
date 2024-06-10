@@ -1,0 +1,4 @@
+etc/rc.d/vpnserver.sh
+pkg/softether5.xml
+www/vpn_softether5_vpnserver.php
+%%DATADIR%%/info.xml
