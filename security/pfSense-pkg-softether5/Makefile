@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-softether5
 PORTVERSION=	5.02
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	security net-vpn
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -35,7 +35,11 @@ do-install:
 		${STAGEDIR}${PREFIX}/pkg
 	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnserver.sh \
 		${STAGEDIR}${PREFIX}/etc/rc.d
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/vpn_softether5_vpnserver.php \
+	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnbridge.sh \
+		${STAGEDIR}${PREFIX}/etc/rc.d
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/vpn_softether5_server.php \
+		${STAGEDIR}${PREFIX}/www
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/vpn_softether5_bridge.php \
 		${STAGEDIR}${PREFIX}/www
 	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}

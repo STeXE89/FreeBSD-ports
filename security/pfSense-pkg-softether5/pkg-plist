@@ -1,4 +1,6 @@
 etc/rc.d/vpnserver.sh
+etc/rc.d/vpnbridge.sh
 pkg/softether5.xml
-www/vpn_softether5_vpnserver.php
+www/vpn_softether5_server.php
+www/vpn_softether5_bridge.php
 %%DATADIR%%/info.xml

@@ -1,6 +1,6 @@
 <?php
 /*
- * vpn_softether5.php
+ * vpn_softether5_server.php
  *
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2011-2024 Rubicon Communications, LLC (Netgate)
@@ -20,16 +20,16 @@
  * limitations under the License.
  */
 
-require_once("globals.inc");
 require_once("guiconfig.inc");
-require_once("pfsense-utils.inc");
-require_once("pkg-utils.inc");
-require_once("certs.inc");
-require_once("classes/Form.class.php");
 
-$pgtitle = array("SoftEther5 VPN", "vpnserver");
+$pgtitle = array("SoftEther5", "VPN Server");
 
 include("head.inc");
+
+$tab_array = array();
+$tab_array[] = array(gettext("VPN Server"), true, "/vpn_softether5_server.php");
+$tab_array[] = array(gettext("VPN Bridge"), false, "/vpn_softether5_bridge.php");
+display_top_tabs($tab_array);
 
 if ($input_errors) {
 	print_input_errors($input_errors);
@@ -38,7 +38,7 @@ if ($input_errors) {
 ?>
 
 <div class="bs-callout bs-callout-danger">
-	<h4>Attention!</h4>
+	<h4>Caution!</h4>
 	The pfSense SoftEther5 package is under development.
 	<br>
 	To start/stop/restart the vpnserver service go to Status > Services
@@ -48,6 +48,9 @@ if ($input_errors) {
 	<br>
 	<br>
 	<b>Be careful, if you need to use the https port (443) as your vpnserver, change the pfSense https default port with another not in use.</b>
+	<br>
+	<br>
+	You can use vpnserver and vpnbridge simultaneously for different applications using different ports.
 	<br>
 	<br>
 	Remember to backup your vpnserver data/configuration, using the external tool SoftEther VPN Server Manager.
