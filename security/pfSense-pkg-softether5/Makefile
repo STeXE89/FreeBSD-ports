@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-softether5
 PORTVERSION=	5.02
-PORTREVISION=	2
+PORTREVISION=	3
 CATEGORIES=	security net-vpn
 MASTER_SITES=	# empty
 DISTFILES=	# empty

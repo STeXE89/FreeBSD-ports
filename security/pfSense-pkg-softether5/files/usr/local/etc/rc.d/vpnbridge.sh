@@ -6,7 +6,8 @@ name="vpnbridge"
 command="/usr/local/bin/vpnbridge"
 
 piddir="/var/run/softether"
-datadir="/var/db/softether"
+datadir="/cf/softether"
+link_datadir="/var/db/softether"
 
 precmd() {
     if [ ! -d "${piddir}" ]; then
@@ -14,6 +15,10 @@ precmd() {
     fi
     if [ ! -d "${datadir}" ]; then
         mkdir -p ${datadir}
+    fi
+
+    if [ ! -L "${link_datadir}" ]; then
+        ln -s ${datadir} ${link_datadir}
     fi
 }
 
