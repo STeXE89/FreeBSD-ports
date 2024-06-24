@@ -481,7 +481,6 @@
     SUBDIR += mdocml
     SUBDIR += meilisearch
     SUBDIR += meld
-    SUBDIR += mergestat
     SUBDIR += metauml
     SUBDIR += mgdiff
     SUBDIR += mi-aspell
@@ -1782,6 +1781,7 @@
     SUBDIR += rubygem-elasticsearch-model713
     SUBDIR += rubygem-elasticsearch-persistence
     SUBDIR += rubygem-elasticsearch-rails
+    SUBDIR += rubygem-elasticsearch-rails7
     SUBDIR += rubygem-elasticsearch-transport
     SUBDIR += rubygem-elasticsearch-transport713
     SUBDIR += rubygem-elasticsearch-xpack
@@ -1886,12 +1886,14 @@
     SUBDIR += rubygem-representable
     SUBDIR += rubygem-reverse_markdown
     SUBDIR += rubygem-rexml
+    SUBDIR += rubygem-rexml32
     SUBDIR += rubygem-ri_cal
     SUBDIR += rubygem-rly
     SUBDIR += rubygem-rmmseg-cpp
     SUBDIR += rubygem-ronn
     SUBDIR += rubygem-rouge
     SUBDIR += rubygem-rouge3
+    SUBDIR += rubygem-rouge42
     SUBDIR += rubygem-rttool
     SUBDIR += rubygem-ruby-augeas
     SUBDIR += rubygem-ruby-xslt
@@ -1917,7 +1919,6 @@
     SUBDIR += rubygem-sassc-rails-rails60
     SUBDIR += rubygem-sassc-rails-rails61
     SUBDIR += rubygem-sassc-rails-rails70
-    SUBDIR += rubygem-sassc22
     SUBDIR += rubygem-sax-machine
     SUBDIR += rubygem-scss_lint
     SUBDIR += rubygem-shell2html
@@ -2018,6 +2019,7 @@
     SUBDIR += stardict-dictd_mova
     SUBDIR += stardict-rptts
     SUBDIR += stardict3
+    SUBDIR += sttr
     SUBDIR += sv-aspell
     SUBDIR += sv-hunspell
     SUBDIR += sv-mythes

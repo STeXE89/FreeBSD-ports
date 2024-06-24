@@ -67,6 +67,7 @@
     SUBDIR += erlang-runtime24
     SUBDIR += erlang-runtime25
     SUBDIR += erlang-runtime26
+    SUBDIR += erlang-runtime27
     SUBDIR += erlang-wx
     SUBDIR += execline
     SUBDIR += expect
@@ -94,6 +95,7 @@
     SUBDIR += gcc12-devel
     SUBDIR += gcc13
     SUBDIR += gcc13-devel
+    SUBDIR += gcc14
     SUBDIR += gcc14-devel
     SUBDIR += gcc15-devel
     SUBDIR += gcc6-aux
@@ -290,6 +292,7 @@
     SUBDIR += prql
     SUBDIR += ptoc
     SUBDIR += purescript
+    SUBDIR += py-dhall
     SUBDIR += py-hy
     SUBDIR += py-lupa
     SUBDIR += py-textX
@@ -377,6 +380,7 @@
     SUBDIR += tuareg-mode.el
     SUBDIR += twelf
     SUBDIR += typstfmt
+    SUBDIR += typstyle
     SUBDIR += ucc
     SUBDIR += urweb
     SUBDIR += v
@@ -390,8 +394,6 @@
     SUBDIR += ypsilon
     SUBDIR += zephir
     SUBDIR += zig
-    SUBDIR += zig-devel
     SUBDIR += zig010
-    SUBDIR += zig011
 
 .include <bsd.port.subdir.mk>
