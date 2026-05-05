@@ -1,5 +1,5 @@
 PORTNAME=	fcitx5-gtk
-DISTVERSION=	5.1.3
+DISTVERSION=	5.1.5
 CATEGORIES=	textproc
 MASTER_SITES=	https://download.fcitx-im.org/fcitx5/${PORTNAME}/
 
@@ -23,7 +23,7 @@ gtk4_PKGNAMESUFFIX=	4
 USES=		cmake compiler:c++17-lang gnome kde:5 pkgconfig \
 		tar:zst xorg
 
-USE_GNOME=	cairo gdkpixbuf2 glib20 introspection
+USE_GNOME=	cairo gdkpixbuf glib20 introspection
 USE_KDE=	ecm
 USE_LDCONFIG=	yes
 USE_XORG=	x11

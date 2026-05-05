@@ -4,7 +4,6 @@ PORTNAME=	ocaml
 PORTVERSION=	4.14.2
 CATEGORIES=	lang
 MASTER_SITES=	http://caml.inria.fr/pub/distrib/${DISTNAME:R}/ \
-		GENTOO \
 		http://caml.inria.fr/pub/distrib/${DISTNAME:R}/:docs
 DISTFILES=	${DISTNAME}${EXTRACT_SUFX}
 EXTRACT_ONLY=	${_DISTFILES:M*.tar.*}
@@ -55,9 +54,15 @@ DOCS_DISTFILES=			${DISTNAME:R}-refman-html.tar.gz:docs \
 				${DISTNAME:R}-refman.pdf:docs
 THREADS_CONFIGURE_ENABLE=	systhreads
 
+.include <bsd.port.options.mk>
+
+.if ${ARCH} == powerpc
+LLD_UNSAFE=	yes
+.endif
+
 post-install-DOCS-on:
 	${MKDIR} ${STAGEDIR}${DOCSDIR}
 	(cd ${WRKDIR} && ${COPYTREE_SHARE} htmlman ${STAGEDIR}${DOCSDIR})
-	${INSTALL_DATA} ${_DISTDIR}${DISTNAME:R}-refman.pdf ${STAGEDIR}${DOCSDIR}
+	${INSTALL_DATA} ${_DISTDIR}/${DISTNAME:R}-refman.pdf ${STAGEDIR}${DOCSDIR}
 
 .include <bsd.port.mk>

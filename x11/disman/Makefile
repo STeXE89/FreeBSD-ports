@@ -1,9 +1,10 @@
 PORTNAME=	disman
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.601.0
+DISTVERSION=	0.602.0
+PORTREVISION=	1
 CATEGORIES=	x11
 
-MAINTAINER=	jbeich@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Qt/C++ display management library
 WWW=		https://github.com/winft/disman
 

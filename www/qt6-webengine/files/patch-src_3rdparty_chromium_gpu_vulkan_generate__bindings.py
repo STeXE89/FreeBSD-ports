@@ -1,6 +1,6 @@
---- src/3rdparty/chromium/gpu/vulkan/generate_bindings.py.orig	2023-09-13 12:11:42 UTC
+--- src/3rdparty/chromium/gpu/vulkan/generate_bindings.py.orig	2025-08-15 18:30:00 UTC
 +++ src/3rdparty/chromium/gpu/vulkan/generate_bindings.py
-@@ -260,7 +260,7 @@ VULKAN_DEVICE_FUNCTIONS = [
+@@ -271,7 +271,7 @@ VULKAN_DEVICE_FUNCTIONS = [
      ]
    },
    {

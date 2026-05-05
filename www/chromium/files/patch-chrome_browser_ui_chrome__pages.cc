@@ -1,6 +1,6 @@
---- chrome/browser/ui/chrome_pages.cc.orig	2024-06-17 12:56:06 UTC
+--- chrome/browser/ui/chrome_pages.cc.orig	2026-03-13 06:02:14 UTC
 +++ chrome/browser/ui/chrome_pages.cc
-@@ -86,7 +86,7 @@
+@@ -87,12 +87,12 @@
  #include "components/signin/public/identity_manager/identity_manager.h"
  #endif
  
@@ -9,9 +9,33 @@
  #include "chrome/browser/web_applications/web_app_utils.h"
  #endif
  
-@@ -719,7 +719,7 @@ void ShowShortcutCustomizationApp(Profile* profile,
- #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+-    BUILDFLAG(IS_CHROMEOS)
++    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
+ #include "components/webapps/isolated_web_apps/scheme.h"
+ #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+         // BUILDFLAG(IS_CHROMEOS)
+@@ -254,7 +254,7 @@ bool SiteGURLIsValid(const GURL& url) {
+   return !site_origin.opaque() && (url.SchemeIsHTTPOrHTTPS() ||
+                                    url.SchemeIs(extensions::kExtensionScheme)
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+-    BUILDFLAG(IS_CHROMEOS)
++    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
+                                    || url.SchemeIs(webapps::kIsolatedAppScheme)
+ #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+         // BUILDFLAG(IS_CHROMEOS)
+@@ -413,7 +413,7 @@ void ShowChromeTips(Browser* browser) {
+   ShowSingletonTab(browser, GURL(kChromeTipsURL));
  }
+ 
+-#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
++#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
+ void ShowChromeWhatsNew(Browser* browser) {
+   ShowSingletonTab(browser, GURL(kChromeUIWhatsNewURL));
+ }
+@@ -761,7 +761,7 @@ void ShowShortcutCustomizationApp(Profile* profile,
+ }
+ #endif  // BUILDFLAG(IS_CHROMEOS)
  
 -#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 +#if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)

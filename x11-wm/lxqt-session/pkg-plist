@@ -39,6 +39,7 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_id.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_it.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_ja.qm
+%%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_ka.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_ko.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_lg.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_lt.qm
@@ -56,6 +57,7 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_sl.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_sr@latin.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_sr_RS.qm
+%%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_sv.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_th_TH.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_tr.qm
 %%LXQT_TRANSLATIONS%%/lxqt-config-session/lxqt-config-session_uk.qm
@@ -71,8 +73,10 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_da.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_de.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_el.qm
+%%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_en_GB.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_es.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_et.qm
+%%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_eu.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_fi.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_fr.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_gl.qm
@@ -82,6 +86,8 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_id.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_it.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_ja.qm
+%%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_ka.qm
+%%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_kab.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_kk.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_ko.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_lg.qm
@@ -97,6 +103,7 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_si.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_sk.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_sl.qm
+%%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_sv.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_tr.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_uk.qm
 %%LXQT_TRANSLATIONS%%/lxqt-leave/lxqt-leave_vi.qm
@@ -112,6 +119,7 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_da.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_de.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_el.qm
+%%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_en_GB.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_eo.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_es.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_es_UY.qm
@@ -128,6 +136,8 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_id.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_it.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_ja.qm
+%%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_ka.qm
+%%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_kab.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_kk.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_ko.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_lg.qm
@@ -148,11 +158,13 @@ share/applications/lxqt-suspend.desktop
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_sr@latin.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_sr_BA.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_sr_RS.qm
+%%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_sv.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_th_TH.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_tr.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_uk.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_zh_CN.qm
 %%LXQT_TRANSLATIONS%%/lxqt-session/lxqt-session_zh_TW.qm
+%%LXQT_SHAREDIR%%/waylandwindowmanagers.conf
 %%LXQT_SHAREDIR%%/windowmanagers.conf
 share/man/man1/lxqt-config-session.1.gz
 share/man/man1/lxqt-leave.1.gz

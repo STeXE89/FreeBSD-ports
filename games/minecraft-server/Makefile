@@ -1,7 +1,8 @@
 PORTNAME=	minecraft-server
-DISTVERSION=	1.21
+DISTVERSION=	1.21.11
+PORTREVISION=	2
 CATEGORIES=	games java
-MASTER_SITES=	https://piston-data.mojang.com/v1/objects/450698d1863ab5180c25d7c804ef0fe6369dd1ba/
+MASTER_SITES=	https://piston-data.mojang.com/v1/objects/64bb6d763bed0a9f1d632ec347938594144943ed/
 DISTNAME=	server
 EXTRACT_SUFX=	.jar
 DIST_SUBDIR=	${PORTNAME}-${DISTVERSION}
@@ -16,13 +17,13 @@ LICENSE_NAME=	Minecraft End User License Agreement
 LICENSE_TEXT=	The license can be viewed at: https://account.mojang.com/documents/minecraft_eula
 LICENSE_PERMS=	no-dist-mirror no-dist-sell no-pkg-mirror no-pkg-sell
 
-USE_JAVA=	yes
-JAVA_VERSION=	21
+USES=		java
+JAVA_VERSION=	21+
 
 NO_ARCH=	yes
 NO_BUILD=	yes
 SUB_FILES=	minecraft-server pkg-deinstall pkg-message
-SUB_LIST=	JAVA_VERSION=${JAVA_VERSION} VERSION=${DISTVERSION}
+SUB_LIST=	JAVA_VERSION=${JAVA_PORT_VERSION} VERSION=${DISTVERSION}
 
 USERS=		mcserver
 GROUPS=		${USERS}
@@ -43,13 +44,12 @@ DAEMON_RUN_DEPENDS=	tmux:sysutils/tmux
 DAEMON_VARS=		USE_RC_SUBR=minecraft
 
 do-install:
-	${MKDIR} ${STAGEDIR}${PREFIX}/${PORTNAME}
+	${MKDIR} ${STAGEDIR}${PREFIX}/${PORTNAME} \
+		 ${STAGEDIR}${ETCDIR} \
+		 ${STAGEDIR}/var/db/minecraft-server \
+		 ${STAGEDIR}/var/log/minecraft-server/debug
 	${INSTALL_DATA} ${DISTDIR}/${DIST_SUBDIR}/${DISTFILES} \
 		${STAGEDIR}${PREFIX}/${PORTNAME}
-	${MKDIR} ${STAGEDIR}${ETCDIR}
-	${MKDIR} ${STAGEDIR}/var/db/minecraft-server
-	${MKDIR} ${STAGEDIR}/var/log/minecraft-server
-	${MKDIR} ${STAGEDIR}/var/log/minecraft-server/debug
 .for file in ${CONFIG_FILES}
 	${LN} -s ${ETCDIR}/${file} ${STAGEDIR}${PREFIX}/${PORTNAME}/${file}
 .endfor
@@ -60,6 +60,6 @@ do-install:
 post-install-STANDALONE-on:
 	${INSTALL_SCRIPT} ${WRKDIR}/minecraft-server \
 		${STAGEDIR}${PREFIX}/bin
-	${CP} ${FILESDIR}/java-args.txt ${STAGEDIR}${ETCDIR}
+	${INSTALL_DATA} ${FILESDIR}/java-args.txt ${STAGEDIR}${ETCDIR}
 
 .include <bsd.port.mk>

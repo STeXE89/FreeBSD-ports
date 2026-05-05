@@ -1,6 +1,6 @@
---- base/debug/elf_reader.cc.orig	2024-06-25 12:08:48 UTC
+--- base/debug/elf_reader.cc.orig	2026-02-16 10:45:29 UTC
 +++ base/debug/elf_reader.cc
-@@ -50,6 +50,10 @@ using Xword = Elf64_Xword;
+@@ -45,6 +45,10 @@ using Xword = Elf64_Xword;
  
  constexpr char kGnuNoteName[] = "GNU";
  

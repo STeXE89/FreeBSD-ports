@@ -1,90 +1,21 @@
---- chrome/browser/flag_descriptions.h.orig	2024-06-22 08:49:42 UTC
+--- chrome/browser/flag_descriptions.h.orig	2026-03-15 18:32:51 UTC
 +++ chrome/browser/flag_descriptions.h
-@@ -1705,7 +1705,7 @@ extern const char kCbdTimeframeRequiredName[];
- extern const char kCbdTimeframeRequiredDescription[];
+@@ -8310,6 +8310,18 @@ inline constexpr char kEnableOktaSSOName[] =
+ inline constexpr char kEnableOktaSSODescription[] =
+     "Enables native support for Okta SSO on managed MacOS devices.";
  
- #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
--    BUILDFLAG(IS_CHROMEOS_ASH)
-+    BUILDFLAG(IS_CHROMEOS_ASH) || BUILDFLAG(IS_BSD)
- extern const char kPolicyIndicationForManagedDefaultSearchName[];
- extern const char kPolicyIndicationForManagedDefaultSearchDescription[];
- #endif
-@@ -1876,7 +1876,7 @@ extern const char kShowAutofillTypePredictionsName[];
- extern const char kShowAutofillTypePredictionsDescription[];
- 
- #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
--    BUILDFLAG(IS_CHROMEOS)
-+    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
- extern const char kShowFeaturedEnterpriseSiteSearchName[];
- extern const char kShowFeaturedEnterpriseSiteSearchDescription[];
- #endif
-@@ -1891,7 +1891,7 @@ extern const char kSiteInstanceGroupsForDataUrlsName[]
- extern const char kSiteInstanceGroupsForDataUrlsDescription[];
- 
- #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
--    BUILDFLAG(IS_CHROMEOS)
-+    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
- extern const char kSiteSearchSettingsPolicyName[];
- extern const char kSiteSearchSettingsPolicyDescription[];
- #endif
-@@ -4350,7 +4350,7 @@ extern const char kLacrosMergeIcuDataFileName[];
- extern const char kLacrosMergeIcuDataFileDescription[];
- #endif  // #if BUILDFLAG(IS_CHROMEOS_LACROS)
- 
--#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
-+#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
- extern const char kGetAllScreensMediaName[];
- extern const char kGetAllScreensMediaDescription[];
- #endif  // BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
-@@ -4505,7 +4505,7 @@ extern const char kV4L2FlatStatefulVideoDecoderDescrip
- 
- // Linux ---------------------------------------------------------------------
- 
--#if BUILDFLAG(IS_LINUX)
-+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
- extern const char kOzonePlatformHintChoiceDefault[];
- extern const char kOzonePlatformHintChoiceAuto[];
- extern const char kOzonePlatformHintChoiceX11[];
-@@ -4547,7 +4547,7 @@ extern const char kWebBluetoothConfirmPairingSupportNa
- extern const char kWebBluetoothConfirmPairingSupportDescription[];
- #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
- 
--#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
-+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_BSD)
- extern const char kSkipUndecryptablePasswordsName[];
- extern const char kSkipUndecryptablePasswordsDescription[];
- 
-@@ -4559,13 +4559,13 @@ extern const char kRestartToGainAccessToKeychainDescri
- #endif  // BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC)
- 
- #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
--    BUILDFLAG(IS_CHROMEOS)
-+    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
- extern const char kFollowingFeedSidepanelName[];
- extern const char kFollowingFeedSidepanelDescription[];
- #endif  // BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
-         //  BUILDFLAG(IS_CHROMEOS)
- 
--#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
-+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
- extern const char kEnableNetworkServiceSandboxName[];
- extern const char kEnableNetworkServiceSandboxDescription[];
- 
-@@ -4661,7 +4661,7 @@ extern const char kElementCaptureDescription[];
- 
- #if BUILDFLAG(IS_WIN) ||                                      \
-     (BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS_LACROS)) || \
--    BUILDFLAG(IS_MAC)
-+    BUILDFLAG(IS_MAC) || BUILDFLAG(IS_BSD)
- extern const char kUIDebugToolsName[];
- extern const char kUIDebugToolsDescription[];
- 
-@@ -4704,7 +4704,7 @@ extern const char kComposeNudgeAtCursorName[];
- extern const char kComposeNudgeAtCursorDescription[];
- #endif  // BUILDFLAG(ENABLE_COMPOSE)
- 
--#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
-+#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD)
- extern const char kThirdPartyProfileManagementName[];
- extern const char kThirdPartyProfileManagementDescription[];
- 
++#if BUILDFLAG(IS_BSD)
++inline constexpr char kAudioBackendName[] =
++    "Audio Backend";
++inline constexpr char kAudioBackendDescription[] =
++#if BUILDFLAG(IS_OPENBSD)
++    "Select the desired audio backend to use. The default is sndio.";
++#elif BUILDFLAG(IS_FREEBSD)
++    "Select the desired audio backend to use. The default will automatically "
++    "enumerate through the supported backends.";
++#endif
++#endif
++
+ // ============================================================================
+ // Don't just add flags to the end, put them in the alphabetical order.
+ // ============================================================================

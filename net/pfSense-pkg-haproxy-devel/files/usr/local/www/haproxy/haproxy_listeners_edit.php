@@ -3,7 +3,7 @@
  * haproxy_listeners_edit.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013-2015 PiBa-NL
  * Copyright (c) 2008 Remco Hoef <remcoverhoef@pfsense.com>
  * Copyright (c) 2013 Marcello Coutinho <marcellocoutinho@gmail.com>
@@ -41,7 +41,7 @@ if (!function_exists("cert_get_purpose")) {
 
 haproxy_config_init();
 
-$a_pools = config_get_path('installedpackages/haproxy/ha_pools/item');
+$a_pools = config_get_path('installedpackages/haproxy/ha_pools/item', []);
 uasort($a_pools, 'haproxy_compareByName');
 
 global $simplefields;
@@ -319,13 +319,6 @@ if (isset($_GET['dup'])) {
 $changedesc = "Services: HAProxy: Frontend";
 $changecount = 0;
 
-/* Deal with the renae is_portoralias -> is_port_or_alias() */
-if (!function_exists('is_port_or_alias')) {
-	function is_port_or_alias($port) {
-		return is_portoralias($port);
-	}
-}
-
 if ($_POST) {
 	$changecount++;
 
@@ -364,7 +357,7 @@ if ($_POST) {
 	}
 
 	/* Ensure that our pool names are unique */
-	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item');
+	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 	for ($i=0; isset($a_frontends[$i]); $i++) {
 		if (($_POST['name'] == $a_frontends[$i]['name']) && ($i != $id)) {
 			$input_errors[] = gettext("This frontend name has already been used. Frontend names must be unique.")." $i != $id";
@@ -425,45 +418,73 @@ if ($_POST) {
 		}
 	}
 	if (!$input_errors) {
-		$backend = array();
-		if(isset($id) && config_get_path("installedpackages/haproxy/ha_backends/item/{$id}")) {
-			$backend = config_get_path("installedpackages/haproxy/ha_backends/item/{$id}");
-		}
-
-		if($backend['name'] != "") {
+		$backends_config = config_get_path('installedpackages/haproxy/ha_backends', []);
+		if (isset($id)) {
+			array_init_path($backends_config, "item/{$id}");
+			$backend = &$backends_config['item'][$id];
 			$changedesc .= " modified '{$backend['name']}' pool:";
+		} else {
+			$backends_config['item'][] = [];
+			$backend = &$backends_config['item'][array_key_last($backends_config['item'])];
+			$backend['name'] = $_POST['name'];
 		}
 
 		// update references to this primary frontend
 		if ($backend['name'] != $_POST['name']) {
-			foreach(config_get_path('installedpackages/haproxy/ha_backends/item', []) as $fidx => $frontend) {
-				if ($frontend['primary_frontend'] == $backend['name']) {
-					config_set_path("installedpackages/haproxy/ha_backends/item/{$fidx}/primary_frontend", $_POST['name']);
+			foreach($backends_config['item'] as &$frontend_config) {
+				if (array_get_path($frontend_config, 'primary_frontend') != $backend['name']) {
+					continue;
 				}
+				$frontend_config['primary_frontend'] = $_POST['name'];
 			}
 		}
 
 		foreach($simplefields as $stat) {
 			update_if_changed($stat, $backend[$stat], $_POST[$stat]);
-			if (empty($backend[$stat])) {
+			if (isset($backend[$stat]) && ($backend[$stat] != 0) && empty($backend[$stat])) {
 				unset($backend[$stat]);
 			}
 		}
 
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
-		array_set_path($backend,'ha_acls/item', $a_acl);
-		array_set_path($backend,'ha_certificates/item', $a_certificates);
-		array_set_path($backend,'clientcert_ca/item', $a_clientcert_ca);
-		array_set_path($backend,'clientcert_crl/item', $a_clientcert_crl);
-		array_set_path($backend,'a_extaddr/item', $a_extaddr);
-		array_set_path($backend,'a_actionitems/item', $a_actionitems);
-		array_set_path($backend,'a_errorfiles/item', $a_errorfiles);
 
-		if (isset($id) && config_get_path("installedpackages/haproxy/ha_backends/item/{$id}")) {
-			config_set_path("installedpackages/haproxy/ha_backends/item/{$id}", $backend);
+		if (!empty($a_acl)) {
+			array_set_path($backend,'ha_acls/item', $a_acl);
 		} else {
-			config_set_path('installedpackages/haproxy/ha_backends/item/', $backend);
+			array_del_path($backend,'ha_acls/item');
 		}
+		if (!empty($a_certificates)) {
+			array_set_path($backend,'ha_certificates/item', $a_certificates);
+		} else {
+			array_del_path($backend,'ha_certificates/item');
+		}
+		if (!empty($a_clientcert_ca)) {
+			array_set_path($backend,'clientcert_ca/item', $a_clientcert_ca);
+		} else {
+			array_del_path($backend,'clientcert_ca/item');
+		}
+		if (!empty($a_clientcert_crl)) {
+			array_set_path($backend,'clientcert_crl/item', $a_clientcert_crl);
+		} else {
+			array_del_path($backend,'clientcert_crl/item');
+		}
+		if (!empty($a_extaddr)) {
+			array_set_path($backend,'a_extaddr/item', $a_extaddr);
+		} else {
+			array_del_path($backend,'a_extaddr/item');
+		}
+		if (!empty($a_actionitems)) {
+			array_set_path($backend,'a_actionitems/item', $a_actionitems);
+		} else {
+			array_del_path($backend,'a_actionitems/item');
+		}
+		if (!empty($a_errorfiles)) {
+			array_set_path($backend,'a_errorfiles/item', $a_errorfiles);
+		} else {
+			array_del_path($backend,'a_errorfiles/item');
+		}
+
+		config_set_path('installedpackages/haproxy/ha_backends', $backends_config);
 
 		if ($changecount > 0) {
 			touch($d_haproxyconfdirty_path);

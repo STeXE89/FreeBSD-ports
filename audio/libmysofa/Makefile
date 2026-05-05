@@ -1,6 +1,6 @@
 PORTNAME=	libmysofa
 DISTVERSIONPREFIX=	v
-DISTVERSION=	1.3.2
+DISTVERSION=	1.3.3
 CATEGORIES=	audio
 
 MAINTAINER=	jhale@FreeBSD.org
@@ -12,7 +12,7 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 TEST_DEPENDS=	node:www/node
 
-USES=		cmake cpe pathfix
+USES=		cmake cpe
 CPE_VENDOR=	symonics
 USE_GITHUB=	yes
 GH_ACCOUNT=	hoene

@@ -1,6 +1,6 @@
 PORTNAME=	cargo-hack
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.6.28
+DISTVERSION=	0.6.43
 PORTREVISION=	1
 CATEGORIES=	devel
 
@@ -18,60 +18,57 @@ USES=		cargo
 USE_GITHUB=	yes
 GH_ACCOUNT=	taiki-e
 
-CARGO_CRATES=	anyhow-1.0.86 \
-		autocfg-1.3.0 \
-		bitflags-2.5.0 \
-		build-context-0.1.2 \
-		cargo-config2-0.1.26 \
-		cfg-if-1.0.0 \
-		cfg_aliases-0.1.1 \
-		ctrlc-3.4.4 \
-		easy-ext-1.0.1 \
-		equivalent-1.0.1 \
-		errno-0.3.9 \
-		fastrand-2.1.0 \
-		fs-err-2.11.0 \
-		hashbrown-0.14.5 \
-		home-0.5.9 \
-		indexmap-2.2.6 \
-		itoa-1.0.11 \
-		lexopt-0.3.0 \
-		libc-0.2.155 \
-		linux-raw-sys-0.4.14 \
-		memchr-2.7.2 \
-		nix-0.28.0 \
-		proc-macro2-1.0.82 \
-		quote-1.0.36 \
-		rustix-0.38.34 \
-		ryu-1.0.18 \
+CARGO_CRATES=	anyhow-1.0.102 \
+		autocfg-1.5.0 \
+		bitflags-2.11.0 \
+		block2-0.6.2 \
+		build-context-0.1.4 \
+		cargo-config2-0.1.43 \
+		cfg-if-1.0.4 \
+		cfg_aliases-0.2.1 \
+		ctrlc-3.5.2 \
+		dispatch2-0.3.1 \
+		easy-ext-1.0.3 \
+		equivalent-1.0.2 \
+		errno-0.3.14 \
+		fastrand-2.3.0 \
+		fs-err-3.3.0 \
+		hashbrown-0.16.1 \
+		indexmap-2.13.0 \
+		itoa-1.0.17 \
+		lexopt-0.3.2 \
+		libc-0.2.183 \
+		linux-raw-sys-0.12.1 \
+		memchr-2.8.0 \
+		nix-0.31.2 \
+		objc2-0.6.4 \
+		objc2-encode-4.1.0 \
+		once_cell-1.21.3 \
+		proc-macro2-1.0.106 \
+		quote-1.0.45 \
+		rustix-1.1.4 \
 		same-file-1.0.6 \
-		serde-1.0.202 \
-		serde_derive-1.0.202 \
-		serde_json-1.0.117 \
-		serde_spanned-0.6.6 \
-		slab-0.4.9 \
-		syn-2.0.64 \
-		tempfile-3.10.1 \
+		serde-1.0.228 \
+		serde_core-1.0.228 \
+		serde_derive-1.0.228 \
+		serde_json-1.0.149 \
+		serde_spanned-1.0.4 \
+		syn-2.0.117 \
+		tempfile-3.27.0 \
 		termcolor-1.4.1 \
-		toml_datetime-0.6.6 \
-		toml_edit-0.22.13 \
-		unicode-ident-1.0.12 \
-		winapi-util-0.1.8 \
-		windows-sys-0.52.0 \
-		windows-targets-0.52.5 \
-		windows_aarch64_gnullvm-0.52.5 \
-		windows_aarch64_msvc-0.52.5 \
-		windows_i686_gnu-0.52.5 \
-		windows_i686_gnullvm-0.52.5 \
-		windows_i686_msvc-0.52.5 \
-		windows_x86_64_gnu-0.52.5 \
-		windows_x86_64_gnullvm-0.52.5 \
-		windows_x86_64_msvc-0.52.5 \
-		winnow-0.6.8
+		toml-1.0.6+spec-1.1.0 \
+		toml_datetime-1.0.0+spec-1.1.0 \
+		toml_edit-0.25.4+spec-1.1.0 \
+		toml_parser-1.0.9+spec-1.1.0 \
+		toml_writer-1.0.6+spec-1.1.0 \
+		unicode-ident-1.0.24 \
+		winapi-util-0.1.11 \
+		windows-link-0.2.1 \
+		windows-sys-0.61.2 \
+		winnow-0.7.15 \
+		zmij-1.0.21 \
+		test-helper@git+https://github.com/taiki-e/test-helper.git?rev=f38a7f5\#f38a7f5895cb5f562195c6116cffc139d712acf5
 
 PLIST_FILES=	bin/${PORTNAME}
-
-post-install:
-	@${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/${PORTNAME}
 
 .include <bsd.port.mk>

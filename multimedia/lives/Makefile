@@ -1,9 +1,9 @@
 PORTNAME=	lives
 DISTVERSION=	3.2.0
-PORTREVISION=	23
+PORTREVISION=	26
 CATEGORIES=	multimedia
 MASTER_SITES=	http://lives-video.com/releases/
-DISTNAME=	LiVES-${PORTVERSION}
+DISTNAME=	LiVES-${DISTVERSION}
 
 MAINTAINER=	vvd@FreeBSD.org
 COMMENT=	Video editing system
@@ -14,23 +14,19 @@ LICENSE_COMB=		multi
 LICENSE_FILE_GPLv3+ =	${WRKSRC}/COPYING
 LICENSE_FILE_LGPL3+ =	${WRKSRC}/COPYING.LGPL
 
-BROKEN=		fails to build with FFmpeg 6
-
 BUILD_DEPENDS=	${LOCALBASE}/include/linux/input.h:devel/evdev-proto \
 		analyseplugin:audio/ladspa
 LIB_DEPENDS=	liboil-0.3.so:devel/liboil \
 		libpng.so:graphics/png \
-		libavcodec.so:multimedia/ffmpeg \
 		libmjpegutils.so:multimedia/mjpegtools
 RUN_DEPENDS=	analyseplugin:audio/ladspa \
 		ffprobe:multimedia/ffmpeg \
 		sox:audio/sox
 
-USES=		autoreconf compiler:c++11-lib gettext-runtime gettext-tools \
-		gl gnome libtool localbase pathfix perl5 pkgconfig python \
-		sdl shebangfix xorg
+USES=		autoreconf compiler:c++11-lib gettext gl gnome libtool \
+		localbase pathfix perl5 pkgconfig python sdl shebangfix xorg
 USE_GL=		gl glu
-USE_GNOME=	cairo gdkpixbuf2 gtk30 intltool
+USE_GNOME=	cairo gdkpixbuf gtk30 intltool
 USE_LDCONFIG=	yes
 USE_SDL=	sdl sdl2
 USE_XORG=	x11 xrender
@@ -41,10 +37,9 @@ SHEBANG_FILES=	build-lives-rfx-plugin build-lives-rfx-plugin-multi smogrify \
 		lives-plugins/plugins/encoders/multi_encoder3 \
 		lives-plugins/plugins/playback/audiostream/audiostreamer.pl
 GNU_CONFIGURE=	yes
-
 CONFIGURE_ARGS=	--disable-ldvgrab --disable-prctl --disable-system-weed --disable-dirac
 INSTALL_TARGET=	install-strip
-WRKSRC=		${WRKDIR}/${PORTNAME}-${PORTVERSION}
+WRKSRC=		${WRKDIR}/${PORTNAME}-${DISTVERSION}
 
 DOC_FILES=	AUTHORS COPYING COPYING.LGPL ChangeLog FEATURES GETTING.STARTED NEWS README \
 		OMC/lives-OMC.txt RFX/LiVES-Perl.odt RFX/rfxbuilder.odt \
@@ -52,12 +47,13 @@ DOC_FILES=	AUTHORS COPYING COPYING.LGPL ChangeLog FEATURES GETTING.STARTED NEWS 
 		lives-plugins/marcos-encoders/README.multi_encoder \
 		weed-docs/weedspec.txt weed-docs/weedevents.txt
 
-OPTIONS_DEFINE=			ALSA DOCS DOXYGEN DV FFTW FREI0R JACK IMAGEMAGICK LIBEXPLAIN \
-				LIBVISUAL OGG OPENCV OPTIMIZED_CFLAGS NLS PROJECTM PULSEAUDIO \
-				THEORA V4L WAYLAND
-OPTIONS_DEFAULT=		CDDA2WAV DOCS DV FFTW GHOSTSCRIPT IMAGEMAGICK JACK LAME \
-				MPG123 MPLAYER NLS OGG123 OGG OGM OPENCV \
-				THEORA X264 XDG_SCREENSAVER XDOTOOL XWININFO YTDLP
+OPTIONS_DEFINE=		ALSA DOCS DOXYGEN DV FFMPEG FFTW FREI0R IMAGEMAGICK \
+			JACK LIBEXPLAIN LIBVISUAL NLS OGG OPENCV \
+			OPTIMIZED_CFLAGS PROJECTM PULSEAUDIO THEORA V4L WAYLAND
+OPTIONS_DEFAULT=	CDDA2WAV DV FFTW GHOSTSCRIPT IMAGEMAGICK JACK \
+			LAME MPG123 MPLAYER OGG OGG123 OGM THEORA X264 \
+			XDG_SCREENSAVER XDOTOOL XWININFO YTDLP
+
 OPTIONS_GROUP=			RUNTIME EXT_WIN_CAPTURE MPLAYERS MP3
 OPTIONS_GROUP_EXT_WIN_CAPTURE=	WMCTRL XDOTOOL
 OPTIONS_GROUP_MP3=		MPG123 MPG321
@@ -96,6 +92,13 @@ DV_LIB_DEPENDS=			libdv.so:multimedia/libdv
 DV_RUN_DEPENDS=			encodedv:multimedia/libdv
 DV_CONFIGURE_OFF=		--disable-libdv
 
+FFMPEG_BROKEN=			Crashes at runtime if the FFMPEG option is enabled
+FFMPEG_LIB_DEPENDS=		libavcodec.so.58:multimedia/ffmpeg4
+FFMPEG_CONFIGURE_OFF=		--disable-ffmpeg
+FFMPEG_CONFIGURE_ENV=		PKG_CONFIG_PATH="${LOCALBASE}/ffmpeg4/libdata/pkgconfig"
+FFMPEG_CFLAGS=			-I${LOCALBASE}/ffmpeg4/include
+FFMPEG_LDFLAGS=			-L${LOCALBASE}/ffmpeg4/lib
+
 FFTW_LIB_DEPENDS=		libfftw3.so:math/fftw3 \
 				libfftw3f.so:math/fftw3-float
 FFTW_CONFIGURE_OFF=		--disable-fftw3f
@@ -131,8 +134,6 @@ MPG321_RUN_DEPENDS=		mpg321:audio/mpg321
 MPLAYER_RUN_DEPENDS=		mplayer:multimedia/mplayer
 
 MPV_RUN_DEPENDS=		mpv:multimedia/mpv
-
-NLS_USES=			gettext-tools
 
 OGG123_RUN_DEPENDS=		ogg123:audio/vorbis-tools
 
@@ -186,6 +187,14 @@ post-patch:
 		${WRKSRC}/lives-plugins/weed-plugins/frei0r.c
 	@${REINPLACE_CMD} 's|/usr/bin/perl|${perl_CMD}|' \
 		${WRKSRC}/build-lives-rfx-plugin
+	@${REINPLACE_CMD} -e '/haar_analyser\.la/d' \
+		${WRKSRC}/lives-plugins/weed-plugins/gdk/Makefile.am
+# ISO C++17 does not allow 'register' storage class specifier
+	@${REINPLACE_CMD} -e 's,register int,int,' \
+		${WRKSRC}/lives-plugins/plugins/playback/video/openGL.cpp \
+		${WRKSRC}/lives-plugins/weed-plugins/farneback_analyser.cpp \
+		${WRKSRC}/lives-plugins/weed-plugins/gdk/haar_analyser.cpp \
+		${WRKSRC}/lives-plugins/weed-plugins/projectM.cpp
 
 pre-build-NLS-on:
 	@(cd ${WRKSRC}/po && ${DO_MAKE_BUILD} update-po)

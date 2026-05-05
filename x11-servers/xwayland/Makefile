@@ -1,12 +1,12 @@
 PORTNAME=	xwayland
-PORTVERSION=	24.1.0
+PORTVERSION=	24.1.9
 PORTEPOCH=	1
 CATEGORIES=	x11-servers
 MASTER_SITES=	XORG/individual/xserver
 
 MAINTAINER=	x11@FreeBSD.org
 COMMENT=	X11 server as Wayland client
-WWW=		https://wayland.freedesktop.org/xserver.html
+WWW=		https://wayland.freedesktop.org/
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/COPYING
@@ -29,6 +29,7 @@ USE_XORG=	pixman xau xdmcp xfont2 xkbfile xshmfence xtrans
 
 MESON_ARGS=	-Dxvfb=false \
 		-Dxcsecurity=true \
+		-Dsecure-rpc=false \
 		-Dxkb_output_dir=/var/lib/xkb \
 		-Ddefault_font_path="${DEFAULT_FONTPATH_LIST:ts,}"
 

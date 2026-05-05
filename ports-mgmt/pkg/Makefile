@@ -1,5 +1,5 @@
 PORTNAME=	pkg
-DISTVERSION=	1.21.3
+DISTVERSION=	2.6.2
 PORTREVISION=	1
 _PKG_VERSION=	${DISTVERSION}
 CATEGORIES=	ports-mgmt
@@ -26,7 +26,6 @@ CONFIGURE_ENV=	CC_FOR_BUILD="${CC}"
 # so that pkg-static is used from the wrkdir
 USE_SUBMAKE=	yes
 CFLAGS+=	-Wno-error
-CFLAGS_powerpc64le=	-DSQLITE_BYTEORDER=1234
 
 OPTIONS_DEFINE=	DOCS
 
@@ -58,6 +57,7 @@ PKG_BIN=	${WRKSRC}/src/pkg-static
 
 post-install:
 	@${MKDIR} ${STAGEDIR}${PREFIX}/lib/compat/pkg
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/libpkg.so ${STAGEDIR}${PREFIX}/sbin/pkg*
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}

@@ -1,6 +1,6 @@
 PORTNAME=	cpp-httplib
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.16.0
+DISTVERSION=	0.37.2
 CATEGORIES=	www devel
 
 MAINTAINER=	yuri@FreeBSD.org
@@ -44,7 +44,11 @@ BROTLI_RUN_DEPENDS=	brotli>0:archivers/brotli
 SSL_USES=		ssl
 SSL_CMAKE_BOOL=		HTTPLIB_REQUIRE_OPENSSL HTTPLIB_USE_OPENSSL_IF_AVAILABLE
 
-do-test: # 5 test fail, see https://github.com/yhirose/cpp-httplib/issues/1339
+do-test:
 	@cd ${WRKSRC}/test && ${SETENV} ${MAKE_ENV} ${GMAKE} CXXFLAGS="${CXXFLAGS} -I${WRKSRC}/test" LDFLAGS="${LDFLAGS}"
+
+# tests as of 0.35.0:
+# [==========] 611 tests from 132 test suites ran. (192695 ms total)
+# [  PASSED  ] 611 tests.
 
 .include <bsd.port.mk>

@@ -1,13 +1,14 @@
 PORTNAME=	pyTooling
 DISTVERSIONPREFIX=	v
-DISTVERSION=	6.3.0
+DISTVERSION=	8.11.0
 CATEGORIES=	devel
 #MASTER_SITES=	PYPI # requirements.txt is missing
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
 MAINTAINER=	yuri@FreeBSD.org
 COMMENT=	Collection of arbitrary classes, decorators, meta-classes, exceptions
-WWW=		https://pytooling.github.io/pyTooling/
+WWW=		https://pytooling.github.io/pyTooling/ \
+		https://github.com/pyTooling/pyTooling
 
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE.md
@@ -28,11 +29,13 @@ TEST_DEPENDS=	${PYTHON_PKGNAMEPREFIX}anytree>=2.8.0:devel/py-anytree@${PY_FLAVOR
 		${PYTHON_PKGNAMEPREFIX}treelib>0:devel/py-treelib@${PY_FLAVOR}
 
 USES=		python
-USE_PYTHON=	pep517 autoplist pytest # 104 tests fail, see https://github.com/pyTooling/pyTooling/issues/123
+USE_PYTHON=	pep517 autoplist unittest # 8 tests fail, see https://github.com/pyTooling/pyTooling/issues/123#issuecomment-2362275029
 USE_GITHUB=	yes
 
 NO_ARCH=	yes
 
-TEST_WRKSRC=	${WRKSRC}/tests
+TEST_WRKSRC=	${WRKSRC}
+
+# tests as of 8.3.0: 6 failed, 858 passed, 17 skipped, 6 xfailed in 20.75s
 
 .include <bsd.port.mk>

@@ -3,7 +3,7 @@
  * syslog-ng.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2012 Lance Leger
  * All rights reserved.
  *
@@ -33,6 +33,7 @@ if (!function_exists("filter_configure")) {
 
 define("SYSLOGNG_BASEDIR", "/usr/local/");
 define('SYSLOGNG_DIR', "/var/etc/syslog-ng/");
+define('LOG_PREFIX_PKG_SYSLOGNG', 'syslog-ng');
 
 function syslogng_get_real_interface_address($interface) {
 	$interface = convert_friendly_interface_to_real_interface_name($interface);
@@ -42,13 +43,13 @@ function syslogng_get_real_interface_address($interface) {
 
 function syslogng_install_command() {
 	$crontask = "/usr/bin/nice -n20 " . SYSLOGNG_BASEDIR . "sbin/logrotate /usr/local/etc/logrotate.conf";
-	install_cron_job("${crontask}", true, "0");
+	install_cron_job("{$crontask}", true, "0");
 	syslogng_resync();
 }
 
 function syslogng_deinstall_command() {
 	$crontask = "/usr/bin/nice -n20 " . SYSLOGNG_BASEDIR . "sbin/logrotate /usr/local/etc/logrotate.conf";
-	install_cron_job("${crontask}", false);
+	install_cron_job("{$crontask}", false);
 	unlink_if_exists("/usr/local/etc/logrotate.conf");
 	unlink_if_exists("/usr/local/etc/syslog-ng.conf");
 	filter_configure();
@@ -234,7 +235,7 @@ function syslogng_build_conf($objects) {
 function syslogng_build_logrotate_conf($settings, $objects) {
 	if ($settings['enable'] != 'on') {
 		$crontask = "/usr/bin/nice -n20 " . SYSLOGNG_BASEDIR . "sbin/logrotate /usr/local/etc/logrotate.conf";
-		install_cron_job("${crontask}", false);
+		install_cron_job("{$crontask}", false);
 		unlink_if_exists('/usr/local/etc/logrotate.conf');
 		return '';
 	}
@@ -271,7 +272,7 @@ function syslogng_build_logrotate_conf($settings, $objects) {
 
 	file_put_contents('/usr/local/etc/logrotate.conf', $conf);
 	$crontask = "/usr/bin/nice -n20 " . SYSLOGNG_BASEDIR . "sbin/logrotate /usr/local/etc/logrotate.conf";
-	install_cron_job("${crontask}", true, "0");
+	install_cron_job("{$crontask}", true, "0");
 	return $conf;
 }
 
@@ -380,10 +381,10 @@ function syslogng_resync() {
 		}
 
 		if (!is_service_running('syslog-ng')) {
-			log_error("Starting syslog-ng");
+			logger(LOG_INFO, localize_text("Starting service"), LOG_PREFIX_PKG_SYSLOGNG);
 			start_service("syslog-ng");
 		} else {
-			log_error("Reloading syslog-ng for configuration sync");
+			logger(LOG_INFO, localize_text("Reloading service for configuration sync"), LOG_PREFIX_PKG_SYSLOGNG);
 			restart_service("syslog-ng");
 		}
 
@@ -395,7 +396,7 @@ function syslogng_resync() {
 		}
 	} else {
 		if (is_service_running('syslog-ng')) {
-			log_error("Stopping syslog-ng");
+			logger(LOG_INFO, localize_text("Stopping service"), LOG_PREFIX_PKG_SYSLOGNG);
 			stop_service("syslog-ng");
 		}
 		unlink_if_exists("/usr/local/etc/syslog-ng.conf");

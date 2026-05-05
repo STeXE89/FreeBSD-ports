@@ -20,6 +20,24 @@
  */
 
 namespace { // global code
+	/* Temporary stopgap until all releases have new logger and localize_text */
+	if (!function_exists('logger')) {
+		function logger($priority, $message, $prefix = null) {
+			if (isset($prefix)) {
+				$message = "[{$prefix}] {$message}";
+			}
+			syslog($priority, $message);
+		}
+	}
+	if (!function_exists('localize_text')) {
+		function localize_text(...$args) {
+			$arg0_len = strlen($args[0]);
+			if (($arg0_len > 0) && ($arg0_len < 4096)) {
+				$args[0] = gettext($args[0]);
+			}
+			return (count($args) == 1) ? $args[0] : sprintf(...$args);
+		}
+	}
 	/* Write an ACME certificates to the filesystem. */
 	function acme_write_certificate($certref) {
 		$prefix = '/conf/acme';
@@ -157,7 +175,8 @@ require_once("acme_utils.inc");
 require_once("acme_sh.inc");
 require_once("acme/acme_serverconnectors.inc");
 
-$d_acmeconfdirty_path = $g['varrun_path'] . "/acme.conf.dirty";
+define('LOG_PREFIX_PKG_ACME', 'ACME');
+
 #region global array item definitions..
 // <editor-fold desc="global array item definitions">
 
@@ -168,20 +187,12 @@ $a_enabledisable['disable'] = array('name' => 'Disabled');
 global $a_acmeserver;
 $a_acmeserver = array();
 $a_acmeserver['letsencrypt-staging-2'] = [
-	'name' => "Let's Encrypt Staging ACME v2 (For TESTING purposes)",
+	'name' => "Let's Encrypt Staging (For TESTING purposes)",
 	'url' => 'https://acme-staging-v02.api.letsencrypt.org/directory'
 ];
 $a_acmeserver['letsencrypt-production-2'] = [
-	'name' => "Let's Encrypt Production ACME v2 (Applies rate limits to certificate requests)",
+	'name' => "Let's Encrypt Production (Applies rate limits to certificate requests)",
 	'url' => 'https://acme-v02.api.letsencrypt.org/directory'
-];
-$a_acmeserver['buypass-staging'] = [
-	'name' => "BuyPass Staging (For TESTING purposes)",
-	'url' => 'https://api.test4.buypass.no/acme/directory'
-];
-$a_acmeserver['buypass-production'] = [
-	'name' => "BuyPass Production ACME v1 (Applies rate limits to certificate requests)",
-	'url' => 'https://api.buypass.com/acme/directory'
 ];
 $a_acmeserver['zerossl-production'] = [
 	'name' => "ZeroSSL Production (Applies rate limits to certificate requests)",
@@ -196,17 +207,32 @@ $a_acmeserver['sslcom-ecc-production'] = [
 	'url' => 'https://acme.ssl.com/sslcom-dv-ecc'
 ];
 $a_acmeserver['google-staging'] = [
-	'name' => "Google ACMEv2 Staging (For TESTING purposes)",
+	'name' => "Google Staging (For TESTING purposes)",
 	'url' => 'https://dv.acme-v02.test-api.pki.goog/directory'
 ];
 $a_acmeserver['google-production'] = [
-	'name' => "Google Production ACME v2 (Applies rate limits to certificate requests)",
+	'name' => "Google Production (Applies rate limits to certificate requests)",
 	'url' => 'https://dv.acme-v02.api.pki.goog/directory'
+];
+$a_acmeserver['actalis'] = [
+	'name' => "Actalis (Free certificates may only have the doimain and www subdomain. No wildcards.)",
+	'url' => 'https://acme-api.actalis.com/acme/directory'
 ];
 /*$a_acmeserver['dummy'] = [
 	'name' => "dummy",
 	'url' => 'https://example.org'
 ];*/
+
+foreach (config_get_path('installedpackages/acme/customacme/servers', []) as $cas) {
+	if (empty($cas['intid']) ||
+	    empty($cas['url'])) {
+		continue;
+	}
+	$a_acmeserver[$cas['intid']] = [
+		'name' => $cas['name'],
+		'url' => $cas['url']
+	];
+}
 
 global $acme_domain_validation_method;
 $acme_domain_validation_method = [];
@@ -410,10 +436,33 @@ $acme_domain_validation_method['dns_acmedns'] = [
 $acme_domain_validation_method['dns_active24'] = [
 	'name' => 'DNS-Active24',
 	'fields' => [
-		'ACTIVE24_Token' => [
-			'name' => 'active24_token',
-			'description' => 'Active24 Token',
-			'columnheader' => 'Token',
+		'Active24_ApiKey' => [
+			'name' => 'active24_apikey',
+			'description' => 'Active24 API Key',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'Active24_ApiSecret' => [
+			'name' => 'active24_apisecret',
+			'description' => 'API Secret',
+			'columnheader' => 'API Secret',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_beget'] = [
+	'name' => 'DNS-Beget.com',
+	'fields' => [
+		'BEGET_User' => [
+			'name' => 'beget_user',
+			'description' => 'Beget Username',
+			'columnheader' => 'Username',
+			'type' => 'textbox',
+		],
+		'BEGET_Password' => [
+			'name' => 'beget_password',
+			'description' => 'Beget Password',
+			'columnheader' => 'Password',
 			'type' => 'password',
 		],
 	]
@@ -494,6 +543,17 @@ $acme_domain_validation_method['dns_ad'] = [
 			'name' => 'ad_api_key',
 			'description' => 'Alwaysdata API Key',
 			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_alviy'] = [
+	'name' => 'DNS-Alviy.com',
+	'fields' => [
+		'Alviy_token' => [
+			'name' => 'alviy_token',
+			'description' => 'API token (https://cloud.alviy.com/token)',
+			'columnheader' => 'API token',
 			'type' => 'password',
 		],
 	]
@@ -644,6 +704,18 @@ $acme_domain_validation_method['dns_azure'] = [
 			'columnheader' => 'Client Secret',
 			'type' => 'password',
 		],
+		'AZUREDNS_MANAGEDIDENTITY' => [
+			'name' => 'azuredns_managedidentity',
+			'description' => 'Use Managed Identity assigned to a resource instead of a service principal ("true" or "false")',
+			'columnheader' => 'Managed Identity',
+			'type' => 'textbox',
+		],
+		'AZUREDNS_BEARERTOKEN' => [
+			'name' => 'azuredns_bearertoken',
+			'description' => 'Optional token used instead of service principal credentials or managed identity',
+			'columnheader' => 'Bearer Token',
+			'type' => 'password',
+		],
 	]
 ];
 $acme_domain_validation_method['dns_bookmyname'] = [
@@ -723,34 +795,34 @@ $acme_domain_validation_method['dns_cloudns'] = [
 $acme_domain_validation_method['dns_cf'] = [
 	'name' => 'DNS-Cloudflare',
 	'fields' => [
+		'CF_Token' => [
+			'name' => 'cf_token',
+			'description' => 'Token Auth: Cloudflare API Token (https://dash.cloudflare.com/profile/api-tokens)',
+			'columnheader' => 'Token',
+			'type' => 'password',
+		],
+		'CF_Zone_ID' => [
+			'name' => 'cf_zone_id',
+			'description' => 'Token Auth: Cloudflare API Zone ID for single zone certificates',
+			'columnheader' => 'Token Zone ID',
+			'type' => 'textbox',
+		],
+		'CF_Account_ID' => [
+			'name' => 'cf_account_id',
+			'description' => 'Token Auth: Cloudflare API Account ID for multi-zone certificates',
+			'columnheader' => 'Token Account ID',
+			'type' => 'textbox',
+		],
 		'CF_Key' => [
 			'name' => 'cf_key',
-			'description' => 'Cloudflare API Key',
-			'columnheader' => 'Key',
+			'description' => 'Global Auth: Cloudflare Global API Key (https://dash.cloudflare.com/profile/api-tokens)',
+			'columnheader' => 'Global Key',
 			'type' => 'password',
 		],
 		'CF_Email' => [
 			'name' => 'cf_email',
-			'description' => 'Cloudflare API Email Address',
-			'columnheader' => 'Email',
-			'type' => 'textbox',
-		],
-		'CF_Token' => [
-			'name' => 'cf_token',
-			'description' => 'Cloudflare API Token',
-			'columnheader' => 'Token',
-			'type' => 'password',
-		],
-		'CF_Account_ID' => [
-			'name' => 'cf_account_id',
-			'description' => 'Cloudflare API Account ID',
-			'columnheader' => 'Account ID',
-			'type' => 'textbox',
-		],
-		'CF_Zone_ID' => [
-			'name' => 'cf_zone_id',
-			'description' => 'Cloudflare API Zone ID',
-			'columnheader' => 'Zone ID',
+			'description' => 'Global Auth: Cloudflare API Email Address',
+			'columnheader' => 'Global Email',
 			'type' => 'textbox',
 		],
 	]
@@ -1208,6 +1280,58 @@ $acme_domain_validation_method['dns_easydns'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_edgecenter'] = [
+	'name' => 'DNS-EdgeCenter.ru',
+	'fields' => [
+		'EDGECENTER_API_KEY' => [
+			'name' => 'edgecenter_api_key',
+			'description' => 'API Key',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_efficientip'] = [
+	'name' => 'DNS-EfficientIP',
+	'fields' => [
+		'EfficientIP_Token_Key' => [
+			'name' => 'efficientip_token_key',
+			'description' => 'API Token Key (prefered authentication)',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'EfficientIP_Token_Secret' => [
+			'name' => 'efficientip_token_secret',
+			'description' => 'API Token Secret (required for API Key)',
+			'columnheader' => 'API Secret',
+			'type' => 'password',
+		],
+		'EfficientIP_Creds' => [
+			'name' => 'efficientip_creds',
+			'description' => 'HTTP Basic Authentication in username:password form (alternate auth)',
+			'columnheader' => 'HTTP Auth',
+			'type' => 'password',
+		],
+		'EfficientIP_Server' => [
+			'name' => 'efficientip_server',
+			'description' => 'EfficientIP SOLIDserver Management IP address or FQDN',
+			'columnheader' => 'Server',
+			'type' => 'textbox',
+		],
+		'EfficientIP_DNS_Name' => [
+			'name' => 'efficientip_dns_name',
+			'description' => 'Name of the DNS smart or server hosting the zone. Optional.',
+			'columnheader' => 'DNS Name',
+			'type' => 'textbox',
+		],
+		'EfficientIP_View' => [
+			'name' => 'efficientip_view',
+			'description' => 'Name of the DNS view hosting the zone. Optional.',
+			'columnheader' => 'DNS View',
+			'type' => 'textbox',
+		],
+	]
+];
 $acme_domain_validation_method['dns_euserv'] = [
 	'name' => 'DNS-Euserv.eu',
 	'fields' => [
@@ -1270,12 +1394,29 @@ $acme_domain_validation_method['dns_freedns'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_freemyip'] = [
+	'name' => 'DNS-FreeMyIP.com',
+	'fields' => [
+		'FREEMYIP_Token' => [
+			'name' => 'freemyip_token',
+			'description' => 'API Token',
+			'columnheader' => 'Token',
+			'type' => 'password',
+		],
+	]
+];
 $acme_domain_validation_method['dns_gandi_livedns'] = [
 	'name' => 'DNS-Gandi LiveDNS',
 	'fields' => [
+		'GANDI_LIVEDNS_TOKEN' => [
+			'name' => 'gandi_livedns_token',
+			'description' => 'Gandi LiveDNS Personal Access Token (PAT)',
+			'columnheader' => 'PAT',
+			'type' => 'password',
+		],
 		'GANDI_LIVEDNS_KEY' => [
 			'name' => 'gandi_livedns_key',
-			'description' => 'Gandi LiveDNS API Key, retrieved from <a href="https://account.gandi.net">https://account.gandi.net</a>',
+			'description' => 'Gandi LiveDNS API Key (Deprecated)',
 			'columnheader' => 'API Key',
 			'type' => 'password',
 		],
@@ -1354,6 +1495,35 @@ $acme_domain_validation_method['dns_hetzner'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_hetznercloud'] = [
+	'name' => 'DNS-Hetzner Cloud DNS',
+	'fields' => [
+		'HETZNER_TOKEN' => [
+			'name' => 'hetzner_token',
+			'description' => 'Hetzner Cloud DNS API Token (required)',
+			'columnheader' => 'API Token',
+			'type' => 'password',
+		],
+		'HETZNER_TTL' => [
+			'name' => 'hetzner_ttl',
+			'description' => 'Custom TTL for new TXT rrsets (default 120)',
+			'columnheader' => 'TTL',
+			'type' => 'textbox',
+		],
+		'HETZNER_API' => [
+			'name' => 'hetzner_api',
+			'description' => 'Override API endpoint (default https://api.hetzner.cloud/v1)',
+			'columnheader' => 'API URL',
+			'type' => 'textbox',
+		],
+		'HETZNER_MAX_ATTEMPTS' => [
+			'name' => 'hetzner_max_attempts',
+			'description' => 'Number of 1s polls to wait for async actions (default 120)',
+			'columnheader' => 'Max Polls',
+			'type' => 'textbox',
+		],
+	]
+];
 $acme_domain_validation_method['dns_hexonet'] = [
 	'name' => 'DNS-Hexonet',
 	'fields' => [
@@ -1368,6 +1538,35 @@ $acme_domain_validation_method['dns_hexonet'] = [
 			'description' => 'Hexonet Password',
 			'columnheader' => 'Password',
 			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_hostup'] = [
+	'name' => 'DNS-HostUp',
+	'fields' => [
+		'HOSTUP_API_KEY' => [
+			'name' => 'hostup_api_key',
+			'description' => 'HostUp API key. Required. Must have read:dns + write:dns + read:domains scopes.',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'HOSTUP_API_BASE' => [
+			'name' => 'hostup_api_base',
+			'description' => 'Optional. Override API base URL (default: https://cloud.hostup.se/api).',
+			'columnheader' => 'API URL',
+			'type' => 'textbox',
+		],
+		'HOSTUP_TTL' => [
+			'name' => 'hostup_ttl',
+			'description' => 'Optional. TTL for TXT records (default: 60 seconds).',
+			'columnheader' => 'TTL',
+			'type' => 'textbox',
+		],
+		'HOSTUP_ZONE_ID' => [
+			'name' => 'hostup_zone_id',
+			'description' => 'Optional. Force a specific zone ID (skip auto-detection).',
+			'columnheader' => 'Zone ID',
+			'type' => 'textbox',
 		],
 	]
 ];
@@ -1407,6 +1606,17 @@ $acme_domain_validation_method['dns_he'] = [
 			'name' => 'he_password',
 			'description' => 'Hurricane Electric password',
 			'columnheader' => 'Password',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_he_ddns'] = [
+	'name' => 'DNS-Hurricane Electric HE.net DDNS',
+	'fields' => [
+		'HE_DDNS_KEY' => [
+			'name' => 'he_ddns_key',
+			'description' => 'HE.net DDNS Key',
+			'columnheader' => 'Key',
 			'type' => 'password',
 		],
 	]
@@ -1451,6 +1661,23 @@ $acme_domain_validation_method['dns_infoblox'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_infoblox_uddi'] = [
+	'name' => 'DNS-Infoblox UDDI',
+	'fields' => [
+		'Infoblox_UDDI_Key' => [
+			'name' => 'infoblox_uddi_key',
+			'description' => 'API Key for Infoblox UDDI',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'Infoblox_Portal' => [
+			'name' => 'infoblox_portal',
+			'description' => 'Portal URL, e.g. "csp.infoblox.com" or "csp.eu.infoblox.com"',
+			'columnheader' => 'URL',
+			'type' => 'textbox',
+		],
+	]
+];
 $acme_domain_validation_method['dns_infomaniak'] = [
 	'name' => 'DNS-Infomaniak',
 	'fields' => [
@@ -1487,6 +1714,17 @@ $acme_domain_validation_method['dns_ionos'] = [
 			'name' => 'ionos_secret',
 			'description' => 'Secret. Read https://beta.developer.hosting.ionos.de/docs/getstarted to learn how to get a prefix and secret.',
 			'columnheader' => 'Secret',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_ionos_cloud'] = [
+	'name' => 'DNS-IONOS Cloud DNS (ionos.com)',
+	'fields' => [
+		'IONOS_TOKEN' => [
+			'name' => 'ionos_token',
+			'description' => 'API Token',
+			'columnheader' => 'API Token',
 			'type' => 'password',
 		],
 	]
@@ -1672,8 +1910,8 @@ $acme_domain_validation_method['dns_la'] = [
 			'columnheader' => 'ID',
 			'type' => 'textbox',
 		],
-		'LA_Key' => [
-			'name' => 'la_key',
+		'LA_Sk' => [
+			'name' => 'la_sk',
 			'description' => 'Key',
 			'columnheader' => 'Key',
 			'type' => 'password',
@@ -1703,7 +1941,7 @@ $acme_domain_validation_method['dns_limacity'] = [
 	]
 ];
 $acme_domain_validation_method['dns_linode'] = [
-	'name' => 'DNS-Linode',
+	'name' => 'DNS-Linode (Deprecated -- Use v4)',
 	'fields' => [
 		'LINODE_API_KEY' => [
 			'name' => 'linode_api_key',
@@ -1778,6 +2016,34 @@ $acme_domain_validation_method['dns_miab'] = [
 			'description' => 'MailinaBox Server',
 			'columnheader' => 'Server',
 			'type' => 'textbox',
+		],
+	]
+];
+$acme_domain_validation_method['dns_mgwm'] = [
+	'name' => 'DNS-mgw-media.de',
+	'fields' => [
+		'MGWM_CUSTOMER' => [
+			'name' => 'mgwm_customer',
+			'description' => 'MGWM Username',
+			'columnheader' => 'Username',
+			'type' => 'textbox',
+		],
+		'MGWM_API_HASH' => [
+			'name' => 'mgwm_api_hash',
+			'description' => 'MGWM API Hash',
+			'columnheader' => 'API Hash',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_mijnhost'] = [
+	'name' => 'DNS-mijn.host',
+	'fields' => [
+		'MIJNHOST_API_KEY' => [
+			'name' => 'mijnhost_api_key',
+			'description' => 'mijn.host API Key',
+			'columnheader' => 'API Key',
+			'type' => 'password',
 		],
 	]
 ];
@@ -2037,6 +2303,23 @@ $acme_domain_validation_method['dns_nw'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_omglol'] = [
+	'name' => 'DNS-omg.lol',
+	'fields' => [
+		'OMG_Address' => [
+			'name' => 'omg_address',
+			'description' => 'omg.lol address, without the preceding @ (See https://home.omg.lol/dashboard)',
+			'columnheader' => 'Address',
+			'type' => 'textbox',
+		],
+		'OMG_ApiKey' => [
+			'name' => 'omg_apikey',
+			'description' => 'API Key from omg.lol (https://home.omg.lol/account)',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+	]
+];
 $acme_domain_validation_method['dns_one'] = [
 	'name' => 'DNS-one.com',
 	'fields' => [
@@ -2061,6 +2344,40 @@ $acme_domain_validation_method['dns_online'] = [
 			'name' => 'online_api_key',
 			'description' => 'Online.net API Key',
 			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_openprovider'] = [
+	'name' => 'DNS-OpenProvider',
+	'fields' => [
+		'OPENPROVIDER_USER' => [
+			'name' => 'openprovider_user',
+			'description' => 'OpenProvider Username',
+			'columnheader' => 'Username',
+			'type' => 'textbox',
+		],
+		'OPENPROVIDER_PASSWORDHASH' => [
+			'name' => 'openprovider_passwordhash',
+			'description' => 'OpenProvider Password Hash',
+			'columnheader' => 'Password Hash',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_openprovider_rest'] = [
+	'name' => 'DNS-OpenProvider (REST)',
+	'fields' => [
+		'OPENPROVIDER_REST_USERNAME' => [
+			'name' => 'openprovider_rest_username',
+			'description' => 'OpenProvider Account Username',
+			'columnheader' => 'Username',
+			'type' => 'textbox',
+		],
+		'OPENPROVIDER_REST_PASSWORD' => [
+			'name' => 'openprovider_rest_password',
+			'description' => 'OpenProvider Account Password',
+			'columnheader' => 'Password Hash',
 			'type' => 'password',
 		],
 	]
@@ -2091,23 +2408,6 @@ $acme_domain_validation_method['dns_oci'] = [
 			'description' => 'The private API signing key in PEM format. Using an encrypted private key that needs a passphrase is not supported.',
 			'columnheader' => 'Key (PEM)',
 			'type' => 'textarea',
-		],
-	]
-];
-$acme_domain_validation_method['dns_openprovider'] = [
-	'name' => 'DNS-OpenProvider',
-	'fields' => [
-		'OPENPROVIDER_USER' => [
-			'name' => 'openprovider_user',
-			'description' => 'OpenProvider Username',
-			'columnheader' => 'Username',
-			'type' => 'textbox',
-		],
-		'OPENPROVIDER_PASSWORDHASH' => [
-			'name' => 'openprovider_passwordhash',
-			'description' => 'OpenProvider Password Hash',
-			'columnheader' => 'Password Hash',
-			'type' => 'password',
 		],
 	]
 ];
@@ -2142,10 +2442,13 @@ $acme_domain_validation_method['dns_ovh'] = [
 					'name' => 'None'
 				],
 				'ovh-eu' => [
-					'name' => 'OVH Europe'
+					'name' => 'OVH Europe (Default)'
 				],
 				'ovh-ca' => [
 					'name' => 'OVH Canada'
+				],
+				'ovh-us' => [
+					'name' => 'OVH USA'
 				],
 				'kimsufi-eu' => [
 					'name' => 'Kimsufi Europe'
@@ -2248,6 +2551,23 @@ $acme_domain_validation_method['dns_pdns'] = [
 			'name' => 'pdns_ttl',
 			'description' => 'PowerDNS Record TTL (e.g. 60 )',
 			'columnheader' => 'TTL',
+			'type' => 'textbox',
+		],
+	]
+];
+$acme_domain_validation_method['dns_qc'] = [
+	'name' => 'DNS-QUIC.cloud',
+	'fields' => [
+		'QC_API_KEY' => [
+			'name' => 'qc_api_key',
+			'description' => 'QC API Key',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'QC_API_EMAIL' => [
+			'name' => 'qc_api_email',
+			'description' => 'QC Account E-mail Address',
+			'columnheader' => 'E-mail',
 			'type' => 'textbox',
 		],
 	]
@@ -2374,10 +2694,51 @@ $acme_domain_validation_method['dns_schlundtech'] = [
 $acme_domain_validation_method['dns_selectel'] = [
 	'name' => 'DNS-Selectel',
 	'fields' => [
+		'SL_Ver' => [
+			'name' => 'sl_ver',
+			'description' => 'Selectel API Version and use options matching that API version.',
+			'columnheader' => 'API Version',
+			'type' => 'select',
+			'items' => [
+				'v2' => ['name' => 'v2'],
+				'v1' => ['name' => 'v1 (Deprecated)'],
+			],
+		],
+		'SL_Login_ID' => [
+			'name' => 'sl_login_id',
+			'description' => 'v2 Account ID',
+			'columnheader' => 'v2 Account',
+			'type' => 'textbox',
+		],
+		'SL_Project_Name' => [
+			'name' => 'sl_project_name',
+			'description' => 'v2 Project Name',
+			'columnheader' => 'v2 Project',
+			'type' => 'textbox',
+		],
+		'SL_Login_Name' => [
+			'name' => 'sl_login_name',
+			'description' => 'v2 Service Username',
+			'columnheader' => 'v2 Username',
+			'type' => 'textbox',
+		],
+		'SL_Pswd' => [
+			'name' => 'sl_pswd',
+			'description' => 'v2 User Password',
+			'columnheader' => 'v2 Password',
+			'type' => 'password',
+		],
+		'SL_Expire' => [
+			'name' => 'sl_expire',
+			'description' => 'v2 Token Lifetime (Minutes, 0-1440)',
+			'columnheader' => 'v2 Lifetime',
+			'type' => 'textbox',
+		],
+
 		'SL_Key' => [
 			'name' => 'sl_key',
-			'description' => 'Selectel API Key',
-			'columnheader' => 'Key',
+			'description' => 'Selectel v1 API Key',
+			'columnheader' => 'v1 Key',
 			'type' => 'password',
 		],
 	]
@@ -2445,6 +2806,63 @@ $acme_domain_validation_method['dns_simply'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_sotoon'] = [
+	'name' => 'DNS-Sotoon.ir',
+	'fields' => [
+		'Sotoon_Token' => [
+			'name' => 'sotoon_token',
+			'description' => 'API Token',
+			'columnheader' => 'Token',
+			'type' => 'password',
+		],
+		'Sotoon_WorkspaceUUID' => [
+			'name' => 'sotoon_workspaceuuid',
+			'description' => 'Workspace UUID',
+			'columnheader' => 'UUID',
+			'type' => 'textbox',
+		],
+	]
+];
+$acme_domain_validation_method['dns_spaceship'] = [
+	'name' => 'DNS-Spaceship.com',
+	'fields' => [
+		'SPACESHIP_API_KEY' => [
+			'name' => 'spaceship_api_key',
+			'description' => 'API Key',
+			'columnheader' => 'API Key',
+			'type' => 'password',
+		],
+		'SPACESHIP_API_SECRET' => [
+			'name' => 'spaceship_api_secret',
+			'description' => 'API Secret',
+			'columnheader' => 'Secret',
+			'type' => 'password',
+		],
+		'SPACESHIP_ROOT_DOMAIN' => [
+			'name' => 'spaceship_root_domain',
+			'description' => 'Root domain. Manually specify the root domain if auto-detection fails. Optional.',
+			'columnheader' => 'Root Domain',
+			'type' => 'textbox',
+		],
+	]
+];
+$acme_domain_validation_method['dns_technitium'] = [
+	'name' => 'DNS-Technitium DNS Server',
+	'fields' => [
+		'Technitium_Server' => [
+			'name' => 'technitium_server',
+			'description' => 'Technitium DNS Server Address',
+			'columnheader' => 'Server',
+			'type' => 'textbox',
+		],
+		'Technitium_Token' => [
+			'name' => 'technitium_token',
+			'description' => 'API Token',
+			'columnheader' => 'Token',
+			'type' => 'password',
+		],
+	]
+];
 $acme_domain_validation_method['dns_tele3'] = [
 	'name' => 'DNS-Tele3.cz',
 	'fields' => [
@@ -2475,6 +2893,17 @@ $acme_domain_validation_method['dns_tencent'] = [
 			'name' => 'tencent_secretkey',
 			'description' => 'Tencent Secret Key',
 			'columnheader' => 'Secret Key',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_timeweb'] = [
+	'name' => 'DNS-Timeweb.Cloud',
+	'fields' => [
+		'TW_Token' => [
+			'name' => 'tw_token',
+			'description' => 'API token (JWT, https://timeweb.cloud/my/api-keys)',
+			'columnheader' => 'API Token',
 			'type' => 'password',
 		],
 	]
@@ -2514,7 +2943,7 @@ $acme_domain_validation_method['dns_ultra'] = [
 	]
 ];
 $acme_domain_validation_method['dns_unoeuro'] = [
-	'name' => 'DNS-UnoEuro',
+	'name' => 'DNS-UnoEuro (Deprecated -- Now simply.com)',
 	'fields' => [
 		'UNO_User' => [
 			'name' => 'uno_user',
@@ -2565,6 +2994,17 @@ $acme_domain_validation_method['dns_vercel'] = [
 			'name' => 'vercel_token',
 			'description' => 'Vercel Token',
 			'columnheader' => 'Token',
+			'type' => 'password',
+		],
+	]
+];
+$acme_domain_validation_method['dns_virakcloud'] = [
+	'name' => 'DNS-VirakCloud DNS API',
+	'fields' => [
+		'VIRAKCLOUD_API_TOKEN' => [
+			'name' => 'virakcloud_api_token',
+			'description' => 'VirakCloud API Bearer Token',
+			'columnheader' => 'API Token',
 			'type' => 'password',
 		],
 	]
@@ -2653,6 +3093,35 @@ $acme_domain_validation_method['dns_yandex'] = [
 		],
 	]
 ];
+$acme_domain_validation_method['dns_yandex360'] = [
+	'name' => 'DNS-Yandex 360 for Business',
+	'fields' => [
+		'YANDEX360_CLIENT_ID' => [
+			'name' => 'yandex360_client_id',
+			'description' => 'OAuth 2.0 Client ID',
+			'columnheader' => 'Client ID',
+			'type' => 'textbox',
+		],
+		'YANDEX360_CLIENT_SECRET' => [
+			'name' => 'yandex360_client_secret',
+			'description' => 'OAuth 2.0 Client secret',
+			'columnheader' => 'Client Secret',
+			'type' => 'password',
+		],
+		'YANDEX360_ORG_ID' => [
+			'name' => 'yandex360_org_id',
+			'description' => 'Organization ID (Optional)',
+			'columnheader' => 'Address',
+			'type' => 'textbox',
+		],
+		'YANDEX360_ACCESS_TOKEN' => [
+			'name' => 'yandex360_access_token',
+			'description' => 'OAuth 2.0 Access token (Optional)',
+			'columnheader' => 'Access Token',
+			'type' => 'password',
+		],
+	]
+];
 $acme_domain_validation_method['dns_yc'] = [
 	'name' => 'DNS-Yandex Cloud',
 	'fields' => [
@@ -2713,6 +3182,23 @@ $acme_domain_validation_method['dns_zone'] = [
 			'description' => 'Zone.ee API Key',
 			'columnheader' => 'API Key',
 			'type' => 'textbox',
+		],
+	]
+];
+$acme_domain_validation_method['dns_zoneedit'] = [
+	'name' => 'DNS-ZoneEdit.com',
+	'fields' => [
+		'ZONEEDIT_ID' => [
+			'name' => 'zoneedit_id',
+			'description' => 'ZoneEdit ID',
+			'columnheader' => 'ID',
+			'type' => 'textbox',
+		],
+		'ZONEEDIT_Token' => [
+			'name' => 'zoneedit_token',
+			'description' => 'ZoneEdit API Token',
+			'columnheader' => 'API Token',
+			'type' => 'password',
 		],
 	]
 ];
@@ -2780,6 +3266,12 @@ $acme_newcertificateactions = array(
 // </editor-fold>
 #end
 
+$a_addressfamily = [
+	'' => [ 'name' => "OS Default" ],
+	'ipv4' => [ 'name' => "Force IPv4" ],
+	'ipv6' => [ 'name' => "Force IPv6" ]
+];
+
 $a_keylength = array();
 $a_keylength['2048'] = array('name' => "2048-bit RSA");
 $a_keylength['3072'] = array('name' => "3072-bit RSA");
@@ -2788,15 +3280,11 @@ $a_keylength['ec-256'] = array('name' => "256-bit ECDSA", 'ecc' => true);
 $a_keylength['ec-384'] = array('name' => "384-bit ECDSA", 'ecc' => true);
 $a_keylength['custom'] = array('name' => "Custom...");
 
-config_init_path('installedpackages/acme/certificates/item');
-
-config_init_path('installedpackages/acme/accountkeys/item');
-
 function set_cronjob() {
 	if (config_path_enabled('installedpackages/acme')) {
-		install_cron_job('/usr/local/pkg/acme/acme_command.sh "renewall" | /usr/bin/logger -t ACME 2>&1', true, "16", "3");
+		install_cron_job('/usr/local/pkg/acme/acme_command.sh "renewall" | sed "s/^/NOTICE /" | /usr/bin/logger -p user.notice -t ACME 2>&1', true, "16", "3");
 	} else {
-		install_cron_job('/usr/local/pkg/acme/acme_command.sh "renewall" | /usr/bin/logger -t ACME 2>&1', false);
+		install_cron_job('/usr/local/pkg/acme/acme_command.sh "renewall" | sed "s/^/NOTICE /" | /usr/bin/logger -p user.notice -t ACME 2>&1', false);
 	}
 }
 
@@ -2830,9 +3318,6 @@ function acme_custom_php_install_command() {
 }
 
 function acme_convert_desc_to_descr() {
-	config_init_path('installedpackages/acme/accountkeys/item');
-	config_init_path('installedpackages/acme/certificates/item');
-
 	foreach (array('accountkeys', 'certificates') as $a_array) {
 		$acme_item_config = config_get_path("installedpackages/acme/{$a_array}/item");
 		foreach ($acme_item_config as & $item) {
@@ -2846,9 +3331,7 @@ function acme_convert_desc_to_descr() {
 }
 
 function acme_convert_letsencryptv1_to_letsencryptv2() {
-	config_init_path('installedpackages/acme/accountkeys/item');
-
-	$acme_item_config = config_get_path('installedpackages/acme/accountkeys/item');
+	$acme_item_config = config_get_path('installedpackages/acme/accountkeys/item', []);
 	foreach ($acme_item_config as & $item) {
 		if ($item['acmeserver'] == 'letsencrypt-staging') {
 			$item['acmeserver'] = 'letsencrypt-staging-2';
@@ -2863,7 +3346,8 @@ function get_itembyname($a_array, $name) {
 	$i = 0;
 	if (is_array($a_array)) {
 		foreach ($a_array as $item) {
-			if ($item['name'] == $name) {
+			if (($item['name'] == $name) ||
+			    ($item['name'] == htmlspecialchars_decode($name))) {
 				return $i;
 			}
 			$i++;
@@ -2873,32 +3357,18 @@ function get_itembyname($a_array, $name) {
 }
 
 function get_accountkey_id($name) {
-	config_init_path('installedpackages/acme/accountkeys/item');
-	return get_itembyname(config_get_path('installedpackages/acme/accountkeys/item'), $name);
+	return get_itembyname(config_get_path('installedpackages/acme/accountkeys/item', []), $name);
 }
 function get_accountkey($name) {
-	config_init_path('installedpackages/acme/accountkeys/item');
 	$id = get_accountkey_id($name);
 	return config_get_path("installedpackages/acme/accountkeys/item/{$id}");
 }
 
 function get_certificate_id($name) {
-	config_init_path('installedpackages/acme/certificates/item');
-	$a_certificates = config_get_path('installedpackages/acme/certificates/item');
-	$i = 0;
-	if (is_array($a_certificates)) {
-		foreach ($a_certificates as $certificate) {
-			if ($certificate['name'] == $name) {
-				return $i;
-			}
-			$i++;
-		}
-	}
-	return null;
+	return get_itembyname(config_get_path('installedpackages/acme/certificates/item', []), $name);
 }
 
 function get_certificate($name) {
-	config_init_path('installedpackages/acme/certificates/item');
 	$id = get_certificate_id($name);
 	if (is_numeric($id)) {
 		return config_get_path("installedpackages/acme/certificates/item/{$id}");
@@ -2916,13 +3386,13 @@ function get_certificate($name) {
 		return $acmesh->generateDomainKey($domain, $keylength);
 	}
 
-	function registerAcmeAccountKey($name, $ca, $key, $email = "") {
+	function registerAcmeAccountKey($name, $ca, $key, $email = "", $eabkid = "", $eabhmac = "") {
 		$acmesh = new acme_sh($name, $ca, $email);
-		return $acmesh->registeraccount($key);
+		return $acmesh->registeraccount($key, $eabkid, $eabhmac);
 	}
 
 	function renew_all_certificates($force = false) {
-		$a_certificates = config_get_path('installedpackages/acme/certificates/item');
+		$a_certificates = config_get_path('installedpackages/acme/certificates/item', []);
 		$errors = "";
 		foreach($a_certificates as $certificate) {
 			if ($certificate['status'] != 'active') {
@@ -2932,9 +3402,9 @@ function get_certificate($name) {
 			echo "Checking if renewal is needed for: {$certificate['name']}\n";
 			$res = issue_certificate($certificate['name'], $force);
 			if (!$res) {
-				$errmsg = "ACME, Failed to renew certificate for {$certificate['name']}";
-				syslog(LOG_WARNING, $errmsg);
-				$errors .= "{$errmsg}\n";
+				$errmsg = localize_text("Failed to renew certificate for %s", $certificate['name']);
+				logger(LOG_WARNING, $errmsg, LOG_PREFIX_PKG_ACME);
+				$errors .= LOG_PREFIX_PKG_ACME . " {$errmsg}\n";
 			}
 		}
 		if (!empty($errors)) {
@@ -3006,7 +3476,6 @@ function get_certificate($name) {
 
 	function saveCACertificateToStore($crt) {
 		$crt_enc = base64_encode($crt);
-		config_init_path('ca');
 		foreach(config_get_path('ca', []) as $ca) {
 			if ($ca['crt'] == $crt_enc) {
 				return;
@@ -3018,7 +3487,7 @@ function get_certificate($name) {
 		$cert['descr'] = "Acmecert: {$subject}";
 		ca_import($cert, $crt);
 		config_set_path('ca/', $cert);
-		syslog(LOG_NOTICE, "Acme, storing new CA: {$subject}");
+		logger(LOG_NOTICE, localize_text("storing new CA: %s", $subject), LOG_PREFIX_PKG_ACME);
 	}
 
 	function storeCertificateCer($certificatename, $keyfile, $cerfile, $fullchainfile) {
@@ -3041,7 +3510,7 @@ function get_certificate($name) {
 		}
 		foreach (config_get_path('cert', []) as $idx => $cert) {
 			if ($cert['descr'] == $certificatename) {
-				syslog(LOG_NOTICE, "Acme, storing new certificate: {$certificatename}");
+				logger(LOG_NOTICE, localize_text("storing new certificate: %s", $certificatename), LOG_PREFIX_PKG_ACME);
 				echo "\nupdate cert!";
 				cert_import($cert, $crt, $key);
 				config_set_path("cert/{$idx}", $cert);
@@ -3054,6 +3523,7 @@ function get_certificate($name) {
 	}
 
 	function issue_certificate($id, $force = false, $renew = false) {
+		require_once("certs.inc");
 		$result = true;
 		$certificate = get_certificate($id);
 		if (!$force) {
@@ -3062,22 +3532,48 @@ function get_certificate($name) {
 				return $result;
 			}
 
-			$renewafterdays = is_numericint($certificate['renewafter']) ? $certificate['renewafter'] : 60;
 			$timetorenew = false;
-			$now = new \DateTime();
-			$lastrenewal = new \DateTime();
-			$lastrenewal->setTimestamp($certificate['lastrenewal']);
-			$nextrenewal = $lastrenewal->add(new \DateInterval('P'.$renewafterdays.'D'));
-			if ($now >= $nextrenewal) {
+			/* Try to find corresponding certificate manager entry */
+			$certentry = lookup_cert_by_name($certificate['name']);
+			$certitem = $certentry['item'];
+			if ($certitem) {
+				/* Cert manager entry located */
+				$total_lifetime = cert_get_lifetime($certitem, false);
+				$expiredays = cert_get_lifetime($certitem, true);
+				if (($total_lifetime === null) ||
+				    ($expiredays === null)) {
+					/* Cannot read lifetimes, force renewal */
+					$timetorenew = true;
+				}
+				/* Renew at 2/3 lifetime */
+				$renewaldays = ceil($total_lifetime / 3) * 2;
+				/* If the user configured a renew after days value,
+				 * use it if it is sane.
+				 */
+				if (is_numericint($certificate['renewafter']) &&
+				    ($certificate['renewafter'] < $total_lifetime)) {
+					$renewaldays = $certificate['renewafter'];
+				}
+				/* Is it time to renew based on the remaining lifetime? */
+				$timetorenew = ($expiredays <= $renewaldays);
+			} else {
+				/* No cert entry, fall back to old logic */
+				$renewafterdays = is_numericint($certificate['renewafter']) ? $certificate['renewafter'] : 30;
+				$now = new \DateTime();
+				$lastrenewal = new \DateTime();
+				$lastrenewal->setTimestamp($certificate['lastrenewal']);
+				$nextrenewal = $lastrenewal->add(new \DateInterval('P'.$renewafterdays.'D'));
+				$timetorenew = ($now >= $nextrenewal);
+			}
+			if ($timetorenew) {
 				echo "## Its time to renew ##\n";
-				$timetorenew = true;
 			} else {
 				echo "Renewal number of days not yet reached.\n";
 			}
 		}
 
 		if ($timetorenew || $force) {
-			syslog(LOG_NOTICE, "Acme, renewing certificate: {$id}");
+			logger(LOG_NOTICE, localize_text("renewing certificate: %s", $id), LOG_PREFIX_PKG_ACME);
 			echo "Renewing certificate \n";
 			$domainstosign = array();
 			if (is_array($certificate) &&
@@ -3105,8 +3601,7 @@ function get_certificate($name) {
 					$domainstosign[] = $newdomain;
 					$envvariables = array();
 					if ($method == "dns_namecheap") {
-						# The function to find the default gateway changed on 2.5.0
-						$defgw = function_exists('route_get_default') ? route_get_default('inet') : getcurrentdefaultgatewayip('inet');
+						$defgw = route_get_default('inet');
 						$envvariables['NAMECHEAP_SOURCEIP'] = find_interface_ip(guess_interface_from_ip($defgw));
 					}
 					global $acme_domain_validation_method;
@@ -3132,14 +3627,19 @@ function get_certificate($name) {
 			echo "server: $acmeserver \n";
 
 			global $a_acmeserver;
+			if (!array_key_exists($acmeserver, $a_acmeserver)) {
+				echo "The ACME Server does not exist and cannot be used. Edit the account key and select a new ACME Server. Stopping.";
+				return false;
+			}
 			$url = $a_acmeserver[$acmeserver]['url'];
 			$certificatepsk = getCertificatePSK($url, $certificate, $domainstosign[0]->domainname);
 			$acmesh = new acme_sh($certificate['name'], $url, $email);
 			$action = $renew == true ? "renew" : "issue";
 			$acmesh->dnssleep = $certificate['dnssleep'];
 			$acmesh->challengealias = $certificate['challengealias'];
-			$acmesh->ocspstaple = $certificate['ocspstaple'];
 			$acmesh->preferredchain = $certificate['preferredchain'];
+			$acmesh->addressfamily = $certificate['addressfamily'];
+			$acmesh->certprofile = $certificate['certprofile'];
 			$result = $acmesh->signCertificate($action, $accountkey, $certificatepsk, $domainstosign, $envvariables);
 		}
 		return $result;

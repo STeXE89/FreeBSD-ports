@@ -3,7 +3,7 @@
  * telegraf.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2017-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -206,7 +206,7 @@ EOD;
 
 	/* (re)start service */
 	if (is_service_running("telegraf")) {
-		restart_service("telegraf");
+		restart_service("telegraf", $pidfile, 3);
 	} else {
 		start_service("telegraf");
 	}

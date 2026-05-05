@@ -1,6 +1,6 @@
 PORTNAME=	kosmorro
 PORTVERSION=	0.10.13
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	astro python
 MASTER_SITES=	PYPI
 
@@ -38,5 +38,8 @@ PDF_DESC=	Exporting to PDF
 PDF_RUN_DEPENDS=pdflatex:print/tex-formats
 
 NO_ARCH=	yes
+
+post-install:
+	@${INSTALL_DATA} ${WRKSRC}/CHANGELOG.md ${STAGEDIR}${PYTHON_SITELIBDIR}/
 
 .include <bsd.port.mk>

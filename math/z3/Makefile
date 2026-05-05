@@ -1,27 +1,34 @@
 PORTNAME=	z3
-DISTVERSIONPREFIX=	z3-
-DISTVERSION=	4.13.0
+DISTVERSION=	4.16.0.0
 CATEGORIES=	math
+MASTER_SITES=	https://github.com/Z3Prover/z3/releases/download/${PORTNAME}-${DISTVERSION:R}/
+DISTNAME=	${PORTNAME}_solver-${DISTVERSION}
 
 MAINTAINER=	arrowd@FreeBSD.org
 COMMENT=	Z3 Theorem Prover
-WWW=		https://github.com/Z3Prover/z3
+WWW=		https://z3prover.github.io/ \
+		https://github.com/Z3Prover/z3/
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/LICENSE.txt
 
-USES=		cmake compiler:c++11-lang localbase:ldflags
-USE_GITHUB=	yes
-GH_ACCOUNT=	Z3Prover
+USES=		cmake:testing compiler:c++20-lang localbase:ldflags
 
-OPTIONS_DEFINE=		GMP
+CMAKE_ARGS=	-DCMAKE_INSTALL_PKGCONFIGDIR=${PREFIX}/libdata/pkgconfig
+CMAKE_OFF=	Z3_ENABLE_EXAMPLE_TARGETS
+CMAKE_TESTING_TARGET=	test-z3
 
-OPTIONS_SUB=		yes
+WRKSRC_SUBDIR=	core
 
-GMP_DESC=		Use GMP library for AP arithmetic
-GMP_CMAKE_BOOL=		Z3_USE_LIB_GMP
+PLIST_SUB=	SOVERSION=${DISTVERSION}
+
+OPTIONS_DEFINE=	GMP
+OPTIONS_SUB=	yes
+
 GMP_LIB_DEPENDS=	libgmp.so:math/gmp
+GMP_CMAKE_BOOL=		Z3_USE_LIB_GMP
 
-CMAKE_ARGS=		-DCMAKE_INSTALL_PKGCONFIGDIR=${PREFIX}/libdata/pkgconfig
+post-test:
+	cd ${BUILD_WRKSRC} && ./test-z3 /a
 
 .include <bsd.port.mk>

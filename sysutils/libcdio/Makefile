@@ -1,12 +1,11 @@
 PORTNAME=	libcdio
-DISTVERSION=	2.1.0
-PORTREVISION=	2
+DISTVERSION=	2.3.0
 CATEGORIES=	sysutils
-MASTER_SITES=	GNU
+MASTER_SITES=	https://github.com/${PORTNAME}/${PORTNAME}/releases/download/${DISTVERSION}/
 
 MAINTAINER=	jhale@FreeBSD.org
 COMMENT=	Compact Disc Input and Control Library
-WWW=		https://www.gnu.org/software/libcdio/
+WWW=		https://github.com/libcdio/libcdio/
 
 LICENSE=	GPLv3+
 LICENSE_FILE=	${WRKSRC}/COPYING
@@ -21,6 +20,7 @@ USE_PERL5=	build
 
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--disable-cddb \
+		--disable-static \
 		--disable-vcd-info \
 		${ICONV_CONFIGURE_ARG}
 

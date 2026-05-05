@@ -1,183 +1,223 @@
 PORTNAME=	git-repo-manager
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.7.16
-PORTREVISION=	2
+DISTVERSION=	0.8.2
+PORTREVISION=	6
 CATEGORIES=	devel
 
 MAINTAINER=	yuri@FreeBSD.org
 COMMENT=	Git tool to manage worktrees and integrate with GitHub and GitLab
-WWW=		https://hakoerber.github.io/git-repo-manager/
+WWW=		https://hakoerber.github.io/git-repo-manager/ \
+		https://github.com/hakoerber/git-repo-manager/
 
 LICENSE=	GPLv3
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-LIB_DEPENDS=	libgit2.so:devel/libgit2
+LIB_DEPENDS=	libgit2.so:devel/libgit2 \
+		libssh2.so:security/libssh2
 
-USES=		cargo
+USES=		cargo localbase
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	hakoerber
 
-CARGO_CRATES=	aho-corasick-1.1.3 \
-		anstream-0.6.13 \
-		anstyle-1.0.6 \
-		anstyle-parse-0.2.3 \
-		anstyle-query-1.0.2 \
-		anstyle-wincon-3.0.2 \
-		async-channel-1.9.0 \
-		autocfg-1.2.0 \
-		bitflags-1.3.2 \
-		bitflags-2.5.0 \
-		bytes-1.6.0 \
-		castaway-0.1.2 \
-		cc-1.0.95 \
-		cfg-if-1.0.0 \
-		clap-4.4.18 \
-		clap_builder-4.4.18 \
-		clap_derive-4.4.7 \
-		clap_lex-0.6.0 \
-		colorchoice-1.0.0 \
-		comfy-table-7.1.1 \
-		concurrent-queue-2.5.0 \
-		console-0.15.8 \
-		crossbeam-utils-0.8.19 \
-		crossterm-0.27.0 \
+RUSTFLAGS=	${ARCH:S/i386/YES/:C/^[a-z].*//:S/YES/-C target-feature=+sse,+sse2/} # add sse sse2 target-features only on i386
+
+CARGO_CRATES=	adler2-2.0.1 \
+		aho-corasick-1.1.3 \
+		anstream-0.6.19 \
+		anstyle-1.0.11 \
+		anstyle-parse-0.2.7 \
+		anstyle-query-1.1.3 \
+		anstyle-wincon-3.0.9 \
+		autocfg-1.5.0 \
+		base64-0.22.1 \
+		bitflags-2.9.1 \
+		bumpalo-3.19.0 \
+		bytes-1.10.1 \
+		cc-1.2.30 \
+		cfg-if-1.0.1 \
+		clap-4.5.41 \
+		clap_builder-4.5.41 \
+		clap_derive-4.5.41 \
+		clap_lex-0.7.5 \
+		colorchoice-1.0.4 \
+		comfy-table-7.1.4 \
+		console-0.16.0 \
+		cookie-0.18.1 \
+		cookie_store-0.21.1 \
+		crc32fast-1.5.0 \
+		crossterm-0.28.1 \
 		crossterm_winapi-0.9.1 \
-		curl-0.4.46 \
-		curl-sys-0.4.72+curl-8.6.0 \
-		dirs-5.0.1 \
-		dirs-sys-0.4.1 \
-		encode_unicode-0.3.6 \
-		encoding_rs-0.8.34 \
-		equivalent-1.0.1 \
-		event-listener-2.5.3 \
-		fastrand-1.9.0 \
+		deranged-0.4.0 \
+		dirs-6.0.0 \
+		dirs-sys-0.5.0 \
+		displaydoc-0.2.5 \
+		document-features-0.2.11 \
+		encode_unicode-1.0.0 \
+		equivalent-1.0.2 \
+		errno-0.3.13 \
+		flate2-1.1.2 \
 		fnv-1.0.7 \
 		form_urlencoded-1.2.1 \
-		fuchsia-cprng-0.1.1 \
-		futures-core-0.3.30 \
-		futures-io-0.3.30 \
-		futures-lite-1.13.0 \
-		getrandom-0.2.14 \
-		git2-0.18.3 \
-		hashbrown-0.14.3 \
-		heck-0.4.1 \
-		http-0.2.12 \
-		idna-0.5.0 \
-		indexmap-2.2.6 \
-		instant-0.1.12 \
-		isahc-1.7.2 \
-		itoa-1.0.11 \
-		jobserver-0.1.31 \
-		lazy_static-1.4.0 \
-		libc-0.2.153 \
-		libgit2-sys-0.16.2+1.7.2 \
-		libnghttp2-sys-0.1.10+1.61.0 \
-		libredox-0.1.3 \
-		libssh2-sys-0.3.0 \
-		libz-sys-1.1.16 \
-		lock_api-0.4.12 \
-		log-0.4.21 \
-		memchr-2.7.2 \
-		mime-0.3.17 \
-		once_cell-1.19.0 \
-		openssl-probe-0.1.5 \
-		openssl-src-300.2.3+3.2.1 \
-		openssl-sys-0.9.102 \
+		getrandom-0.2.16 \
+		getrandom-0.3.3 \
+		git2-0.20.2 \
+		hashbrown-0.15.4 \
+		heck-0.5.0 \
+		http-1.3.1 \
+		httparse-1.10.1 \
+		icu_collections-2.0.0 \
+		icu_locale_core-2.0.0 \
+		icu_normalizer-2.0.0 \
+		icu_normalizer_data-2.0.0 \
+		icu_properties-2.0.1 \
+		icu_properties_data-2.0.1 \
+		icu_provider-2.0.0 \
+		idna-1.0.3 \
+		idna_adapter-1.2.1 \
+		indexmap-2.10.0 \
+		is_terminal_polyfill-1.70.1 \
+		itoa-1.0.15 \
+		jobserver-0.1.33 \
+		js-sys-0.3.77 \
+		lazy_static-1.5.0 \
+		libc-0.2.174 \
+		libgit2-sys-0.18.2+1.9.1 \
+		libredox-0.1.6 \
+		libssh2-sys-0.3.1 \
+		libz-sys-1.1.22 \
+		linux-raw-sys-0.4.15 \
+		litemap-0.8.0 \
+		litrs-0.4.1 \
+		lock_api-0.4.13 \
+		log-0.4.27 \
+		memchr-2.7.5 \
+		miniz_oxide-0.8.9 \
+		num-conv-0.1.0 \
+		once_cell-1.21.3 \
+		once_cell_polyfill-1.70.1 \
+		openssl-probe-0.1.6 \
+		openssl-src-300.5.1+3.5.1 \
+		openssl-sys-0.9.109 \
 		option-ext-0.2.0 \
-		parking-2.2.0 \
-		parking_lot-0.12.2 \
-		parking_lot_core-0.9.10 \
-		parse_link_header-0.3.3 \
+		outdir-tempdir-0.2.0 \
+		parking_lot-0.12.4 \
+		parking_lot_core-0.9.11 \
+		parse_link_header-0.4.0 \
 		percent-encoding-2.3.1 \
-		pin-project-1.1.5 \
-		pin-project-internal-1.1.5 \
-		pin-project-lite-0.2.14 \
-		pkg-config-0.3.30 \
-		polling-2.8.0 \
-		proc-macro2-1.0.81 \
-		quote-1.0.36 \
-		rand-0.4.6 \
-		rand_core-0.3.1 \
-		rand_core-0.4.2 \
-		rdrand-0.4.0 \
-		redox_syscall-0.5.1 \
-		redox_users-0.4.5 \
-		regex-1.10.4 \
-		regex-automata-0.4.6 \
-		regex-syntax-0.8.3 \
-		remove_dir_all-0.5.3 \
-		rustversion-1.0.15 \
-		ryu-1.0.17 \
-		schannel-0.1.23 \
+		pkg-config-0.3.32 \
+		potential_utf-0.1.2 \
+		powerfmt-0.2.0 \
+		ppv-lite86-0.2.21 \
+		proc-macro2-1.0.95 \
+		quote-1.0.40 \
+		r-efi-5.3.0 \
+		rand-0.9.2 \
+		rand_chacha-0.9.0 \
+		rand_core-0.9.3 \
+		redox_syscall-0.5.15 \
+		redox_users-0.5.0 \
+		regex-1.11.1 \
+		regex-automata-0.4.9 \
+		regex-syntax-0.8.5 \
+		ring-0.17.14 \
+		rustix-0.38.44 \
+		rustls-0.23.29 \
+		rustls-pemfile-2.2.0 \
+		rustls-pki-types-1.12.0 \
+		rustls-webpki-0.103.4 \
+		rustversion-1.0.21 \
+		ryu-1.0.20 \
 		scopeguard-1.2.0 \
-		serde-1.0.199 \
-		serde_derive-1.0.199 \
-		serde_json-1.0.116 \
-		serde_spanned-0.6.5 \
+		serde-1.0.219 \
+		serde_derive-1.0.219 \
+		serde_json-1.0.141 \
+		serde_spanned-1.0.0 \
 		serde_yaml-0.9.34+deprecated \
-		shellexpand-3.1.0 \
-		slab-0.4.9 \
-		sluice-0.5.5 \
-		smallvec-1.13.2 \
-		socket2-0.5.6 \
-		strsim-0.10.0 \
-		strum-0.26.2 \
-		strum_macros-0.26.2 \
-		syn-2.0.60 \
-		tempdir-0.3.7 \
-		thiserror-1.0.59 \
-		thiserror-impl-1.0.59 \
-		tinyvec-1.6.0 \
-		tinyvec_macros-0.1.1 \
-		toml-0.8.12 \
-		toml_datetime-0.6.5 \
-		toml_edit-0.22.12 \
-		tracing-0.1.40 \
-		tracing-attributes-0.1.27 \
-		tracing-core-0.1.32 \
-		tracing-futures-0.2.5 \
-		unicode-bidi-0.3.15 \
-		unicode-ident-1.0.12 \
-		unicode-normalization-0.1.23 \
-		unicode-width-0.1.12 \
+		shellexpand-3.1.1 \
+		shlex-1.3.0 \
+		smallvec-1.15.1 \
+		stable_deref_trait-1.2.0 \
+		strsim-0.11.1 \
+		subtle-2.6.1 \
+		syn-2.0.104 \
+		synstructure-0.13.2 \
+		temp-env-0.3.6 \
+		thiserror-2.0.12 \
+		thiserror-impl-2.0.12 \
+		time-0.3.41 \
+		time-core-0.1.4 \
+		time-macros-0.2.22 \
+		tinystr-0.8.1 \
+		toml-0.9.2 \
+		toml_datetime-0.7.0 \
+		toml_parser-1.0.1 \
+		toml_writer-1.0.2 \
+		unicode-ident-1.0.18 \
+		unicode-segmentation-1.12.0 \
+		unicode-width-0.2.1 \
 		unsafe-libyaml-0.2.11 \
-		url-2.5.0 \
+		untrusted-0.9.0 \
+		ureq-3.0.12 \
+		ureq-proto-0.4.2 \
+		url-2.5.4 \
 		url-escape-0.1.1 \
-		utf8parse-0.2.1 \
+		utf-8-0.7.6 \
+		utf8_iter-1.0.4 \
+		utf8parse-0.2.2 \
+		uuid-1.17.0 \
 		vcpkg-0.2.15 \
-		waker-fn-1.1.1 \
-		wasi-0.11.0+wasi-snapshot-preview1 \
+		version_check-0.9.5 \
+		wasi-0.11.1+wasi-snapshot-preview1 \
+		wasi-0.14.2+wasi-0.2.4 \
+		wasm-bindgen-0.2.100 \
+		wasm-bindgen-backend-0.2.100 \
+		wasm-bindgen-macro-0.2.100 \
+		wasm-bindgen-macro-support-0.2.100 \
+		wasm-bindgen-shared-0.2.100 \
+		webpki-roots-0.26.11 \
+		webpki-roots-1.0.2 \
 		winapi-0.3.9 \
 		winapi-i686-pc-windows-gnu-0.4.0 \
 		winapi-x86_64-pc-windows-gnu-0.4.0 \
-		windows-sys-0.48.0 \
 		windows-sys-0.52.0 \
-		windows-targets-0.48.5 \
-		windows-targets-0.52.5 \
-		windows_aarch64_gnullvm-0.48.5 \
-		windows_aarch64_gnullvm-0.52.5 \
-		windows_aarch64_msvc-0.48.5 \
-		windows_aarch64_msvc-0.52.5 \
-		windows_i686_gnu-0.48.5 \
-		windows_i686_gnu-0.52.5 \
-		windows_i686_gnullvm-0.52.5 \
-		windows_i686_msvc-0.48.5 \
-		windows_i686_msvc-0.52.5 \
-		windows_x86_64_gnu-0.48.5 \
-		windows_x86_64_gnu-0.52.5 \
-		windows_x86_64_gnullvm-0.48.5 \
-		windows_x86_64_gnullvm-0.52.5 \
-		windows_x86_64_msvc-0.48.5 \
-		windows_x86_64_msvc-0.52.5 \
-		winnow-0.6.7
+		windows-sys-0.59.0 \
+		windows-sys-0.60.2 \
+		windows-targets-0.52.6 \
+		windows-targets-0.53.2 \
+		windows_aarch64_gnullvm-0.52.6 \
+		windows_aarch64_gnullvm-0.53.0 \
+		windows_aarch64_msvc-0.52.6 \
+		windows_aarch64_msvc-0.53.0 \
+		windows_i686_gnu-0.52.6 \
+		windows_i686_gnu-0.53.0 \
+		windows_i686_gnullvm-0.52.6 \
+		windows_i686_gnullvm-0.53.0 \
+		windows_i686_msvc-0.52.6 \
+		windows_i686_msvc-0.53.0 \
+		windows_x86_64_gnu-0.52.6 \
+		windows_x86_64_gnu-0.53.0 \
+		windows_x86_64_gnullvm-0.52.6 \
+		windows_x86_64_gnullvm-0.53.0 \
+		windows_x86_64_msvc-0.52.6 \
+		windows_x86_64_msvc-0.53.0 \
+		winnow-0.7.12 \
+		wit-bindgen-rt-0.39.0 \
+		writeable-0.6.1 \
+		yoke-0.8.0 \
+		yoke-derive-0.8.0 \
+		zerocopy-0.8.26 \
+		zerocopy-derive-0.8.26 \
+		zerofrom-0.1.6 \
+		zerofrom-derive-0.1.6 \
+		zeroize-1.8.1 \
+		zerotrie-0.2.2 \
+		zerovec-0.11.2 \
+		zerovec-derive-0.11.1
 
 OPENSSLINC=	/usr/include
 OPENSSLLIB=	/usr/lib
 
 PLIST_FILES=	bin/grm
-
-post-install:
-	@${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/grm
 
 .include <bsd.port.mk>

@@ -3,7 +3,7 @@
  * haproxy.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013-2016 PiBa-NL
  * All rights reserved.
  *
@@ -27,7 +27,8 @@ require_once("notices.inc");
 require_once("filter.inc");
 require_once("haproxy_utils.inc");
 require_once("haproxy_socketinfo.inc");
-require_once("haproxy_xmlrpcsyncclient.inc");
+
+define('LOG_PREFIX_PKG_HAPROXY', 'HAProxy');
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 #region Global haproxy array item definitions..
@@ -447,6 +448,9 @@ if (haproxy_version() >= '1.6') {
 
 #end
 
+global $haproxy_server_state_path;
+$haproxy_server_state_path = '/tmp/haproxy_server_state';
+
 global $haproxy_version;
 function haproxy_version() {
 	global $haproxy_version;
@@ -727,7 +731,7 @@ function haproxy_find_acl($name) {
 function write_backend($configpath, $fd, $name, $pool, $backendsettings) {
 	$frontend = $backendsettings['frontend'];
 	$ipversion = $backendsettings['ipversion'];
-	$a_global = config_get_path('installedpackages/haproxy');
+	$a_global = config_get_path('installedpackages/haproxy', []);
 	$a_mailers = config_get_path('installedpackages/haproxy/email_mailers/item');
 	$a_resolvers = config_get_path('installedpackages/haproxy/dns_resolvers/item');
 	$a_servers = getarraybyref($pool,'ha_servers','item');
@@ -1345,8 +1349,12 @@ function haproxy_configure() {
 	return haproxy_check_run(1);
 }
 
-function haproxy_check_and_run(&$messages, $reload) {
-	global $g;
+function haproxy_check_and_run(&$messages, $reload, $force = false) {
+	global $g, $haproxy_server_state_path;
+	if ($force) {
+		unlink_if_exists($haproxy_server_state_path);
+		logger(LOG_INFO, localize_text("Removed HAProxy server state file."), LOG_PREFIX_PKG_HAPROXY);
+	}
 	$testpath = "{$g['varetc_path']}/haproxy_test";
 	haproxy_writeconf($testpath);
 	$retval = exec("haproxy -c -V -f $testpath/haproxy.cfg 2>&1", $output, $err);
@@ -1364,17 +1372,14 @@ function haproxy_check_and_run(&$messages, $reload) {
 			$messages .= "<br/>" . htmlspecialchars($line) . "\n";
 			$syslogmessage .= str_replace("\n"," ", $line) . " ";
 		}
-		syslog(LOG_NOTICE, "haproxy: check error output: {$syslogmessage}");
+		logger(LOG_NOTICE, localize_text("check error output: %s", $syslogmessage), LOG_PREFIX_PKG_HAPROXY);
 	}
 	$ok = strstr($retval, "Configuration file is valid");
 	if ($ok && $reload) {
 		global $haproxy_run_message;
 		rmdir_recursive($testpath);
-		$ok = haproxy_check_run(1) == 0;
+		$ok = haproxy_check_run(1, !$force) == 0;
 		$messages = $haproxy_run_message;
-		if ($ok && config_path_enabled('installedpackages/haproxy', 'enablesync')) {
-			mwexec_bg("/usr/local/pkg/haproxy/haproxy_sync.sh");
-		}
 	}
 	return $ok;
 }
@@ -1442,6 +1447,7 @@ function haproxy_write_certificate_fullchain($filename, $certid, $append = false
 function haproxy_write_certificate_issuer($filename, $certid) {
 	$cert = haproxy_lookup_cert($certid);
 	$certchaincontent = ca_chain($cert);
+	$certcontent = '';
 	if ($certchaincontent != "") {
 		$certcontent .= "\r\n" . $certchaincontent;
 	}
@@ -1452,7 +1458,7 @@ function haproxy_write_certificate_issuer($filename, $certid) {
 }
 
 function haproxy_uses_ocsp() {
-	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item');
+	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 	foreach ($a_frontends as $frontend) {
 		if ($frontend['sslocsp'] == 'yes') {
 			return true;
@@ -1469,25 +1475,25 @@ function haproxy_updateocsp_one($socketupdate, $filename, $name) {
 	global $openssl111;
 	if (file_exists("{$filename}.ocsp")) {
 		// If the .ocsp file exists we want to use ocsp
-		syslog(LOG_NOTICE, "HAProxy Retrieving OCSP for frontend {$name}.. ");
+		logger(LOG_NOTICE, localize_text("Retrieving OCSP for frontend %s.. ", $name), LOG_PREFIX_PKG_HAPROXY);
 		$ocsp_url = haproxy_getocspurl($filename);
 		$ocsp_host = parse_url($ocsp_url, PHP_URL_HOST);
 		$ocsp_host_dm = ($openssl111) ? "=" : " ";
 		if (empty($ocsp_url)) {
 			// If cert does not have a ocsp_uri, it cannot be updated..
-			syslog(LOG_ERR, "HAProxy OCSP ERROR Cert does not have a ocsp_uri");
+			logger(LOG_ERR, localize_text("OCSP ERROR Cert does not have a %s", 'ocsp_uri'), LOG_PREFIX_PKG_HAPROXY);
 		} else {
 			$retval = exec("openssl ocsp -issuer {$filename}.issuer -verify_other {$filename}.issuer -cert {$filename} -url {$ocsp_url} -header Host{$ocsp_host_dm}{$ocsp_host} -respout {$filename}.ocsp 2>&1", $output, $err);
 			if ($socketupdate) {
 				$ocspresponse = base64_encode(file_get_contents("{$filename}.ocsp"));
 				$r = haproxy_socket_command("set ssl ocsp-response $ocspresponse");
 				if ($r[0] == "OCSP Response updated!\n") {
-					syslog(LOG_NOTICE, "HAProxy OCSP socket update successful for frontend {$name}..result: ".$retval);
+					logger(LOG_NOTICE, localize_text("OCSP socket update successful for frontend %s..result: %s", $name, $retval), LOG_PREFIX_PKG_HAPROXY);
 				} else {
-					syslog(LOG_ERR, "HAProxy OCSP ERROR while performing haproxy socket update OCSP response for:  {$name}");
+					logger(LOG_ERR, localize_text("OCSP ERROR while performing haproxy socket update OCSP response for: %s", $name), LOG_PREFIX_PKG_HAPROXY);
 				}
 			} else {
-				syslog(LOG_NOTICE, "HAProxy Retrieving OCSP for frontend {$name}..result: ".$retval);
+				logger(LOG_NOTICE, localize_text("Retrieving OCSP for frontend %s..result: %s", $name, $retval), LOG_PREFIX_PKG_HAPROXY);
 			}
 		}
 	}
@@ -1496,7 +1502,7 @@ function haproxy_updateocsp_one($socketupdate, $filename, $name) {
 function haproxy_updateocsp($socketupdate = true) {
 	global $g;
 
-	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item');
+	$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 	$configpath = "{$g['varetc_path']}/haproxy";
 	foreach ($a_frontends as $frontend) {
 		$primaryfrontend = get_primaryfrontend($frontend);
@@ -1518,7 +1524,7 @@ function haproxy_updateocsp($socketupdate = true) {
 }
 
 function haproxy_writeconf($configpath) {
-	global $a_files_cache, $aliastable, $a_action, $a_error, $openssl111;
+	global $a_files_cache, $aliastable, $a_action, $a_error, $openssl111, $haproxy_server_state_path;
 	if (!isset($aliastable)) {
 		alias_make_table();
 	}
@@ -1530,7 +1536,7 @@ function haproxy_writeconf($configpath) {
 	rmdir_recursive($configpath);
 	@mkdir($configpath, 0755, true);
 
-	$a_global = config_get_path('installedpackages/haproxy');
+	$a_global = config_get_path('installedpackages/haproxy', []);
 	$a_frontends = getarraybyref($a_global,'ha_backends','item');
 	$a_backends = getarraybyref($a_global,'ha_pools','item');
 	$a_mailers = getarraybyref($a_global,'email_mailers','item');
@@ -1609,7 +1615,7 @@ function haproxy_writeconf($configpath) {
 		if ($a_global['log-send-hostname']) {
 			fwrite ($fd, "\tlog-send-hostname\t\t{$a_global['log-send-hostname']}\n");
 		}
-		fwrite ($fd, "\tserver-state-file /tmp/haproxy_server_state\n");
+		fwrite ($fd, "\tserver-state-file {$haproxy_server_state_path}\n");
 
 		// lua-load
 		if (is_array($a_files)) {
@@ -2269,7 +2275,7 @@ function use_transparent_clientip_proxying() {
 }
 
 function haproxy_get_transparent_backends(){
-	$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item');
+	$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item', []);
 	$transparent_backends = array();
 	foreach ($a_backends as $backend) {
 		if ($backend["transparent_clientip"] != 'yes') {
@@ -2332,17 +2338,8 @@ function load_ipfw_rules() {
 		$transparent_interfaces[$interface] = 1;
 	}
 
-	if (haproxy_utils::$pf_version < 2.4) {
-		$rulenum = 64000; // why that high? captiveportal.inc also does it...
-		// pfSense 2.2 FreeBSD 10
-		mwexec("/sbin/ipfw zone $ipfw_zone_haproxy create", true);
-		foreach($transparent_interfaces as $transparent_if => $value) {
-			mwexec("/sbin/ipfw zone $ipfw_zone_haproxy madd $transparent_if", true);
-		}
-	} else {
-		// pfSense 2.4, captive portal rules start at 1000
-		$rulenum = 10;
-	}
+	// pfSense 2.4, captive portal rules start at 1000
+	$rulenum = 10;
 
 	foreach($transparent_backends as $transparent_be) {
 		if (is_ipaddrv4($transparent_be["address"])) {
@@ -2357,11 +2354,7 @@ function load_ipfw_rules() {
 
 
 	file_put_contents("{$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", $rules);
-	if (haproxy_utils::$pf_version < 2.4) {
-		mwexec("/sbin/ipfw -x $ipfw_zone_haproxy -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
-	} else {
-		mwexec("/sbin/ipfw -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
-	}
+	mwexec("/sbin/ipfw -q {$g['tmp_path']}/ipfw_{$ipfw_zone_haproxy}.haproxy.rules", true);
 }
 
 function delete_ipfw_rules() {
@@ -2395,7 +2388,7 @@ function haproxy_plugin_certificates($pluginparams) {
 		$result['pkgname'] = "HAProxy";
 		$result['certificatelist'] = array();
 		// return a array of used certificates.
-		$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item');
+		$a_frontends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 		foreach($a_frontends as &$frontend) {
 			if (get_frontend_uses_ssl($frontend) && ($frontend['secondary'] != 'yes')) {
 				if ($pluginparams['event'] == 'used_certificates') {
@@ -2452,7 +2445,7 @@ function haproxy_plugin_certificates($pluginparams) {
 			}
 		}
 
-		$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item');
+		$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item', []);
 		foreach ($a_backends as $backend) {
 			$a_servers = getarraybyref($backend,'ha_servers','item');
 			foreach($a_servers as $srv) {
@@ -2495,17 +2488,17 @@ function haproxy_carpipismaster($ip) {
 	return null;
 }
 
-function haproxy_check_run($reload) {
-	global $g, $haproxy_run_message;
+function haproxy_check_run($reload, $keep_server_state = true) {
+	global $g, $haproxy_run_message, $haproxy_server_state_path;
 	haproxy_config_init();
 	$haproxylock = lock("haproxy", LOCK_EX);
-	$a_global = config_get_path('installedpackages/haproxy');
+	$a_global = config_get_path('installedpackages/haproxy', []);
 	$configpath = "{$g['varetc_path']}/haproxy";
 
 	if ($reload) {
-		if (haproxy_is_running()) {
+		if ($keep_server_state && haproxy_is_running()) {
 			$r = haproxy_socket_command("show servers state");
-			file_put_contents("/tmp/haproxy_server_state", $r);
+			file_put_contents($haproxy_server_state_path, $r);
 		}
 
 		haproxy_writeconf($configpath);
@@ -2529,7 +2522,7 @@ function haproxy_check_run($reload) {
 			$status = haproxy_carpipismaster($a_global['carpdev']);
 			if (!$status) {
 				if (haproxy_is_running()) {
-					log_error("Stopping haproxy on CARP backup.");
+					logger(LOG_INFO, localize_text("Stopping haproxy on CARP backup."), LOG_PREFIX_PKG_HAPROXY);
 					//exec("/bin/pkill -F /var/run/haproxy.pid haproxy");//doesnt work for multiple pid's in a pidfile
 					haproxy_kill();
 				}
@@ -2539,7 +2532,7 @@ function haproxy_check_run($reload) {
 				unlock($haproxylock);
 				return (0);
 			}
-			log_error("Starting haproxy on CARP master.");
+			logger(LOG_INFO, localize_text("Starting haproxy on CARP master."), LOG_PREFIX_PKG_HAPROXY);
 			/* fallthrough */
 		} elseif ($reload == 0) {
 			unlock($haproxylock);
@@ -2568,14 +2561,14 @@ function haproxy_check_run($reload) {
 				$sf_st = "-sf";//finish serving existing connections exit when done, and the new process is listening
 			}
 
-			syslog(LOG_NOTICE, "haproxy: reload old pid:$old_pid");
+			logger(LOG_NOTICE, localize_text("reload old pid:%s", $old_pid), LOG_PREFIX_PKG_HAPROXY);
 			$restartargs = "";
 			if (haproxy_version() >= "1.8") {
 				$restartargs = " -x /tmp/haproxy.socket";
 			}
 			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid -D $restartargs $sf_st `cat /var/run/haproxy.pid` 2>&1", $output, $errcode);
 		} else {
-			syslog(LOG_NOTICE, "haproxy: starting old pid:$old_pid");
+			logger(LOG_NOTICE, localize_text("starting old pid:%s", $old_pid), LOG_PREFIX_PKG_HAPROXY);
 			exec("/usr/local/sbin/haproxy -f {$configpath}/haproxy.cfg -p /var/run/haproxy.pid -D 2>&1", $output, $errcode);
 		}
 		if (file_exists('/var/run/haproxy.pid')){
@@ -2583,7 +2576,7 @@ function haproxy_check_run($reload) {
 		} else {
 			$new_pid = 'none';
 		}
-		syslog(LOG_NOTICE, "haproxy: started new pid:$new_pid");
+		logger(LOG_NOTICE, localize_text("started new pid:%s", $new_pid), LOG_PREFIX_PKG_HAPROXY);
 
 		$syslogmessage = "";
 		foreach($output as $line) {
@@ -2591,7 +2584,7 @@ function haproxy_check_run($reload) {
 			$syslogmessage .= str_replace("\n"," ",$line);
 		}
 		if (!empty($syslogmessage)) {
-			syslog(LOG_NOTICE, "haproxy: startup error output!: {$syslogmessage}");
+			logger(LOG_NOTICE, localize_text("startup error output!: %s", $syslogmessage), LOG_PREFIX_PKG_HAPROXY);
 		}
 
 	} else {
@@ -2619,48 +2612,64 @@ function killprocesses($processname, $pidfile, $signal = "KILL") {
 	exec("kill -$signal `pgrep -x $processname | grep -w -f $pidfile`");
 }
 
-function haproxy_sync_xmlrpc_settings() {
-	if (!is_array(config_get_path('installedpackages/haproxysyncpkg'))) {
-		return false;
+function haproxy_plugin_xmlrpc_send() {
+	if (!config_path_enabled('installedpackages/haproxy', 'enablesync')) {
+		return [];
 	}
-	// preserve 'old' sync settings, that should not be overwritten by xmlrpc-sync.
-	$old_config = config_get_path('installedpackages/haproxy');
-	$enable = config_path_enabled('installedpackages/haproxy', 'enablesync');
-	config_set_path('installedpackages/haproxy', config_get_path('installedpackages/haproxysyncpkg'));
-	config_del_path('installedpackages/haproxysyncpkg');
 
-	// restore 'old' settings.
-	config_set_path('installedpackages/haproxy/enablesync', $enable ? true : false);
-	config_set_path('installedpackages/haproxy/log-send-hostname', $old_config['log-send-hostname']);
-
-	write_config("haproxy, xmlrpc config synced"); // Write new 'merged' configuration
+	return [
+		'installedpackages/haproxy'
+	];
 }
 
-function haproxy_do_xmlrpc_sync() {
-	$syncinfo = array();
-	$syncinfo['sync_logname'] = "HAProxy";
-	$syncinfo['data'] = haproxy_xmlrpc_sync_prepare_config();
-	$syncinfo['sync_include'] = "/usr/local/pkg/haproxy/haproxy.inc";
-	$syncinfo['sync_done_execute'] = "haproxy_xmlrpc_sync_configure";
-	xmlrpc_sync_execute($syncinfo);
-}
-
-function haproxy_xmlrpc_sync_prepare_config() {
-	/* xml will hold the sections to sync */
-	$xml = array();
-	$xml['haproxysyncpkg'] = config_get_path('installedpackages/haproxy');
-	return $xml;
-}
-
-function haproxy_xmlrpc_sync_configure() {
-	// this function is called by xmlrpc after config has been synced.
-	haproxy_sync_xmlrpc_settings();
-	haproxy_configure(); // Configure HAProxy config files to use the new configuration.
-
-	// sync 2nd and further nodes in the chain if applicable.
-	if (config_path_enabled('installedpackages/haproxy', 'enablesync')) {
-		haproxy_do_xmlrpc_sync();
+function haproxy_plugin_xmlrpc_recv($new_sections) {
+	if (!array_path_enabled($new_sections, 'installedpackages/haproxy', 'enablesync')) {
+		return [];
 	}
+
+	$section_paths = [
+		'installedpackages/haproxy'
+	];
+
+	$ret = [
+		'xmlrpc_recv_result' => false
+	];
+	foreach ($section_paths as $path) {
+		$old_section = config_get_path($path, []);
+		$new_section = array_get_path($new_sections, $path, []);
+
+		// Don't save empty configuration sections.
+		if (empty($old_section) && empty($new_section)) {
+			continue;
+		}
+		// Ignore unchanged configuration sections and sync-related package settings.
+		if ($path == 'installedpackages/haproxy') {
+			$old_section_temp = $old_section;
+			$new_section_temp = $new_section;
+			unset($old_section_temp['enablesync'], $old_section_temp['log-send-hostname']);
+			unset($new_section_temp['enablesync'], $new_section_temp['log-send-hostname']);
+			if ($old_section_temp === $new_section_temp) {
+				continue;
+			} else {
+				// Retain existing sync-related package settings.
+				unset($new_section['enablesync'], $new_section['log-send-hostname']);
+			}
+		} elseif ($old_section === $new_section) {
+			continue;
+		}
+
+		$ret[$path] = array_merge($old_section, $new_section);
+		$ret['xmlrpc_recv_result'] = true;
+	}
+
+	return $ret;
+}
+
+function haproxy_plugin_xmlrpc_recv_done($xmlrpc_recv_result) {
+	if (array_get_path($xmlrpc_recv_result, 'haproxy/xmlrpc_recv_result') !== true) {
+		return;
+	}
+	haproxy_configure();
 }
 
 function get_frontend_id($name) {
@@ -2752,7 +2761,7 @@ function get_frontend_bindips($frontend) {
 }
 
 function haproxy_check_config() {
-	$a_backends = config_get_path('installedpackages/haproxy/ha_backends/item');
+	$a_backends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 	$result = false;
 	$activefrontends = array();
 	$issues = array();
@@ -2875,6 +2884,7 @@ function haproxy_get_cert_acls($cert, $usealternativenames = false) {
 		$cert_cn_regex = "^{$cert_cn_regex}(:([0-9]){1,5})?$";// match both with and without port.
 
 		$acl_item['descr'] = "Certificate ACL matches: {$cert_cn}";
+		// TODO: fix unused variables
 		//$aclname_add = $usealternativenames ? "_{$i}" : "";
 		$acl_item['ref'] = array('name' => "{$aclname}_{$descr}{$aclname_add}",'expression' => 'host_regex', 'value' => $cert_cn_regex, 'certacl' => true);
 
@@ -2985,7 +2995,7 @@ function get_backend($name) {
 }
 
 function use_frontend_as_unixsocket($name) {
-	$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item');
+	$a_backends = config_get_path('installedpackages/haproxy/ha_pools/item', []);
 	foreach ($a_backends as $backend) {
 		$a_servers = getarraybyref($backend,'ha_servers','item');
 		if (is_array($a_servers)) {
@@ -3100,7 +3110,7 @@ function config_id() {
 }
 
 function find_frontends_using_backend($backendname) {
-	$a_backends = config_get_path('installedpackages/haproxy/ha_backends/item');
+	$a_backends = config_get_path('installedpackages/haproxy/ha_backends/item', []);
 	$result = array();
 	foreach ($a_backends as $frontend) {
 		$used = false;

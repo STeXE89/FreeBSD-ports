@@ -1,5 +1,5 @@
 PORTNAME=	efl
-DISTVERSION=	1.27.0
+DISTVERSION=	1.28.1
 PORTREVISION=	4
 CATEGORIES=	devel enlightenment
 MASTER_SITES=	http://download.enlightenment.org/rel/libs/${PORTNAME}/

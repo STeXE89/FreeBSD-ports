@@ -1,9 +1,10 @@
 PORTNAME=	kdisplay
 DISTVERSIONPREFIX=	v
-DISTVERSION=	6.1.0
+DISTVERSION=	6.2.0
+PORTREVISION=	2
 CATEGORIES=	x11
 
-MAINTAINER=	jbeich@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	App and daemon for display managing
 WWW=		https://github.com/winft/kdisplay
 

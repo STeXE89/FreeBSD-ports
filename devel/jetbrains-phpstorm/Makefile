@@ -1,5 +1,6 @@
 PORTNAME=	phpstorm
-PORTVERSION=	2024.1.4
+DISTVERSION=	2025.2.4
+PORTREVISION=	1
 CATEGORIES=	devel
 MASTER_SITES=	https://download-cdn.jetbrains.com/webide/
 PKGNAMEPREFIX=	jetbrains-
@@ -19,23 +20,25 @@ ONLY_FOR_ARCHS=	aarch64 amd64
 
 BUILD_DEPENDS=	jna>0:devel/jna
 RUN_DEPENDS=	intellij-fsnotifier>0:java/intellij-fsnotifier \
-		jetbrains-pty4j>=0.12.25:devel/jetbrains-pty4j \
-		jetbrains-restarter>=241.15989.150:devel/jetbrains-restarter \
+		jetbrains-pty4j>=0.13.11:devel/jetbrains-pty4j \
+		jetbrains-restarter>=2025.2.2:devel/jetbrains-restarter \
 		jetbrains-sqlite>=241.15989.150:devel/jetbrains-sqlite \
 		lsof:sysutils/lsof
 
-USES=		cpe python:run
+USES=		cpe java python:run
 
 CPE_VENDOR=	jetbrains
-USE_JAVA=	yes
-JAVA_VERSION=	17+
+JAVA_VERSION=	21+
 
 DATADIR=	${PREFIX}/share/jetbrains/${PORTNAME}
+
+EXTRACT_AFTER_ARGS+=	--exclude PhpStorm-*/jbr
+
 NO_BUILD=	yes
 SUB_FILES=	${PORTNAME} ${PORTNAME}.desktop pkg-message
 SUB_LIST=	JAVA_HOME=${JAVA_HOME}
 
-WRKSRC=		${WRKDIR}/PhpStorm-241.18034.69
+WRKSRC=		${WRKDIR}/PhpStorm-252.27397.112
 
 _PTY4J_ARCH=	freebsd/${ARCH:S/amd64/x86-64/}
 _SQLITE_ARCH=	linux-${ARCH:S/amd64/x86_64/}
@@ -48,21 +51,20 @@ do-install:
 # Linux/Windows/OS X only so remove them
 	@${RM} -r \
 		${WRKSRC}/bin/fsnotifier \
+		${WRKSRC}/bin/phpstorm \
 		${WRKSRC}/bin/remote-dev-server \
 		${WRKSRC}/bin/remote-dev-server.sh \
 		${WRKSRC}/bin/repair \
 		${WRKSRC}/bin/restarter \
-		${WRKSRC}/jbr \
 		${WRKSRC}/lib/async-profiler \
 		${WRKSRC}/lib/jna \
 		${WRKSRC}/lib/native \
 		${WRKSRC}/lib/pty4j \
-		${WRKSRC}/plugins/clouds-docker-gateway \
-		${WRKSRC}/plugins/clouds-docker-impl \
+		${WRKSRC}/lib/skiko-awt-runtime-all \
 		${WRKSRC}/plugins/cwm-plugin \
-		${WRKSRC}/plugins/gateway-plugin \
-		${WRKSRC}/plugins/gateway-terminal \
+		${WRKSRC}/plugins/gateway-plugin/lib/remote-dev-workers \
 		${WRKSRC}/plugins/remote-dev-server \
+		${WRKSRC}/plugins/station-plugin/toolbox \
 		${WRKSRC}/plugins/webp/lib/libwebp
 	${MKDIR} ${STAGEDIR}${DATADIR}
 	@(cd ${WRKSRC} && ${COPYTREE_SHARE} . ${STAGEDIR}${DATADIR} \
@@ -87,5 +89,7 @@ do-install:
 # Use sqlite replacement provided by devel/jetbrains-sqlite
 	${MKDIR} ${STAGEDIR}${DATADIR}/lib/native/${_SQLITE_ARCH}
 	${LN} -sf ../../../../sqlite/${ARCH}/libsqliteij.so ${STAGEDIR}${DATADIR}/lib/native/${_SQLITE_ARCH}/libsqliteij.so
+# Disable automatic updates
+	${ECHO} "ide.no.platform.update=FreeBSD Ports" >> ${STAGEDIR}${DATADIR}/bin/idea.properties
 
 .include <bsd.port.mk>

@@ -1,4 +1,4 @@
---- ui/base/x/x11_display_manager.cc.orig	2024-06-25 12:08:48 UTC
+--- ui/base/x/x11_display_manager.cc.orig	2025-12-10 15:04:57 UTC
 +++ ui/base/x/x11_display_manager.cc
 @@ -16,7 +16,7 @@
  #include "ui/gfx/x/randr.h"

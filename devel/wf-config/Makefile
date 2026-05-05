@@ -1,9 +1,9 @@
 PORTNAME=	wf-config
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.8.0
+DISTVERSION=	0.10.0
 CATEGORIES=	devel
 
-MAINTAINER=	jbeich@FreeBSD.org
+MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Library for managing configuration files, written for wayfire
 WWW=		https://wayfire.org/
 
@@ -23,6 +23,7 @@ USE_GNOME=	libxml2
 USE_LDCONFIG=	yes
 GH_ACCOUNT=	WayfireWM
 MESON_ARGS=	-Dtests=disabled
+PLIST_SUB=	VERSION=${PORTVERSION}
 
 pre-test:
 	@if [ ! -e ${WRKDIR}/.meson_build_tests ]; then \

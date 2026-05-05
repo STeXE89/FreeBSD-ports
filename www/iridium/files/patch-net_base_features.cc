@@ -1,24 +1,38 @@
---- net/base/features.cc.orig	2024-06-25 12:08:48 UTC
+--- net/base/features.cc.orig	2026-03-24 16:59:08 UTC
 +++ net/base/features.cc
-@@ -26,7 +26,7 @@ BASE_FEATURE(kCapReferrerToOriginOnCrossOrigin,
+@@ -29,7 +29,7 @@ BASE_FEATURE(kCapReferrerToOriginOnCrossOrigin,
+ 
  BASE_FEATURE(kAsyncDns,
-              "AsyncDns",
  #if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_ANDROID) || \
 -    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 +    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
               base::FEATURE_ENABLED_BY_DEFAULT
  #else
               base::FEATURE_DISABLED_BY_DEFAULT
-@@ -516,7 +516,12 @@ BASE_FEATURE(kSpdyHeadersToHttpResponseUseBuilder,
-              "SpdyHeadersToHttpResponseUseBuilder",
+@@ -297,7 +297,7 @@ inline constexpr auto kMigrateSessionsOnNetworkChangeV
+ BASE_FEATURE(kMigrateSessionsOnNetworkChangeV2,
+              kMigrateSessionsOnNetworkChangeV2Default);
+ 
+-#if BUILDFLAG(IS_LINUX)
++#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
+ BASE_FEATURE(kAddressTrackerLinuxIsProxied, base::FEATURE_ENABLED_BY_DEFAULT);
+ #endif  // BUILDFLAG(IS_LINUX)
+ 
+@@ -409,7 +409,7 @@ BASE_FEATURE(kReportingApiEnableEnterpriseCookieIssues
               base::FEATURE_DISABLED_BY_DEFAULT);
  
-+#if BUILDFLAG(IS_OPENBSD)
-+// No IP_RECVTOS support
- BASE_FEATURE(kReportEcn, "ReportEcn", base::FEATURE_DISABLED_BY_DEFAULT);
-+#else
-+BASE_FEATURE(kReportEcn, "ReportEcn", base::FEATURE_DISABLED_BY_DEFAULT);
-+#endif
+ BASE_FEATURE(kSimdutfBase64Support,
+-#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
++#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
+              base::FEATURE_ENABLED_BY_DEFAULT
+ #else
+              base::FEATURE_DISABLED_BY_DEFAULT
+@@ -517,7 +517,7 @@ BASE_FEATURE(kHttpCacheMappedFileFlushWin, base::FEATU
  
- BASE_FEATURE(kUseNewAlpsCodepointHttp2,
-              "UseNewAlpsCodepointHttp2",
+ BASE_FEATURE(kHttpCacheNoVarySearch,
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+-    BUILDFLAG(IS_CHROMEOS)
++    BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
+              base::FEATURE_ENABLED_BY_DEFAULT
+ #else
+              base::FEATURE_DISABLED_BY_DEFAULT

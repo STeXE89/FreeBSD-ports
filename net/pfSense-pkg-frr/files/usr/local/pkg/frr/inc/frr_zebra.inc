@@ -3,7 +3,7 @@
  * frr_zebra.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2017-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -791,7 +791,7 @@ function frr_generate_config_zebra() {
 	/* Populate FRR Global Settings */
 	$frr_conf = config_get_path('installedpackages/frr/config/0', []);
 	if (empty($frr_conf)) {
-		frr_package_log("FRR Zebra: No config data found.");
+		frr_package_log("Zebra: No config data found.");
 		return;
 	}
 	if (!array_key_exists('enable', $frr_conf) ||

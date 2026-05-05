@@ -1,6 +1,6 @@
---- src/3rdparty/chromium/sandbox/policy/features.cc.orig	2023-10-11 18:22:24 UTC
+--- src/3rdparty/chromium/sandbox/policy/features.cc.orig	2025-08-15 18:30:00 UTC
 +++ src/3rdparty/chromium/sandbox/policy/features.cc
-@@ -19,7 +19,11 @@ namespace sandbox::policy::features {
+@@ -20,7 +20,11 @@ BASE_FEATURE(kNetworkServiceSandbox,
  // (Only causes an effect when feature kNetworkServiceInProcess is disabled.)
  BASE_FEATURE(kNetworkServiceSandbox,
               "NetworkServiceSandbox",

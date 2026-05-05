@@ -3,7 +3,7 @@
  * haproxy_files.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2016-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2014 PiBa-NL
  * All rights reserved.
  *
@@ -70,7 +70,7 @@ if ($_POST) {
 		}
 
 		// replace references in backends to renamed 'files'
-		$a_pools = config_get_path('installedpackages/haproxy/ha_pools/item');
+		$a_pools = config_get_path('installedpackages/haproxy/ha_pools/item', []);
 		foreach($a_pools as &$backend) {
 			$a_errorfiles = getarraybyref($backend, 'errorfiles', 'item');
 			foreach($a_errorfiles as &$errorfile) {
@@ -106,7 +106,12 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 if (file_exists($d_haproxyconfdirty_path)) {
-	print_apply_box(sprintf(gettext("The haproxy configuration has been changed.%sYou must apply the changes in order for them to take effect."), "<br/>"));
+	print_apply_box(sprintf(
+		gettext(
+			"The HAProxy configuration has been changed.%sServer states are preserved between configuration changes - " .
+			"use %sSettings > Force Service Restart%s to apply changes immediately."
+		), "<br/>", '<a href="/haproxy/haproxy_global.php">', '</a>'
+	));
 }
 haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "files");
 ?>

@@ -1,11 +1,11 @@
---- base/threading/platform_thread.h.orig	2024-06-17 12:56:06 UTC
+--- base/threading/platform_thread.h.orig	2026-03-13 06:02:14 UTC
 +++ base/threading/platform_thread.h
-@@ -49,6 +49,8 @@ typedef DWORD PlatformThreadId;
- typedef zx_koid_t PlatformThreadId;
+@@ -61,6 +61,8 @@ class BASE_EXPORT PlatformThreadId {
+   using UnderlyingType = zx_koid_t;
  #elif BUILDFLAG(IS_APPLE)
- typedef mach_port_t PlatformThreadId;
+   using UnderlyingType = uint64_t;
 +#elif BUILDFLAG(IS_BSD)
-+typedef uint64_t PlatformThreadId;
++  using UnderlyingType = uint64_t;
  #elif BUILDFLAG(IS_POSIX)
- typedef pid_t PlatformThreadId;
+   using UnderlyingType = pid_t;
  #endif

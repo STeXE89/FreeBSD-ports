@@ -3,7 +3,7 @@
  * haproxy_global.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2009-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2009-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013 PiBa-NL
  * Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
  * All rights reserved.
@@ -36,7 +36,6 @@ $sslcompatibilitymodes = array('auto' => 'Auto', 'modern' => 'Modern', 'intermed
 
 $none = array();
 $none['']['name'] = "Dont log";
-$a_sysloglevel = $a_sysloglevel;
 
 $fields_mailers = array();
 $fields_mailers[0]['name'] = "name";
@@ -88,8 +87,8 @@ if ($_POST) {
 		if ($changed > 0)
 			touch($d_haproxyconfdirty_path);
 	} else
-	if ($_POST['apply']) {
-		$result = haproxy_check_and_run($savemsg, true);
+	if ($_POST['apply'] || $_POST['service_force_restart']) {
+		$result = haproxy_check_and_run($savemsg, true, isset($_POST['service_force_restart']));
 		if ($result)
 			unlink_if_exists($d_haproxyconfdirty_path);
 	} else {
@@ -112,9 +111,9 @@ if ($_POST) {
 			$input_errors[] = "The local stats sticktable refresh time should be numeric or empty.";
 
 		if (!$input_errors) {
-			$haproxycfg = config_get_path('installedpackages/haproxy');
-			$haproxycfg['email_mailers']['item'] = $a_mailers;
-			$haproxycfg['dns_resolvers']['item'] = $a_resolvers;
+			$haproxycfg = config_get_path('installedpackages/haproxy', []);
+			array_set_path($haproxycfg, 'email_mailers/item', $a_mailers);
+			array_set_path($haproxycfg, 'dns_resolvers/item', $a_resolvers);
 			$haproxycfg['enable'] = $_POST['enable'] ? true : false;
 			$haproxycfg['terminate_on_reload'] = $_POST['terminate_on_reload'] ? true : false;
 			$haproxycfg['maxconn'] = $_POST['maxconn'] ? $_POST['maxconn'] : false;
@@ -178,7 +177,12 @@ if ($savemsg) {
 	print_info_box($savemsg);
 }
 if (file_exists($d_haproxyconfdirty_path)) {
-	print_apply_box(sprintf(gettext("The haproxy configuration has been changed.%sYou must apply the changes in order for them to take effect."), "<br/>"));
+	print_apply_box(sprintf(
+		gettext(
+			"The HAProxy configuration has been changed.%sServer states are preserved between configuration changes - " .
+			"use %sSettings > Force Service Restart%s to apply changes immediately."
+		), "<br/>", '<a href="/haproxy/haproxy_global.php">', '</a>'
+	));
 }
 haproxy_display_top_tabs_active($haproxy_tab_array['haproxy'], "settings");
 
@@ -468,6 +472,13 @@ $section->addInput(new Form_Checkbox(
 EOD
 );
 $form->add($section);
+
+$form->addGlobal(new Form_Button(
+	'service_force_restart',
+	'Force Service Restart',
+	null,
+	'fa-solid fa-cog'
+))->addClass('btn btn-danger');
 
 print $form;
 

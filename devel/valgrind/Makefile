@@ -1,5 +1,5 @@
 PORTNAME=	valgrind
-PORTVERSION=	3.23.0
+DISTVERSION=	3.26.0
 PORTEPOCH=	1
 CATEGORIES=	devel
 MASTER_SITES=	SOURCEWARE/valgrind
@@ -8,13 +8,13 @@ MAINTAINER=	pjfloyd@wanadoo.fr
 COMMENT=	Memory debugging and profiling tool
 WWW=		https://www.valgrind.org/
 
-LICENSE=	GPLv2
+LICENSE=	GPLv3
 LICENSE_FILE=	${WRKSRC}/COPYING
 
 ONLY_FOR_ARCHS=	aarch64 amd64 i386
 
 USES=		autoreconf cpe gmake pathfix perl5 pkgconfig shebangfix \
-		python:3.9+,run tar:bz2
+		python:run tar:bz2
 USE_PERL5=	build
 SHEBANG_FILES=	callgrind/callgrind_annotate.in callgrind/callgrind_control.in \
 		cachegrind/cg_merge.in cachegrind/cg_diff.in \
@@ -22,6 +22,7 @@ SHEBANG_FILES=	callgrind/callgrind_annotate.in callgrind/callgrind_control.in \
 GNU_CONFIGURE=	yes
 CONFIGURE_ENV+=	ac_cv_path_PERL=${PERL}
 
+PIE_UNSAFE=	yes
 SSP_UNSAFE=	yes
 LIB32_PATH?=	/usr/lib32/libc.so
 
@@ -55,6 +56,8 @@ MANPAGES_BUILD_DEPENDS=	docbook-xsl>=0:textproc/docbook-xsl \
 MPI_LIB_DEPENDS=	libmpich.so:net/mpich
 
 .include <bsd.port.options.mk>
+
+PLIST_SUB+=	ARCH=${ARCH:S/i386/x86/:S/aarch64/arm64/}
 
 .if ${ARCH} == "amd64"
 PLIST_SUB+=		AMD64=""

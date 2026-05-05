@@ -1,6 +1,6 @@
---- base/process/memory_linux.cc.orig	2024-06-22 08:49:42 UTC
+--- base/process/memory_linux.cc.orig	2025-11-01 06:40:37 UTC
 +++ base/process/memory_linux.cc
-@@ -28,6 +28,7 @@ void __libc_free(void*);
+@@ -29,6 +29,7 @@ void* __libc_calloc(size_t, size_t);
  
  namespace base {
  
@@ -8,7 +8,7 @@
  namespace {
  
  void ReleaseReservationOrTerminate() {
-@@ -37,12 +38,14 @@ void ReleaseReservationOrTerminate() {
+@@ -39,12 +40,14 @@ void ReleaseReservationOrTerminate() {
  }
  
  }  // namespace
@@ -23,7 +23,7 @@
    // Set the new-out of memory handler.
    std::set_new_handler(&ReleaseReservationOrTerminate);
    // If we're using glibc's allocator, the above functions will override
-@@ -51,8 +54,10 @@ void EnableTerminationOnOutOfMemory() {
+@@ -53,8 +56,10 @@ void EnableTerminationOnOutOfMemory() {
  #if PA_BUILDFLAG(USE_ALLOCATOR_SHIM)
    allocator_shim::SetCallNewHandlerOnMallocFailure(true);
  #endif
@@ -40,5 +40,5 @@
  }
 +#endif
  
- bool UncheckedMalloc(size_t size, void** result) {
+ bool UncheckedCalloc(size_t num_items, size_t size, void** result) {
  #if PA_BUILDFLAG(USE_ALLOCATOR_SHIM)

@@ -1,7 +1,13 @@
 PORTNAME=	ifcopenshell
 PORTVERSION=	0.7.0.231127
+PORTREVISION=	5
 DISTVERSIONPREFIX=	v
 CATEGORIES=	cad
+
+PATCH_SITES=	https://github.com/IfcOpenShell/IfcOpenShell/commit/
+PATCHFILES=	589b98053e62ee14b6817e7d2b9f5b6b527310b7.patch:-p1 \
+		1fe168d331123920eeb9a96e542fcc1453de57fe.patch:-p1 \
+		0f87bd8206a50d186621c2511d2e907bcf438968.patch:-p1
 
 MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Open source IFC library and geometry engine
@@ -13,7 +19,7 @@ LICENSE_FILE=	${WRKSRC}/COPYING.LESSER
 BUILD_DEPENDS=	${LOCALBASE}/include/CGAL/Cartesian.h:math/cgal \
 		${LOCALBASE}/include/nlohmann/json.hpp:devel/nlohmann-json \
 		${LOCALBASE}/include/svgpp/svgpp.hpp:graphics/svgpp
-LIB_DEPENDS=	libboost_system.so:devel/boost-libs \
+LIB_DEPENDS=	libboost_thread.so:devel/boost-libs \
 		libgmp.so:math/gmp libmpfr.so:math/mpfr \
 		libTKernel.so:cad/opencascade740
 

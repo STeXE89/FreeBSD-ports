@@ -3,7 +3,7 @@
  * snmptt.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2017-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2017-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,8 @@ require_once("util.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
+
+define('LOG_PREFIX_PKG_SNMPTT', 'snmptt');
 
 function php_deinstall_snmptt() {
 	unlink_if_exists("/usr/local/etc/rc.d/snmptt.sh");
@@ -59,7 +61,7 @@ function sync_package_snmptt() {
 	global $g;
 
 	if (is_service_running('snmptt') && !file_exists("{$g['tmp_path']}/.rc.start_packages.running")) {
-		log_error("Stopping service snmptt");
+		logger(LOG_INFO, localize_text("Stopping service"), LOG_PREFIX_PKG_SNMPTT);
 		stop_service('snmptt');
 	}
 
@@ -119,7 +121,7 @@ function sync_package_snmptt() {
 		);
 
 		if (!file_exists("{$g['tmp_path']}/.rc.start_packages.running")) {
-			log_error("Starting service snmptt");
+			logger(LOG_INFO, localize_text("Starting service"), LOG_PREFIX_PKG_SNMPTT);
 			start_service("snmptt");
 		}
 	} else {

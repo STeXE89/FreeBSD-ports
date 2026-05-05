@@ -1,7 +1,7 @@
 PORTNAME=	octave
 PORTVERSION=	${OCTAVE_VERSION}
-PORTREVISION=	2
-CATEGORIES=	math
+PORTREVISION=	3
+CATEGORIES=	math java
 MASTER_SITES=	GNU
 
 MAINTAINER=	stephen@FreeBSD.org
@@ -14,12 +14,13 @@ BUILD_DEPENDS=	${LOCALBASE}/bin/gperf:devel/gperf \
 		${LOCALBASE}/bin/makeinfo:print/texinfo \
 		gnuplot:math/gnuplot \
 		gsed:textproc/gsed \
-		${LOCALBASE}/include/rapidjson/rapidjson.h:devel/rapidjson
+		${LOCALBASE}/include/rapidjson/rapidjson.h:devel/rapidjson \
+		${LOCALBASE}/include/fast_float/fast_float.h:math/fast_float
 RUN_DEPENDS=	${LOCALBASE}/bin/makeinfo:print/texinfo \
 		gnuplot:math/gnuplot \
 		gsed:textproc/gsed
 LIB_DEPENDS=	libamd.so:math/suitesparse-amd \
-		libarpack.so:math/arpack-ng \
+		libarpack.so:math/arpack-ng@mpich \
 		libcamd.so:math/suitesparse-camd \
 		libccolamd.so:math/suitesparse-ccolamd \
 		libcholmod.so:math/suitesparse-cholmod \
@@ -48,9 +49,9 @@ LIB_DEPENDS=	libamd.so:math/suitesparse-amd \
 		libsundials_arkode.so:math/sundials \
 		libumfpack.so:math/suitesparse-umfpack
 
-USES=		charsetfix compiler:c++14-lang desktop-file-utils fortran gl \
+USES=		charsetfix compiler:c++17-lang desktop-file-utils fortran gl \
 		gmake iconv libtool localbase:ldflags ncurses octave:env perl5 \
-		pkgconfig readline tar:xz xorg
+		pkgconfig readline tar:xz xorg python:3.0+
 USE_LDCONFIG=	${PREFIX}/lib/${PORTNAME}/${PORTVERSION}
 USE_PERL5=	build
 GNU_CONFIGURE=	yes
@@ -100,18 +101,22 @@ DOCS_CONFIGURE_ENABLE=	docs
 JAVA_CONFIGURE_ENABLE=	java
 QT6_CONFIGURE_WITH=	qscintilla qt=6
 
-QT6_LIB_DEPENDS=	libqscintilla2_qt6.so:devel/qscintilla2-qt6
+QT6_LIB_DEPENDS=	libqscintilla2_qt6.so:devel/qscintilla2@qt6
 
 DOCS_USES=	tex
 DOCS_USE=	TEX=dvipsk:build,formats:build
-JAVA_USE=	JAVA=yes
+JAVA_USES=	java
 JAVA_CFLAGS=	-I${JAVA_HOME}/include/${OPSYS:tl}
+JAVA_VARS=	JAVA_VERSION=11+
 QT6_USES=	qt:6
 OPENBLAS_USES=	blaslapack:openblas
 NETLIB_USES=	blaslapack:netlib
 ATLAS_USES=	blaslapack:atlas
 
 BINARY_ALIAS=	sed=gsed
+
+post-patch:
+	${REINPLACE_CMD} -e s+python3+${PYTHON_CMD}+g ${WRKSRC}/scripts/miscellaneous/python.m
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}

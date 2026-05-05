@@ -1,6 +1,6 @@
 PORTNAME=	iamb
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.0.9
+DISTVERSION=	0.0.11
 PORTREVISION=	2
 CATEGORIES=	net-im
 
@@ -11,8 +11,7 @@ WWW=		https://iamb.chat/
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-BUILD_DEPENDS=	${LOCALBASE}/libdata/pkgconfig/oniguruma.pc:devel/oniguruma
-
+BROKEN_i386=	fails to build
 USES=		cargo ssl
 USE_GITHUB=	yes
 GH_ACCOUNT=	ulyssa
@@ -25,4 +24,11 @@ post-install:
 	${INSTALL_DATA} ${WRKSRC}/docs/iamb.1 ${STAGEDIR}${PREFIX}/share/man/man1
 	${INSTALL_DATA} ${WRKSRC}/docs/iamb.5 ${STAGEDIR}${PREFIX}/share/man/man5
 
-.include <bsd.port.mk>
+.include <bsd.port.pre.mk>
+
+.if ${ARCH:Marmv?}
+LTO_UNSAFE=	yes
+CARGO_ENV+=	CARGO_PROFILE_RELEASE_LTO=false
+.endif
+
+.include <bsd.port.post.mk>

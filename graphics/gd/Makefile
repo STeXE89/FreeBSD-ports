@@ -14,7 +14,8 @@ LICENSE_FILE=	${WRKSRC}/COPYING
 
 CONFLICTS_INSTALL=	libgd ??-libgd
 
-USES=		cpe tar:xz pkgconfig pathfix libtool:keepla autoreconf shebangfix
+USES=		autoreconf cpe gettext-tools libtool:keepla pathfix pkgconfig \
+		shebangfix tar:xz
 SHEBANG_FILES=	${WRKSRC}/src/bdftogd
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--enable-gd-formats
@@ -47,7 +48,6 @@ HEIF_CPPFLAGS=		-I${LOCALBASE}/include
 AVIF_LIB_DEPENDS=	libavif.so:graphics/libavif
 AVIF_CONFIGURE_OFF=	--without-avif
 AVIF_CPPFLAGS=		-I${LOCALBASE}/include
-AVIF_BROKEN=	option AVIF has a circular dependency loop
 LIQ_DESC=	libimagequant color conversion support
 LIQ_LIB_DEPENDS=	libimagequant.so:graphics/libimagequant
 LIQ_CONFIGURE_OFF=	--with-liq=no

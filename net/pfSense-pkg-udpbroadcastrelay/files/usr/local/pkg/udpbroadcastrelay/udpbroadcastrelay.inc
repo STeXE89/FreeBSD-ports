@@ -3,7 +3,7 @@
  * udpbroadcastrelay.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2023-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2023-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,9 +23,11 @@ require_once('pfsense-utils.inc');
 require_once('service-utils.inc');
 require_once('interfaces.inc');
 
+define('LOG_PREFIX_PKG_UDPBROADCASTRELAY', 'udpbroadcastrelay');
+
 global $udpbr_global;
 if (!isset($udpbr_global)) {
-	$udpbr_global['name'] = 'udpbroadcastrelay';
+	$udpbr_global['name'] = LOG_PREFIX_PKG_UDPBROADCASTRELAY;
 	$udpbr_global = [
 		'name'        => $udpbr_global['name'],
 		'config_path' => "installedpackages/{$udpbr_global['name']}/config/0",
@@ -44,11 +46,7 @@ if (!isset($udpbr_global)) {
  *                              config revision.
  */
 function udpbr_log(string $message, int $priority = LOG_INFO, bool $config_revision = false): void {
-	global $udpbr_global;
-
-	openlog($udpbr_global['name'], LOG_ODELAY, LOG_DAEMON);
-	syslog($priority, $message);
-	closelog();
+	logger($priority, $message, LOG_PREFIX_PKG_UDPBROADCASTRELAY, LOG_DAEMON);
 
 	if ($config_revision) {
 		write_config("UDP Broadcast Relay: {$message}");
@@ -198,6 +196,12 @@ function udpbr_get_command(array $config): string {
  */
 function udpbr_resync(): void {
 	global $udpbr_global;
+	$config = udpbr_get_config();
+
+	// Don't take any action if the service is disabled
+	if (empty($config) || !isset($config['enable'])) {
+		return;
+	}
 
 	udpbr_log(gettext('Reloading service.'), LOG_INFO);
 
@@ -210,10 +214,10 @@ function udpbr_resync(): void {
 
 	// Bail if the system is booting - package services will be started after
 	if (is_platform_booting()) {
+		udpbr_log(gettext('Ignoring service start - the system is still booting.'), LOG_INFO);
 		return;
 	}
 
-	$config = udpbr_get_config();
 	$input_errors = udpbr_parse_config($config);
 
 	// Bail if there's a configuration issue
@@ -223,7 +227,8 @@ function udpbr_resync(): void {
 	}
 
 	// Don't take further action if no instance would be started
-	if (empty($config) || !isset($config['enable']) || empty($config['item'])) {
+	if (empty($config['item'])) {
+		udpbr_log(gettext('Ignoring service start - no configured instances to start.'), LOG_INFO);
 		return;
 	}
 
@@ -255,7 +260,7 @@ function udpbr_resync(): void {
 				{$run_command} 2>\$UDPBRTEMP >/dev/null
 				ERRORMSG=\$(cat \${UDPBRTEMP})
 				if [ "\$ERRORMSG" != '' ]; then
-					/usr/bin/logger -p daemon.err -t {$udpbr_global['name']} "{$func_gettext('Failed to start instance.')}: \${ERRORMSG}"
+					/usr/bin/logger -p daemon.err -t {$udpbr_global['name']} "ERROR [{$udpbr_global['name']}] {$func_gettext('Failed to start instance.')}: \${ERRORMSG}"
 				fi
 		
 		SSCRIPT;
@@ -263,6 +268,7 @@ function udpbr_resync(): void {
 
 	// Don't take further action if no instance would be started
 	if (empty($run_commands)) {
+		udpbr_log(gettext('Ignoring service start - no valid instances to start.'), LOG_INFO);
 		return;
 	}
 
@@ -277,7 +283,7 @@ function udpbr_resync(): void {
 	$start .= <<<ESSCRIPT
 	    rm -f "\${UDPBRTEMP}"
 	    else
-	        /usr/bin/logger -p daemon.err -t {$udpbr_global['name']} "{$func_gettext('Failed to start service.')} (\${ERRORMSG})"
+	        /usr/bin/logger -p daemon.err -t {$udpbr_global['name']} "ERROR [{$udpbr_global['name']}] {$func_gettext('Failed to start service.')} (\${ERRORMSG})"
 	    fi
 	ESSCRIPT;
 
@@ -313,7 +319,7 @@ function udpbr_resync(): void {
 function udpbr_get_interfaces(bool $valid_only = true, bool $append_port = true): array {
 	$interfaces = [];
 	$interface_ports = array_flip(get_interface_arr());
-	foreach (config_get_path('interfaces') as $interface_name => $interface) {
+	foreach (config_get_path('interfaces', []) as $interface_name => $interface) {
 		if ($valid_only && (!isset($interface['enable']) ||
 		    !isset($interface['if']) || !isset($interface_ports[$interface['if']]))) {
 			/* Skip invalid interfaces. Valid interfaces must be assigned,

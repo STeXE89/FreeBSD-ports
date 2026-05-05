@@ -1,5 +1,5 @@
 PORTNAME=	goaccess
-PORTVERSION=	1.9.3
+PORTVERSION=	1.10.1
 CATEGORIES=	sysutils
 MASTER_SITES=	https://tar.goaccess.io/
 
@@ -10,7 +10,7 @@ WWW=		https://goaccess.io
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-USES=		alias compiler:c11 pkgconfig ncurses
+USES=		compiler:c11 pkgconfig ncurses
 USE_RC_SUBR=	goaccess
 
 INSTALL_TARGET=	install-strip

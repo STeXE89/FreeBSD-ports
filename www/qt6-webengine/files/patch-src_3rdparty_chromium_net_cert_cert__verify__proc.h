@@ -1,6 +1,6 @@
---- src/3rdparty/chromium/net/cert/cert_verify_proc.h.orig	2023-08-17 07:33:31 UTC
+--- src/3rdparty/chromium/net/cert/cert_verify_proc.h.orig	2025-08-15 18:30:00 UTC
 +++ src/3rdparty/chromium/net/cert/cert_verify_proc.h
-@@ -79,7 +79,7 @@ class NET_EXPORT CertVerifyProc
+@@ -186,7 +186,7 @@ class NET_EXPORT CertVerifyProc
      kMaxValue = kChainLengthOne
    };
  

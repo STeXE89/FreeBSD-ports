@@ -1,5 +1,6 @@
 PORTNAME=	gpsd
 PORTVERSION=	3.25
+PORTREVISION=	3
 CATEGORIES=	astro geography
 MASTER_SITES=	SAVANNAH
 
@@ -14,10 +15,14 @@ FLAVORS=	default nox11
 FLAVOR?=	${FLAVORS:[1]}
 nox11_PKGNAMESUFFIX=	-nox11
 
+BUILD_DEPENDS=	${PY_SETUPTOOLS}
+
 USES=		cpe pathfix pkgconfig python scons
 CPE_VENDOR=	gpsd_project
 USE_LDCONFIG=	yes
 USE_RC_SUBR=	gpsd
+
+PIE_UNSAFE=	yes
 
 MAKE_ARGS=	manbuild=no \
 		mandir="share/man" \
@@ -146,12 +151,10 @@ RECONFIGURE_MAKE_ARGS_OFF=	reconfigure=no
 CPPBIND_MAKE_ARGS_OFF=		libgpsmm=no
 PYSERIAL_BUILD_DEPENDS=		${PYTHON_PKGNAMEPREFIX}pyserial>=0:comms/py-pyserial@${PY_FLAVOR}
 PYSERIAL_RUN_DEPENDS=		${PYTHON_PKGNAMEPREFIX}pyserial>=0:comms/py-pyserial@${PY_FLAVOR}
-X11_BUILD_DEPENDS=		${PYTHON_PKGNAMEPREFIX}cairo>=0:graphics/py-cairo@${PY_FLAVOR} \
-				${PYTHON_PKGNAMEPREFIX}gobject3>=0:devel/py-gobject3@${PY_FLAVOR}
-X11_RUN_DEPENDS=		${PYTHON_PKGNAMEPREFIX}cairo>=0:graphics/py-cairo@${PY_FLAVOR} \
-				${PYTHON_PKGNAMEPREFIX}gobject3>=0:devel/py-gobject3@${PY_FLAVOR}
+X11_BUILD_DEPENDS=		${PYTHON_PKGNAMEPREFIX}pycairo>=0:graphics/py-pycairo@${PY_FLAVOR}
+X11_RUN_DEPENDS=		${PYTHON_PKGNAMEPREFIX}pycairo>=0:graphics/py-pycairo@${PY_FLAVOR}
 X11_USES=			gnome
-X11_USE=			GNOME=gtk30
+X11_USE=			gnome=gtk30 pygobject3
 X11_MAKE_ARGS_OFF=		xgps=no
 
 # Build control

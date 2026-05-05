@@ -1,9 +1,9 @@
---- chrome/browser/web_applications/policy/web_app_policy_manager.cc.orig	2024-05-23 20:04:36 UTC
+--- chrome/browser/web_applications/policy/web_app_policy_manager.cc.orig	2026-02-15 10:01:45 UTC
 +++ chrome/browser/web_applications/policy/web_app_policy_manager.cc
-@@ -101,7 +101,7 @@ namespace web_app {
+@@ -123,7 +123,7 @@ GetPreinstalledWebAppsMappingForTesting() {
+ namespace web_app {
  
  BASE_FEATURE(kDesktopPWAsForceUnregisterOSIntegration,
-              "DesktopPWAsForceUnregisterOSIntegration",
 -#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX)
 +#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
               base::FEATURE_ENABLED_BY_DEFAULT

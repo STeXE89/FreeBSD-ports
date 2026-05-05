@@ -1,4 +1,4 @@
---- media/audio/pulse/pulse_util.cc.orig	2024-06-25 12:08:48 UTC
+--- media/audio/pulse/pulse_util.cc.orig	2025-12-10 15:04:57 UTC
 +++ media/audio/pulse/pulse_util.cc
 @@ -45,7 +45,11 @@ constexpr char kBrowserDisplayName[] = "chromium-brows
  

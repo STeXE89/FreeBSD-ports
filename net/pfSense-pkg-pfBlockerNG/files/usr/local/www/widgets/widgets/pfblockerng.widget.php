@@ -3,8 +3,8 @@
  * pfblockerng.widget.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2024 Rubicon Communications, LLC (Netgate)
- * Copyright (c) 2015-2023 BBcan177@gmail.com
+ * Copyright (c) 2016-2026 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2024 BBcan177@gmail.com
  * All rights reserved.
  *
  * Originally based Upon pfBlocker
@@ -47,8 +47,7 @@ $pfb['err']	= '<i class="fa-solid fa-minus-circle text-danger" title="pf Errors 
 $wglobal_array = array ('popup' => 'off', 'sortcolumn' => 'none', 'sortmix' => 'off', 'sortdir' => 'asc', 'dnsblquery' => 5,
 			'maxfails' => 3, 'maxheight' => 2500, 'clearip' => 'never', 'cleardnsbl' => 'never');
 
-config_init_path('installedpackages/pfblockerngglobal');
-$pfb['wglobal'] = config_get_path('installedpackages/pfblockerngglobal');
+$pfb['wglobal'] = config_get_path('installedpackages/pfblockerngglobal', []);
 foreach ($wglobal_array as $type => $value) {
 	$pfb[$type] = $pfb['wglobal']['widget-' . "{$type}"] ?: $value;
 }
@@ -285,7 +284,11 @@ function pfBlockerNG_update_table() {
 
 			if (isset($pfb_alias)) {
 				if (substr($line, 0, 9) == 'Addresses') {
-					$addr = trim(substr(strrchr($line, ':'), 1));
+					$addr = trim(exec_command(implode(' ', [
+						$pfb['pfctl'], '-t',
+						escapeshellarg($pfb_alias),
+						'-Tshow', '|', $pfb['wc'], '-l'
+					])));
 					if (!is_numeric($addr)) {
 						$addr = 0;
 					}
@@ -630,7 +633,7 @@ function pfBlockerNG_get_header($mode='') {
 			$dnsbl_msg	= "DNSBL {$py_mode} is out of sync. Perform a Force Reload to correct.";
 		} else {
 			$dnsbl_status	= 'fa-solid fa-check-circle text-success';
-			$dnsbl_msg	= "DNSBL {$py_mode} is Active on vip: {$pfb['dnsbl_vip']} ports: {$pfb['dnsbl_port']} & {$pfb['dnsbl_port_ssl']}";
+			$dnsbl_msg	= "DNSBL {$py_mode} is Active on vip: {$pfb['dnsbl_vip4']} ports: {$pfb['dnsbl_port']} & {$pfb['dnsbl_port_ssl']}";
 		}
 
 		// Check for any Python Integration errors

@@ -1,6 +1,6 @@
 PORTNAME=	BerkeleyGW
 DISTVERSION=	4.0
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	science
 MASTER_SITES=	https://app.box.com/shared/static/
 DISTFILES=	22edl07muvhfnd900tnctsjjftbtcqc4.gz
@@ -18,7 +18,7 @@ BUILD_DEPENDS=	bash:shells/bash
 LIB_DEPENDS=	libfftw3.so:math/fftw3
 RUN_DEPENDS=	bash:shells/bash
 
-USES=		blaslapack:openblas gmake fortran python shebangfix
+USES=		blaslapack:openblas gmake fortran:gfortran python shebangfix
 
 SHEBANG_GLOB=	*.sh *.py *awk
 

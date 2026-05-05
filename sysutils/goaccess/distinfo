@@ -1,3 +1,5 @@
-TIMESTAMP = 1718472174
-SHA256 (goaccess-1.9.3.tar.gz) = 49f0ee49e3c4a95f5f75f6806b0406746fcbf2f9ad971cae23e2ea95d3ec7837
-SIZE (goaccess-1.9.3.tar.gz) = 821878
+TIMESTAMP = 1773165557
+SHA256 (goaccess-1.10.1.tar.gz) = 32293bc6bc5f6d113e8490c8ff78a10bbc629aa23b0fb428534f53cc0c9a756e
+SIZE (goaccess-1.10.1.tar.gz) = 1118613
+SHA256 (edf8a85.patch) = 67af95c43c347465a5d0c145e2c8fe9867dac8ddda5baa4a898a52f879565722
+SIZE (edf8a85.patch) = 858

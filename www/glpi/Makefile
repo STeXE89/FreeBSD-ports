@@ -1,17 +1,17 @@
 PORTNAME=	glpi
-PORTVERSION=	10.0.15
+DISTVERSION=	11.0.1
 PORTREVISION=	1
 PORTEPOCH=	1
 CATEGORIES=	www
-MASTER_SITES=	https://github.com/glpi-project/glpi/releases/download/${PORTVERSION}/
+MASTER_SITES=	https://github.com/glpi-project/glpi/releases/download/${DISTVERSION}/
 
-MAINTAINER=	mathias@monnerville.com
+MAINTAINER=	m@kappa.st
 COMMENT=	Free IT and asset management software
 WWW=		https://glpi-project.org/
 
 LICENSE=	GPLv2
 
-USES=		cpe gettext php tar:tgz
+USES=		cpe gettext-tools php tar:tgz
 CPE_VENDOR=	glpi-project
 USE_PHP=	bz2 ctype curl dom exif fileinfo filter gd iconv intl json \
 		mbstring mysqli opcache session simplexml sodium xml xmlreader \

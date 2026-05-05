@@ -1,5 +1,5 @@
 PORTNAME=	boolector
-DISTVERSION=	3.2.3
+DISTVERSION=	3.2.4
 PORTREVISION=	1
 CATEGORIES=	math
 
@@ -27,6 +27,9 @@ USE_GITHUB=	yes
 GH_ACCOUNT=	Boolector
 
 SHEBANG_GLOB=	*.sh
+
+CFLAGS+=	-I${LOCALBASE}/include/cadical
+CXXFLAGS+=	-I${LOCALBASE}/include/cadical
 
 CMAKE_ON=	BUILD_SHARED_LIBS \
 		USE_GMP

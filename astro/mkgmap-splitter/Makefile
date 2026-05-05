@@ -1,5 +1,6 @@
 PORTNAME=	splitter
 PORTVERSION=	r654
+PORTREVISION=	1
 CATEGORIES=	astro converters java
 MASTER_SITES=	https://www.mkgmap.org.uk/download/
 PKGNAMEPREFIX=	mkgmap-
@@ -10,8 +11,7 @@ WWW=		https://www.mkgmap.org.uk/doc/splitter.html
 
 LICENSE=	GPLv3
 
-USE_JAVA=	yes
-JAVA_VERSION=	8+
+USES=		java
 NO_BUILD=	yes
 NO_ARCH=	yes
 

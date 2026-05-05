@@ -1,6 +1,6 @@
---- src/utils/os_unix.c.orig	2022-01-16 12:51:29.000000000 -0800
-+++ src/utils/os_unix.c	2024-06-01 22:03:18.774245000 -0700
-@@ -103,10 +103,12 @@
+--- src/utils/os_unix.c.orig	2024-07-20 18:04:37 UTC
++++ src/utils/os_unix.c
+@@ -103,9 +103,11 @@ int os_get_reltime(struct os_reltime *t)
  			break;
  #endif
  #ifdef CLOCK_MONOTONIC
@@ -8,8 +8,7 @@
  		case CLOCK_MONOTONIC:
  			clock_id = CLOCK_REALTIME;
  			break;
- #endif
 +#endif
+ #endif
  		case CLOCK_REALTIME:
  			return -1;
- 		}

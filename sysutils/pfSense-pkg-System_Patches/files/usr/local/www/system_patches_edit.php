@@ -3,7 +3,7 @@
  * system_patches_edit.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2012-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2012-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,16 +32,18 @@ require_once("patches.inc");
 require_once("pkg-utils.inc");
 require_once('classes/Form.class.php');
 
-config_init_path('installedpackages/patches/item');
-
 $id = $_GET['id'];
-if (isset($_POST['id'])) {
+if (is_numericint($_POST['id'])) {
 	$id = $_POST['id'];
 }
 
-if (isset($_GET['dup'])) {
+if (is_numericint($_GET['dup'])) {
 	$id = $_GET['dup'];
 	$after = $_GET['dup'];
+}
+
+if (!is_numericint($id)) {
+	unset($id);
 }
 
 $this_patches_config = isset($id) ? config_get_path("installedpackages/patches/item/{$id}") : null;
@@ -132,7 +134,7 @@ if ($_POST) {
 			config_set_path("installedpackages/patches/item/{$id}", $thispatch);
 		} else {
 			if (is_numeric($after)) {
-				$a_patches = config_set_path('installedpackages/patches/item');
+				$a_patches = config_get_path('installedpackages/patches/item');
 				array_splice($a_patches, $after+1, 0, array($thispatch));
 				config_set_path('installedpackages/patches/item', $a_patches);
 			} else {
@@ -140,7 +142,7 @@ if ($_POST) {
 			}
 		}
 
-		write_config(gettext("System: Patches: edited a patch."));
+		write_config(LOG_PREFIX_PKG_SYSTEMPATCHES . ": " . gettext("edited a patch."));
 		if ($thispatch['autoapply']) {
 			patch_add_shellcmd();
 		}
@@ -237,7 +239,7 @@ $section = new Form_Section('Patch Information');
 
 $section->addInput(new Form_StaticText(
 	'Patch ID',
-	$pconfig['uniqid']
+	htmlspecialchars($pconfig['uniqid'])
 ));
 
 $form->add($section);

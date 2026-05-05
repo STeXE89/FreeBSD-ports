@@ -1,11 +1,11 @@
 PORTNAME=	vkmark
-DISTVERSION=	2017.08-36
-PORTREVISION=	1
-DISTVERSIONSUFFIX=	-gab6e6f3
+DISTVERSION=	2025.01
+PORTREVISION=	2
 CATEGORIES=	benchmarks
 
 PATCH_SITES=	https://github.com/${GH_ACCOUNT}/${GH_PROJECT}/commit/
-PATCHFILES+=	27fa846e34ed.patch:-p1 # https://github.com/vkmark/vkmark/pull/29
+PATCHFILES+=	abc5fc849569.patch:-p1 # https://github.com/vkmark/vkmark/pull/80
+PATCHFILES+=	ab3f3d709e2f.patch:-p1 # https://github.com/vkmark/vkmark/pull/80
 
 MAINTAINER=	jbeich@FreeBSD.org
 COMMENT=	Vulkan benchmark

@@ -1,7 +1,6 @@
 PORTNAME=	wlrobs
 DISTVERSIONPREFIX=	v
-PORTVERSION=	1.1
-PORTREVISION=	3
+PORTVERSION=	1.2
 CATEGORIES=	multimedia wayland
 MASTER_SITES=	https://hg.sr.ht/~scoopta/${PORTNAME}/archive/${DISTVERSIONFULL:C/.*-//}${EXTRACT_SUFX}?dummy=/
 
@@ -12,6 +11,7 @@ WWW=		https://hg.sr.ht/~scoopta/wlrobs
 LICENSE=	GPLv3+
 LICENSE_FILE=	${WRKSRC}/COPYING.md
 
+BUILD_DEPENDS=	simde>0:devel/simde # XXX Move to RUN_DEPENDS in obs-studio
 LIB_DEPENDS=	libwayland-client.so:graphics/wayland \
 		libobs.so:multimedia/obs-studio
 

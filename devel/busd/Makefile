@@ -1,5 +1,5 @@
 PORTNAME=	busd
-DISTVERSION=	0.3.1
+DISTVERSION=	0.5.0
 PORTREVISION=	2
 CATEGORIES=	devel
 
@@ -19,5 +19,10 @@ post-patch:
 # Respect consolekit2 as XDG_RUNTIME_DIR fallback
 	@${REINPLACE_CMD} 's,/run,/var&,' \
 		${WRKSRC}/src/bus/mod.rs
+# Respect PREFIX for devel/dbus configs
+	@${REINPLACE_CMD} 's,/usr/share,${LOCALBASE}/share,' \
+		${WRKSRC}/src/bin/busd.rs \
+		${WRKSRC}/src/config/mod.rs \
+		${WRKSRC}/tests/config.rs
 
 .include <bsd.port.mk>

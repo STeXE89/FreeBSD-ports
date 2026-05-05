@@ -3,7 +3,7 @@
  * tinc.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2016-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2016-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,26 +25,28 @@ require_once('service-utils.inc');
 require_once('util.inc');
 require_once('system.inc');
 
+define('LOG_PREFIX_PKG_TINC', 'tinc');
+
 function tinc_plugin_carp($pluginparams) {
 	// $pluginparams['type'] = 'carp';
 	// $pluginparams['event'] = 'rc.carpmaster';
 	// $pluginparams['interface'] = $argument;
-	log_error("[tinc] got carp event ");
+	logger(LOG_INFO, localize_text("got carp event "), LOG_PREFIX_PKG_TINC);
 	if ($pluginparams['type'] == 'carp') {
 		if ($pluginparams['event'] == 'rc.carpmaster') {
 			// start
-			log_error("[tinc] got CARP:MASTER -> starting");
+			logger(LOG_INFO, localize_text("got CARP:MASTER -> starting"), LOG_PREFIX_PKG_TINC);
 			if (is_service_running('tinc')) {
-				log_error("[tinc] already running");
+				logger(LOG_INFO, localize_text("Service already running"), LOG_PREFIX_PKG_TINC);
 			} else {
 				start_service("tinc");
 			}
 		}
 		if ($pluginparams['event'] == 'rc.carpbackup') {
 			// stop
-			log_error("[tinc] got CARP:BACKUP -> stopping");
+			logger(LOG_INFO, localize_text("got CARP:BACKUP -> stopping"), LOG_PREFIX_PKG_TINC);
 			if (!is_service_running('tinc')) {
-				log_error("[tinc] already stopped");
+				logger(LOG_INFO, localize_text("Service already stopped"), LOG_PREFIX_PKG_TINC);
 			} else {
 				stop_service("tinc");
 			}
@@ -67,7 +69,7 @@ function tinc_save() {
 
 	// No proper config, bail out.
 	if (!isset($tincconf['name']) || empty($tincconf['name'])) {
-		log_error("[tinc] Cannot configure (name not set). Check your configuration.");
+		logger(LOG_ERR, localize_text("Cannot configure (name not set). Check your configuration."), LOG_PREFIX_PKG_TINC);
 		return;
 	}
 
@@ -75,7 +77,6 @@ function tinc_save() {
 	fwrite($fout, "name=" . $tincconf['name'] . "\n");
 	fwrite($fout, "AddressFamily=" . $tincconf['addressfamily'] . "\n");
 
-	config_init_path('installedpackages/tinchosts/config');
 	foreach (config_get_path('installedpackages/tinchosts/config', []) as $host) {
 		if ($host['connect']) {
 			fwrite($fout, "ConnectTo=" . $host['name'] . "\n");
@@ -176,12 +177,11 @@ function tinc_install() {
 	unlink_if_exists("/usr/local/etc/rc.d/tincd");
 
 	/* Create Interface Group */
-	config_init_path('ifgroups/ifgroupentry');
 
 	/* Don't add the interface group if it already exists */
 	$found = false;
 	foreach (config_get_path('ifgroups/ifgroupentry', []) as $ifg) {
-		if ($ifg == "pkg_tinc") {
+		if ($ifg['ifname'] == "pkg_tinc") {
 			$found = true;
 		}
 	}
@@ -193,10 +193,6 @@ function tinc_install() {
 		config_set_path('ifgroups/ifgroupentry/', $ifgroupentry);
 	}
 
-	/*
-	 * XXX: Do not remove this, otherwise the interface group may not be added properly.
-	 */
-	unlink_if_exists("{$g['tmp_path']}/config.cache");
 	write_config("[tinc] Package installed.");
 }
 
@@ -204,7 +200,6 @@ function tinc_deinstall() {
 	global $g;
 
 	/* Remove Interface Group */
-	config_init_path('ifgroups/ifgroupentry');
 
 	$myid = -1;
 	foreach (config_get_path('ifgroups/ifgroupentry', []) as $idx => $ifgroupentry) {
@@ -214,23 +209,19 @@ function tinc_deinstall() {
 		}
 	}
 
-	if ($myid >= 0 && config_get_path("ifgroups/ifgroupentry/{$myid}")) {
-		$members = explode(" ", config_get_path("ifgroups/ifgroupentry/{$_GET['id']}/members"));
+	if (is_numericint($myid) && config_get_path("ifgroups/ifgroupentry/{$myid}")) {
+		$members = array_filter(explode(" ", config_get_path("ifgroups/ifgroupentry/{$myid}/members")));
 		foreach ($members as $ifs) {
 			$realif = get_real_interface($ifs);
 			if ($realif) {
-				mwexec("/sbin/ifconfig {$realif} -group " . escapeshellarg(config_get_path("ifgroups/ifgroupentry/{$_GET['id']}/ifname")));
+				mwexec("/sbin/ifconfig {$realif} -group " . escapeshellarg(config_get_path("ifgroups/ifgroupentry/{$myid}/ifname")));
 			}
 		}
 		config_del_path("ifgroups/ifgroupentry/{$myid}");
-		/*
-		* XXX: Do not remove this, otherwise the interface group may not be removed properly.
-		*/
-		unlink_if_exists("{$g['tmp_path']}/config.cache");
-		write_config("[tinc] Package uninstalled.");
 	}
 	rmdir_recursive("/var/tmp/tinc");
 	rmdir_recursive("/usr/local/etc/tinc*");
+	write_config("[tinc] Package uninstalled.");
 }
 
 function tinc_validate_input($post, &$input_errors) {

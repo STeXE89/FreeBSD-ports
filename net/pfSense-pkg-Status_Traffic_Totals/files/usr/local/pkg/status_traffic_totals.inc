@@ -3,7 +3,7 @@
  * status_traffic_totals.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2008-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2008-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -25,6 +25,8 @@
 require_once("service-utils.inc");
 require_once("interfaces.inc");
 require_once("ipsec.inc");
+
+define('LOG_PREFIX_PKG_TRAFFICTOTALS', 'Traffic Totals');
 
 global $vnstat_dbdir, $vnstat_config;
 $vnstat_dbdir = '/var/db/vnstat';
@@ -64,7 +66,7 @@ CTxD            "-"
 EOF;
 
 	if (file_put_contents($vnstat_config, $vnstat_conf_file) === FALSE) {
-		log_error("ERROR: Could not write {$vnstat_config}");
+		logger(LOG_ERR, localize_text("Could not write %s", $vnstat_config), LOG_PREFIX_PKG_TRAFFICTOTALS);
 		exit;
 	}
 }
@@ -173,7 +175,7 @@ EOD;
 }
 
 function vnstat_portlist() {
-	$portlist = config_get_path('interfaces');
+	$portlist = config_get_path('interfaces', []);
 	$ifdescrs = get_configured_interface_with_descr();
 
 	if (ipsec_enabled()) {

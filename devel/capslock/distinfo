@@ -1,5 +1,5 @@
-TIMESTAMP = 1719466891
-SHA256 (go/devel_capslock/capslock-v0.2.3/v0.2.3.mod) = dece902f3a3aea0c606a7e5e9fab925a2aa5c46088a8fa9dfc4769ea1f36ff48
-SIZE (go/devel_capslock/capslock-v0.2.3/v0.2.3.mod) = 411
-SHA256 (go/devel_capslock/capslock-v0.2.3/v0.2.3.zip) = 4d1c32488f3ff13540b75a4c5f61e4953b1cde7d0ae181578bd84574e81eae63
-SIZE (go/devel_capslock/capslock-v0.2.3/v0.2.3.zip) = 141966
+TIMESTAMP = 1762663355
+SHA256 (go/devel_capslock/capslock-v0.3.0/v0.3.0.mod) = cc7f47e5f670baae906d69de9f54540cd2c0a04e67e0f77f3bff8b1af8cc4cb2
+SIZE (go/devel_capslock/capslock-v0.3.0/v0.3.0.mod) = 415
+SHA256 (go/devel_capslock/capslock-v0.3.0/v0.3.0.zip) = 493b6ae7e0bea89855935fdbe87e8fa2292d5c314321aa186c4dea2d33970844
+SIZE (go/devel_capslock/capslock-v0.3.0/v0.3.0.zip) = 155789

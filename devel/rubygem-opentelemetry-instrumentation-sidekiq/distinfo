@@ -1,3 +1,3 @@
-TIMESTAMP = 1716202777
-SHA256 (rubygem/opentelemetry-instrumentation-sidekiq-0.25.4.gem) = 4ce1b2e0952321d504d4c3e0e4fcbd5d090ff1f4de4cb214c6aa79d70ce8a3a3
-SIZE (rubygem/opentelemetry-instrumentation-sidekiq-0.25.4.gem) = 13824
+TIMESTAMP = 1760249402
+SHA256 (rubygem/opentelemetry-instrumentation-sidekiq-0.27.0.gem) = 780cb9b9ccfa715cec2691bc8c1faa264bbbe9281bd974f64cb2f49c4e6eff7a
+SIZE (rubygem/opentelemetry-instrumentation-sidekiq-0.27.0.gem) = 14336

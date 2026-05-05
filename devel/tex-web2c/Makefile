@@ -1,5 +1,6 @@
 PORTNAME=	web2c
 DISTVERSION=	${TEXLIVE_VERSION}
+PORTREVISION=	1
 CATEGORIES=	devel
 MASTER_SITES=	TEX_CTAN/systems/texlive/${TEXLIVE_YEAR}
 PKGNAMEPREFIX=	tex-
@@ -40,7 +41,9 @@ CONFIGURE_ARGS=		--disable-aleph \
 			--disable-ptex \
 			--disable-synctex \
 			--disable-tex \
+			--disable-texprof \
 			--disable-uptex \
+			--disable-upweb \
 			--disable-xetex \
 			--with-system-mpfi \
 			--with-system-zlib \

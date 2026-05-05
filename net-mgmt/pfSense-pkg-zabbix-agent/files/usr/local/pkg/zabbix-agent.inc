@@ -3,7 +3,7 @@
  * zabbix-agent.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2013 Danilo G. Baio
  * Copyright (c) 2013 Marcello Coutinho
  * All rights reserved.
@@ -90,9 +90,23 @@ function validate_input_zabbix_agent($post, &$input_errors) {
 		}
 
 		if ($post['refreshactchecks'] != '') {
+			if (!in_array(ZABBIX_VERSION, [6])) {
+				$refreshactchecks_min = 1;
+				$refreshactchecks_max = 86400;
+			} else {
+				// Zabbix version < 7
+				$refreshactchecks_min = 60;
+				$refreshactchecks_max = 3600;
+			}
+			$filter_validate_int_options = [
+				'options' => [
+					'min_range' => $refreshactchecks_min,
+					'max_range' => $refreshactchecks_max
+				]
+			];
 			if (!is_numericint($post['refreshactchecks'])) {
 				$input_errors[] = "'Refresh Active Checks' value is not numeric.";
-			} elseif ($post['refreshactchecks'] < 60 || $post['refreshactchecks'] > 3600) {
+			} elseif (filter_var($post['refreshactchecks'], FILTER_VALIDATE_INT, $filter_validate_int_options) === false) {
 				$input_errors[] = "You must enter a valid value for 'Refresh Active Checks'.";
 			}
 		}
@@ -137,8 +151,7 @@ function sync_package_zabbix_agent() {
 
 	// Check Zabbix Agent settings
 	if (is_array(config_get_path('installedpackages/%%ZABBIXUNIQNAME%%'))) {
-		config_init_path('installedpackages/%%ZABBIXUNIQNAME%%/config/0');
-		$zbagent_config = config_get_path('installedpackages/%%ZABBIXUNIQNAME%%/config/0');
+		$zbagent_config = config_get_path('installedpackages/%%ZABBIXUNIQNAME%%/config/0', []);
 		if ($zbagent_config['agentenabled'] == "on") {
 			$RefreshActChecks = (preg_match("/(\d+)/", $zbagent_config['refreshactchecks'], $matches)? $matches[1] : "120");
 			$BufferSend = (preg_match("/(\d+)/", $zbagent_config['buffersend'], $matches) ? $matches[1] : "5");
@@ -345,7 +358,6 @@ function zabbix_agent_certca($type) {
 
 function zabbixagent_plugin_certificates($pluginparams) {
 	$result = array();
-	config_init_path('installedpackages/zabbixagentlts/config');
 	$zabbixconf = config_get_path('installedpackages/zabbixagentlts/config/0');
 
 	if (($pluginparams['type'] == 'certificates') && !empty($zabbixconf) && ($zabbixconf['agentenabled'] == 'on')) {

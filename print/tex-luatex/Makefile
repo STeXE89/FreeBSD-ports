@@ -1,5 +1,6 @@
 PORTNAME=	luatex
 DISTVERSION=	${TEXLIVE_VERSION}
+PORTREVISION=	1
 CATEGORIES=	print
 MASTER_SITES=	TEX_CTAN/systems/texlive/${TEXLIVE_YEAR}/
 PKGNAMEPREFIX=	tex-
@@ -21,7 +22,7 @@ LIB_DEPENDS=	libfreetype.so:print/freetype2 \
 		libTECkit.so:textproc/teckit \
 		libzzip.so:devel/zziplib
 
-USES=		gnome libtool localbase pkgconfig python:env tar:xz tex xorg
+USES=		gmake gnome libtool localbase pkgconfig python:env tar:xz tex xorg
 USE_GNOME=	cairo
 USE_LDCONFIG=	yes
 USE_TEX=	fmtutil formats kpathsea texlua texluajit web2c
@@ -34,16 +35,14 @@ CONFIGURE_ARGS+=	${EXCLUDE_ENGINES:S/^/--disable-/} \
 			--enable-luahbtex \
 			--enable-luajithbtex \
 			--with-system-zlib \
-			--with-system-zziplib \
-			CC="${CC}" \
-			CXX="${CXX}"
+			--with-system-zziplib
+CONFIGURE_ENV+=		${MAKE_ENV}
+
 .for L in cairo freetype2 gmp graphite2 harfbuzz kpathsea libpng mpfr pixman ptexenc teckit
 CONFIGURE_ARGS+=	--with-$L-include=${LOCALBASE}/include \
 			--with-$L-libdir=${LOCALBASE}/lib \
 			--with-system-$L
 .endfor
-
-MAKE_JOBS_UNSAFE=	yes
 
 EXTRACT_AFTER_ARGS=	${EXTRACT_FILES:S,^,${DISTNAME}/,}
 EXTRACT_FILES=			build-aux libs/xpdf libs/lua53 libs/luajit \
@@ -65,7 +64,7 @@ EXTRACT_FILES_TEXMF=		texmf-dist/doc/lualatex texmf-dist/doc/luatex \
 WRKSRC=				${WRKDIR}/${DISTNAME}/texk/web2c
 EXCLUDE_ENGINES=		aleph etex pdftex mf mf-nowin ptex eptex uptex \
 				euptex otangle mp pmp upmp web2c web-progs \
-				xetex tex synctex mflua mfluajit
+				xetex tex synctex mflua mfluajit texprof hitex
 TEX_FORMATS=			luatex
 
 TEXHASHDIRS=	${TEXMFDISTDIR} ${TEXMFVARDIR}
@@ -76,6 +75,10 @@ post-extract:
 	cd ${WRKSRC}/.. && \
 	    ${LN} -s -f ${LOCALBASE}/${TEXMFDISTDIR}/web2c kpathsea
 
+post-patch:
+	${REINPLACE_CMD} -E 's|gcc|${CC}|' \
+		${WRKSRC}/../../libs/luajit/LuaJIT-src/src/Makefile
+
 pre-configure:
 	for D in libs/xpdf libs/pplib; do \
 		cd ${WRKDIR}/${DISTNAME}/$$D && \
@@ -84,6 +87,8 @@ pre-configure:
 	done
 	cd ${WRKDIR}/${DISTNAME}/libs/pplib && \
 		${MAKE}
+	cd ${WRKDIR}/${DISTNAME}/libs/luajit/LuaJIT-src/src && \
+		${GMAKE} luajit.h
 
 pre-install:
 	${CAT} ${DISTDIR}/${DIST_SUBDIR}/texlive-${TEXLIVE_VERSION}-texmf${EXTRACT_SUFX} \

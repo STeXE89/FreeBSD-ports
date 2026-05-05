@@ -1,27 +1,28 @@
 PORTNAME=	mattermost
-PORTVERSION=	9.5.6
+PORTVERSION=	10.11.12
 PORTREVISION=	1
 CATEGORIES=	www
 MASTER_SITES=	LOCAL/decke
 PKGNAMESUFFIX=	-server
 
-# implicit-approval+ for decke
-MAINTAINER=	bofh@FreeBSD.org
+MAINTAINER=	decke@FreeBSD.org
 COMMENT=	Open source Slack-alternative in Golang and React
 WWW=		https://mattermost.org/
 
 LICENSE=	MIT
 LICENSE_FILE=	${WRKSRC}/../LICENSE.txt
 
-ONLY_FOR_ARCHS=	aarch64 amd64 armv6 armv7 i386
+ONLY_FOR_ARCHS=	aarch64 amd64
+ONLY_FOR_ARCHS_REASON=	module modernc.org/sqlite only supported on aarch64 and amd64
+
 
 RUN_DEPENDS=	${LOCALBASE}/share/certs/ca-root-nss.crt:security/ca_root_nss \
 		mattermost-webapp>=${PORTVERSION}:www/mattermost-webapp
 
-USES=		go:1.22,modules tar:xz
+USES=		go:modules tar:xz
 USE_RC_SUBR=	mattermostd
 
-GO_TARGET=	./cmd/mattermost ./scripts/config_generator
+GO_TARGET=	./cmd/mattermost ./cmd/mmctl ./scripts/config_generator
 GO_BUILDFLAGS=	-ldflags=" \
 		-X github.com/mattermost/mattermost/server/public/model.BuildNumber=${PORTVERSION} \
 		-X github.com/mattermost/mattermost/server/public/model.BuildHashEnterprise=none \

@@ -1,6 +1,7 @@
 PORTNAME=	dri
-PORTVERSION=	23.3.3
-DISTVERSIONSUFFIX=	-1.el9
+PORTVERSION=	25.0.7
+DISTVERSIONSUFFIX=	-3.el9_7
+PORTREVISION=	1
 CATEGORIES=	graphics linux
 
 MAINTAINER=	emulation@FreeBSD.org
@@ -8,16 +9,17 @@ COMMENT=	Mesa libGL runtime libraries (Rocky Linux ${LINUX_DIST_VER})
 
 USES=		linux:rl9
 USE_LDCONFIG=	yes
-USE_LINUX=	elfutils-libelf expat libdrm libglvnd llvm wayland xorglibs
+USE_LINUX=	elfutils-libelf expat libdrm libglvnd llvm spirv-tools wayland xorglibs
 USE_LINUX_RPM=	yes
+WANT_LINUX32=	yes
 
 LIB_DISTNAMES=	freeglut-3.2.1-10.el9 \
 		mesa-dri-drivers-${DISTVERSIONFULL} \
 		mesa-libEGL-${DISTVERSIONFULL} \
 		mesa-libGL-${DISTVERSIONFULL} \
 		mesa-libGLU-9.0.1-6.el9 \
-		mesa-libgbm-${DISTVERSIONFULL} \
-		mesa-libglapi-${DISTVERSIONFULL}
+		mesa-libgbm-${DISTVERSIONFULL}
+#		mesa-libglapi-${DISTVERSIONFULL}
 
 LIB_DISTNAMES_amd64=	m/mesa-vulkan-drivers-${DISTVERSIONFULL} \
 		m/mesa-libxatracker-${DISTVERSIONFULL}

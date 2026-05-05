@@ -1,6 +1,6 @@
---- src/3rdparty/chromium/content/browser/renderer_host/media/service_video_capture_device_launcher.cc.orig	2023-09-13 12:11:42 UTC
+--- src/3rdparty/chromium/content/browser/renderer_host/media/service_video_capture_device_launcher.cc.orig	2025-08-15 18:30:00 UTC
 +++ src/3rdparty/chromium/content/browser/renderer_host/media/service_video_capture_device_launcher.cc
-@@ -24,7 +24,7 @@
+@@ -26,7 +26,7 @@
  #include "media/base/media_switches.h"
  #endif
  
@@ -9,7 +9,7 @@
  #include "content/browser/gpu/gpu_data_manager_impl.h"
  #endif
  
-@@ -166,7 +166,7 @@ void ServiceVideoCaptureDeviceLauncher::LaunchDeviceAs
+@@ -183,7 +183,7 @@ void ServiceVideoCaptureDeviceLauncher::LaunchDeviceAs
    }
  #else
    if (switches::IsVideoCaptureUseGpuMemoryBufferEnabled()) {

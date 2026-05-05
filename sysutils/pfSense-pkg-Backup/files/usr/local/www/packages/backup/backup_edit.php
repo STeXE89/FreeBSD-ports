@@ -3,7 +3,7 @@
  * backup_edit.php
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2026 Rubicon Communications, LLC (Netgate)
  * Copyright (c) 2008 Mark J Crane
  * All rights reserved.
  *
@@ -21,8 +21,6 @@
  */
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/backup.inc");
-
-config_init_path('installedpackages/backup/config');
 
 $id = $_GET['id'];
 if (isset($_POST['id'])) {
@@ -56,7 +54,7 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-	if (!$input_errors) {
+	if (empty($input_errors)) {
 
 		$ent = array();
 		$ent['name'] = $_POST['name'];

@@ -1,6 +1,6 @@
 PORTNAME=	pgbackrest
 DISTVERSIONPREFIX=	release/
-DISTVERSION=	2.51
+DISTVERSION=	2.58.0
 CATEGORIES=	databases
 
 MAINTAINER=	schoutm@gmail.com
@@ -17,18 +17,13 @@ USES=		gnome meson pgsql pkgconfig python ssl
 USE_GITHUB=	yes
 USE_GNOME=	libxml2
 
-MESON_ARGS+=	-Dconfigdir="${LOCALBASE}/etc/pgbackrest"
+MESON_ARGS+=	-Dconfigdir="${ETCDIR}"
 
 BINARY_ALIAS=	python3=${PYTHON_CMD}
 
-OPTIONS_DEFINE=		LZ4 SFTP ZSTD
-OPTIONS_DEFAULT=	LZ4
+OPTIONS_DEFINE=		SFTP ZSTD
 
-SFTP_DESC=	Enable SFTP storage support
-
-LZ4_LIB_DEPENDS=	liblz4.so:archivers/liblz4
-LZ4_MESON_ON=		-Dliblz4=enabled
-LZ4_MESON_OFF=		-Dliblz4=disabled
+SFTP_DESC=		Enable SFTP storage support
 
 SFTP_LIB_DEPENDS=	libssh2.so:security/libssh2
 SFTP_MESON_ON=		-Dlibssh2=enabled
@@ -39,6 +34,6 @@ ZSTD_MESON_ON=		-Dlibzstd=enabled
 ZSTD_MESON_OFF=		-Dlibzstd=disabled
 
 post-install:
-	${MKDIR} ${STAGEDIR}${PREFIX}/etc/pgbackrest
+	${MKDIR} ${STAGEDIR}${ETCDIR}
 
 .include <bsd.port.mk>

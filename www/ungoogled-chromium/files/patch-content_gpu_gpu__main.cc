@@ -1,6 +1,6 @@
---- content/gpu/gpu_main.cc.orig	2024-06-22 08:49:42 UTC
+--- content/gpu/gpu_main.cc.orig	2026-03-15 18:32:51 UTC
 +++ content/gpu/gpu_main.cc
-@@ -94,10 +94,14 @@
+@@ -108,10 +108,14 @@
  #include "sandbox/win/src/sandbox.h"
  #endif
  
@@ -16,7 +16,7 @@
  #include "sandbox/policy/sandbox_type.h"
  #endif
  
-@@ -117,7 +121,7 @@ namespace content {
+@@ -129,7 +133,7 @@ namespace content {
  
  namespace {
  
@@ -25,27 +25,27 @@
  bool StartSandboxLinux(gpu::GpuWatchdogThread*,
                         const gpu::GPUInfo*,
                         const gpu::GpuPreferences&);
-@@ -182,7 +186,7 @@ class ContentSandboxHelper : public gpu::GpuSandboxHel
-   bool EnsureSandboxInitialized(gpu::GpuWatchdogThread* watchdog_thread,
+@@ -191,7 +195,7 @@ class ContentSandboxHelper : public gpu::GpuSandboxHel
                                  const gpu::GPUInfo* gpu_info,
                                  const gpu::GpuPreferences& gpu_prefs) override {
+     TRACE_EVENT("gpu,startup", "gpu_main::EnsureSandboxInitialized");
 -#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 +#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
      return StartSandboxLinux(watchdog_thread, gpu_info, gpu_prefs);
  #elif BUILDFLAG(IS_WIN)
      return StartSandboxWindows(sandbox_info_);
-@@ -291,7 +295,7 @@ int GpuMain(MainFunctionParams parameters) {
+@@ -307,7 +311,7 @@ int GpuMain(MainFunctionParams parameters) {
            std::make_unique<base::SingleThreadTaskExecutor>(
-               gpu_preferences.message_pump_type);
+               gpu_preferences.message_pump_type, /*is_main_thread=*/true);
      }
 -#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 +#elif BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_BSD)
  #error "Unsupported Linux platform."
  #elif BUILDFLAG(IS_MAC)
      // Cross-process CoreAnimation requires a CFRunLoop to function at all, and
-@@ -313,7 +317,8 @@ int GpuMain(MainFunctionParams parameters) {
- 
+@@ -332,7 +336,8 @@ int GpuMain(MainFunctionParams parameters) {
    base::PlatformThread::SetName("CrGpuMain");
+   mojo::InterfaceEndpointClient::SetThreadNameSuffixForMetrics("GpuMain");
  
 -#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_CHROMEOS)
 +// XXX BSD
@@ -53,7 +53,7 @@
    // Thread type delegate of the process should be registered before
    // thread type change below for the main thread and for thread pool in
    // ChildProcess constructor.
-@@ -443,7 +448,7 @@ int GpuMain(MainFunctionParams parameters) {
+@@ -484,7 +489,7 @@ int GpuMain(MainFunctionParams parameters) {
  
  namespace {
  
@@ -62,12 +62,12 @@
  bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdog_thread,
                         const gpu::GPUInfo* gpu_info,
                         const gpu::GpuPreferences& gpu_prefs) {
-@@ -483,7 +488,7 @@ bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdo
+@@ -532,7 +537,7 @@ bool StartSandboxLinux(gpu::GpuWatchdogThread* watchdo
    sandbox_options.accelerated_video_encode_enabled =
        !gpu_prefs.disable_accelerated_video_encode;
  
 -#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX)
 +#if BUILDFLAG(IS_CHROMEOS) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)
    // Video decoding of many video streams can use thousands of FDs as well as
-   // Exo clients like Lacros.
+   // Exo clients.
    // See https://crbug.com/1417237

@@ -1,6 +1,6 @@
 PORTNAME=	stylua
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.20.0
+DISTVERSION=	2.3.1
 PORTREVISION=	4
 CATEGORIES=	devel
 
@@ -34,9 +34,6 @@ OPTIONS_DEFAULT+=	LUA${_ver:C/\.//}
 LUA${_ver:C/\.//}_DESC=	Build with Lua ${_ver} support
 LUA${_ver:C/\.//}_VARS=	CARGO_FEATURES+=lua${_ver:C/\.//}
 .endfor
-
-post-install:
-	${STRIP_CMD} ${STAGEDIR}/${PREFIX}/bin/${PORTNAME}
 
 post-install-DOCS-on:
 	@${MKDIR} ${STAGEDIR}${DOCSDIR}

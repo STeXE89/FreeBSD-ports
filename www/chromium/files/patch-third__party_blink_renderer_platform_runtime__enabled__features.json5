@@ -1,6 +1,51 @@
---- third_party/blink/renderer/platform/runtime_enabled_features.json5.orig	2024-06-17 12:56:06 UTC
+--- third_party/blink/renderer/platform/runtime_enabled_features.json5.orig	2026-03-13 06:02:14 UTC
 +++ third_party/blink/renderer/platform/runtime_enabled_features.json5
-@@ -325,7 +325,7 @@
+@@ -368,7 +368,7 @@
+         "default": "",
+       },
+       origin_trial_feature_name: "AIPromptAPIMultimodalInput",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       origin_trial_allows_third_party: true,
+       implied_by: ["AIPromptAPIMultimodalInput"],
+     },
+@@ -398,7 +398,7 @@
+         "default": "",
+       },
+       origin_trial_feature_name: "AIPromptAPIMultimodalInput",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       origin_trial_allows_third_party: true,
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+@@ -432,7 +432,7 @@
+         "default": "",
+       },
+       origin_trial_feature_name: "AIProofreaderAPI",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       origin_trial_allows_third_party: true,
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+@@ -447,7 +447,7 @@
+         "default": "",
+       },
+       origin_trial_feature_name: "AIRewriterAPI",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       origin_trial_allows_third_party: true,
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+@@ -480,7 +480,7 @@
+         "default": "",
+       },
+       origin_trial_feature_name: "AIWriterAPI",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       origin_trial_allows_third_party: true,
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+@@ -612,7 +612,7 @@
        name: "AppTitle",
        status: "experimental",
        origin_trial_feature_name: "AppTitle",
@@ -9,25 +54,43 @@
        base_feature: "WebAppEnableAppTitle",
      },
      {
-@@ -1517,7 +1517,7 @@
-       status: "test",
+@@ -1320,7 +1320,7 @@
+       name: "CSPHashesV1",
        base_feature: "none",
-       origin_trial_feature_name: "FedCmContinueOnBundle",
+       origin_trial_feature_name: "CSPExtendedScriptSrcHashes",
+-      origin_trial_os: ["win", "linux", "mac", "android", "chromeos"],
++      origin_trial_os: ["win", "linux", "mac", "android", "chromeos", "openbsd", "freebsd"],
+       status: "experimental",
+       public: true,
+     },
+@@ -1913,7 +1913,7 @@
+     {
+       name: "DeviceBoundSessionCredentials",
+       origin_trial_feature_name: "DeviceBoundSessionCredentials",
+-      origin_trial_os: ["win", "linux", "mac"],
++      origin_trial_os: ["win", "linux", "mac", "openbsd", "freebsd"],
+       status: "experimental",
+       // Killswitch is net::features::kDeviceBoundSessions
+       base_feature: "none",
+@@ -1921,7 +1921,7 @@
+     {
+       name: "DeviceBoundSessionCredentials2",
+       origin_trial_feature_name: "DeviceBoundSessionCredentials2",
+-      origin_trial_os: ["win", "linux", "mac"],
++      origin_trial_os: ["win", "linux", "mac", "openbsd", "freebsd"],
+       status: "experimental",
+       // Killswitch is net::features::kDeviceBoundSessions
+       base_feature: "none",
+@@ -2084,7 +2084,7 @@
+       name: "DocumentIsolationPolicy",
+       status: "experimental",
+       origin_trial_feature_name: "DocumentIsolationPolicy",
 -      origin_trial_os: ["win", "mac", "linux", "chromeos"],
 +      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
-       origin_trial_allows_third_party: true,
-     },
-     {
-@@ -1534,7 +1534,7 @@
-       status: "test",
        base_feature: "none",
-       origin_trial_feature_name: "FedCmButtonMode",
--      origin_trial_os: ["win", "mac", "linux", "chromeos"],
-+      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
-       origin_trial_allows_third_party: true,
      },
      {
-@@ -1579,7 +1579,7 @@
+@@ -2411,7 +2411,7 @@
        base_feature: "none",
        public: true,
        origin_trial_feature_name: "FedCmMultipleIdentityProviders",
@@ -36,34 +99,16 @@
        origin_trial_allows_third_party: true,
      },
      {
-@@ -1919,7 +1919,7 @@
-       base_feature_status: "enabled",
-       copied_from_base_feature_if: "overridden",
-       origin_trial_feature_name: "FullscreenPopupWindows",
--      origin_trial_os: ["win", "mac", "linux", "chromeos"],
-+      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
-     },
-     {
-       name: "GamepadButtonAxisEvents",
-@@ -2983,7 +2983,7 @@
+@@ -4086,7 +4086,7 @@
        // Tracking bug for the implementation: https://crbug.com/1462930
        name: "PermissionElement",
        origin_trial_feature_name: "PermissionElement",
--      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos"],
-+      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "openbsd", "freebsd"],
+-      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "android"],
++      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "android", "openbsd", "freebsd"],
        status: "experimental",
        public: true,
        base_feature_status: "enabled",
-@@ -3118,7 +3118,7 @@
-     {
-       name: "PrivateNetworkAccessPermissionPrompt",
-       origin_trial_feature_name: "PrivateNetworkAccessPermissionPrompt",
--      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos"],
-+      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "openbsd", "freebsd"],
-       status: "stable",
-       public: true,
-       base_feature: "none",
-@@ -4068,7 +4068,7 @@
+@@ -5652,7 +5652,7 @@
        name: "UnrestrictedSharedArrayBuffer",
        base_feature: "none",
        origin_trial_feature_name: "UnrestrictedSharedArrayBuffer",
@@ -72,7 +117,25 @@
      },
      // Enables using policy-controlled feature "usb-unrestricted" to allow
      // isolated context to access protected USB interface classes and to
-@@ -4237,7 +4237,7 @@
+@@ -5743,7 +5743,7 @@
+       status: "experimental",
+       origin_trial_feature_name: "UserMediaElement",
+       public: true,
+-      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "android"],
++      origin_trial_os: ["win", "mac", "linux", "fuchsia", "chromeos", "android", "openbsd", "freebsd"],
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+     },
+@@ -5859,7 +5859,7 @@
+       name: "WebAppInstallation",
+       status: {"Android": "", "default": "test"},
+       origin_trial_feature_name: "WebAppInstallation",
+-      origin_trial_os: ["win", "mac", "linux", "chromeos"],
++      origin_trial_os: ["win", "mac", "linux", "chromeos", "openbsd", "freebsd"],
+       base_feature_status: "enabled",
+       copied_from_base_feature_if: "overridden",
+     },
+@@ -5871,7 +5871,7 @@
      {
        name: "WebAppScopeExtensions",
        origin_trial_feature_name: "WebAppScopeExtensions",
@@ -81,12 +144,3 @@
        status: "experimental",
        base_feature: "none",
      },
-@@ -4280,7 +4280,7 @@
-       status: "experimental",
-       base_feature: "none",
-       origin_trial_feature_name: "WebAppUrlHandling",
--      origin_trial_os: ["win", "mac", "linux"],
-+      origin_trial_os: ["win", "mac", "linux", "openbsd", "freebsd"],
-     },
-     {
-       // WebAssembly JS Promise Integration,

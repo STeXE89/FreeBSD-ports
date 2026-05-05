@@ -1,8 +1,8 @@
---- components/password_manager/core/browser/features/password_features.h.orig	2024-06-25 12:08:48 UTC
+--- components/password_manager/core/browser/features/password_features.h.orig	2026-03-24 16:59:08 UTC
 +++ components/password_manager/core/browser/features/password_features.h
-@@ -82,7 +82,7 @@ BASE_DECLARE_FEATURE(kPasswordManagerLogToTerminal);
- // Enables triggering password suggestions through the context menu.
- BASE_DECLARE_FEATURE(kPasswordManualFallbackAvailable);
+@@ -164,7 +164,7 @@ BASE_DECLARE_FEATURE(kProactivelyDownloadModelForPassw
+ // control locale/country server side.
+ BASE_DECLARE_FEATURE(kReduceRequirementsForPasswordChange);
  
 -#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX)
 +#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_BSD)

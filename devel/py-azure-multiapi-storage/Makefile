@@ -1,11 +1,11 @@
 PORTNAME=	azure-multiapi-storage
 PORTVERSION=	1.2.0
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	devel python
 MASTER_SITES=	PYPI
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
-MAINTAINER=	dbaio@FreeBSD.org
+MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Microsoft Azure Storage Client Library with multi API version support
 WWW=		https://pypi.org/project/azure-multiapi-storage/
 

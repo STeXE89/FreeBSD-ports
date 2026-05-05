@@ -1,20 +1,38 @@
---- components/supervised_user/core/common/features.cc.orig	2024-06-22 08:49:42 UTC
+--- components/supervised_user/core/common/features.cc.orig	2026-03-15 18:32:51 UTC
 +++ components/supervised_user/core/common/features.cc
-@@ -59,7 +59,7 @@ BASE_FEATURE(kUpdatedSupervisedUserExtensionApprovalSt
-              "UpdatedSupervisedUserExtensionApprovalStrings",
-              base::FEATURE_DISABLED_BY_DEFAULT);
+@@ -30,7 +30,7 @@ BASE_FEATURE(kAllowSubframeLocalWebApprovals,
+ #endif
+ 
+ #if BUILDFLAG(IS_IOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || \
+-    BUILDFLAG(IS_WIN)
++    BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD) 
+ const int kLocalWebApprovalBottomSheetLoadTimeoutDefaultValueMs = 5000;
+ 
+ const base::FeatureParam<int> kLocalWebApprovalBottomSheetLoadTimeoutMs{
+@@ -39,7 +39,7 @@ const base::FeatureParam<int> kLocalWebApprovalBottomS
+ #endif  // BUILDFLAG(IS_IOS) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) ||
+         // BUILDFLAG(IS_WIN)
  
 -#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-+#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD)
- BASE_FEATURE(kEnableExtensionsPermissionsForSupervisedUsersOnDesktop,
-              "EnableExtensionsPermissionsForSupervisedUsersOnDesktop",
++#if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD) 
+ BASE_FEATURE(kEnableLocalWebApprovalErrorDialog,
+              base::FEATURE_ENABLED_BY_DEFAULT);
+ #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
+@@ -51,7 +51,7 @@ BASE_FEATURE(kLocalWebApprovalsWidgetSupportsUrlPayloa
+ // TODO(crbug.com/435635774): Release the interstitial v3 in all platforms.
+ BASE_FEATURE(kSupervisedUserBlockInterstitialV3,
+ #if BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || \
+-    BUILDFLAG(IS_IOS)
++    BUILDFLAG(IS_IOS) || BUILDFLAG(IS_BSD)
+              base::FEATURE_ENABLED_BY_DEFAULT);
+ #else
               base::FEATURE_DISABLED_BY_DEFAULT);
-@@ -70,7 +70,7 @@ bool IsSupervisedUserSkipParentApprovalToInstallExtens
- #if BUILDFLAG(IS_CHROMEOS)
-   return base::FeatureList::IsEnabled(
-       kEnableSupervisedUserSkipParentApprovalToInstallExtensions);
--#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
-+#elif BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD)
-   bool skipParentApprovalEnabled = base::FeatureList::IsEnabled(
-       kEnableSupervisedUserSkipParentApprovalToInstallExtensions);
-   bool permissionExtensionsForSupervisedUsersEnabled =
+@@ -87,7 +87,7 @@ bool IsLocalWebApprovalsEnabledForSubframes() {
+   return base::FeatureList::IsEnabled(kAllowSubframeLocalWebApprovals);
+ }
+ 
+-#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
++#if BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN) || BUILDFLAG(IS_BSD) 
+ BASE_FEATURE(kEnableSupervisedUserVersionSignOutDialog,
+              base::FEATURE_ENABLED_BY_DEFAULT);
+ #endif

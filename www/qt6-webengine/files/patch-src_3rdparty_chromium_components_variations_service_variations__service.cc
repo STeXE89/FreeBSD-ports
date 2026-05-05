@@ -1,6 +1,6 @@
---- src/3rdparty/chromium/components/variations/service/variations_service.cc.orig	2023-05-31 08:12:17 UTC
+--- src/3rdparty/chromium/components/variations/service/variations_service.cc.orig	2025-08-15 18:30:00 UTC
 +++ src/3rdparty/chromium/components/variations/service/variations_service.cc
-@@ -95,7 +95,7 @@ std::string GetPlatformString() {
+@@ -100,7 +100,7 @@ std::string GetPlatformString() {
    return "android";
  #elif BUILDFLAG(IS_FUCHSIA)
    return "fuchsia";

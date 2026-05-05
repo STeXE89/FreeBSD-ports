@@ -1,5 +1,5 @@
 PORTNAME=	werkzeug
-PORTVERSION=	3.0.3
+PORTVERSION=	3.1.5
 CATEGORIES=	www python
 MASTER_SITES=	PYPI \
 		https://github.com/pallets/werkzeug/releases/download/${PORTVERSION}/
@@ -7,7 +7,7 @@ PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
 MAINTAINER=	sunpoet@FreeBSD.org
 COMMENT=	Python utilities collection for building WSGI applications
-WWW=		https://palletsprojects.com/p/werkzeug/ \
+WWW=		https://palletsprojects.com/projects/werkzeug/ \
 		https://github.com/pallets/werkzeug
 
 LICENSE=	BSD3CLAUSE

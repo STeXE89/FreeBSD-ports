@@ -1,6 +1,7 @@
 PORTNAME=	adios2
 DISTVERSIONPREFIX=	v
-DISTVERSION=	2.10.1
+DISTVERSION=	2.10.2
+PORTREVISION=	5
 CATEGORIES=	misc science
 
 MAINTAINER=	yuri@FreeBSD.org
@@ -10,11 +11,12 @@ WWW=		https://github.com/ornladios/ADIOS2
 LICENSE=	APACHE20
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
+BROKEN_armv7=	compilation fails: non-constant-expression cannot be narrowed from type 'uint64_t' (aka 'unsigned long long') to 'size_t' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
 BROKEN_i386=	constant expression evaluates to 18446744073709551613 which cannot be narrowed to type 'unsigned int': https://github.com/ornladios/ADIOS2/issues/2469
 BROKEN_powerpc=	constant expression evaluates to 18446744073709551613 which cannot be narrowed to type 'unsigned int': https://github.com/ornladios/ADIOS2/issues/2469
 
 PY_DEPENDS=	${PYNUMPY} \
-		${PYTHON_PKGNAMEPREFIX}mpi4py>=3.0.3:net/py-mpi4py@${PY_FLAVOR}
+		${PYTHON_PKGNAMEPREFIX}mpi4py-mpich>=3.0.3:net/py-mpi4py-mpich@${PY_FLAVOR}
 BUILD_DEPENDS=	bash:shells/bash \
 		pybind11>0:devel/pybind11 \
 		${PYTHON_PKGNAMEPREFIX}pybind11>=2.4:devel/py-pybind11@${PY_FLAVOR} \
@@ -55,5 +57,8 @@ DOCSDIR=	${PREFIX}/share/doc/ADIOS2
 PORTDOCS=	*
 
 # several tests fail, see https://github.com/ornladios/ADIOS2/issues/3286
+
+post-install:
+	@${STRIP_CMD} ${STAGEDIR}${PYTHON_SITELIBDIR}/adios2/bindings/adios2_bindings${PYTHON_TAG}.so
 
 .include <bsd.port.mk>

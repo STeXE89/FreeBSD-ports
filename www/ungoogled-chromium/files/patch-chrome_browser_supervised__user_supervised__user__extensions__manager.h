@@ -1,4 +1,4 @@
---- chrome/browser/supervised_user/supervised_user_extensions_manager.h.orig	2024-06-22 08:49:42 UTC
+--- chrome/browser/supervised_user/supervised_user_extensions_manager.h.orig	2025-12-06 13:30:52 UTC
 +++ chrome/browser/supervised_user/supervised_user_extensions_manager.h
 @@ -147,7 +147,7 @@ class SupervisedUserExtensionsManager : public Extensi
    // launched.

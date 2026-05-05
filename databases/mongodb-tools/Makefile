@@ -1,5 +1,5 @@
 PORTNAME=	mongodb-tools
-DISTVERSION=	100.9.5
+DISTVERSION=	100.15.0
 CATEGORIES=	databases
 
 MAINTAINER=	ronald@FreeBSD.org
@@ -17,7 +17,10 @@ GH_PROJECT=	mongo-tools
 GO_PKGNAME=	github.com/${GH_ACCOUNT}/${GH_PROJECT}
 GO_BUILDFLAGS=	-tags "${USE_MY_TAGS}"
 
-CONFLICTS_INSTALL=	mongodb42-tools
+# This should be TEST_ENV according to bsd.port.mk, but Uses/go.mk passes
+# MAKE_ENV instead of TEST_ENV in the do-test target.
+# https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=284387
+MAKE_ENV+=		TOOLS_TESTING_UNIT=true
 
 OPTIONS_DEFINE=		DOCS
 OPTIONS_DEFAULT=	BSONDUMP MONGODUMP MONGOEXPORT MONGOFILES MONGOIMPORT \

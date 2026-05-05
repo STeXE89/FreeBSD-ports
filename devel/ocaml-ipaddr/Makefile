@@ -1,10 +1,10 @@
 PORTNAME=	ipaddr
-PORTVERSION=	5.5.0
+PORTVERSION=	5.6.1
 DISTVERSIONPREFIX=	v
 CATEGORIES=	devel
 PKGNAMEPREFIX=	ocaml-
 
-MAINTAINER=	ports@FreeBSD.org
+MAINTAINER=	wen@FreeBSD.org
 COMMENT=	OCaml library for manipulation of IP address representations
 WWW=		https://github.com/mirage/ocaml-ipaddr
 
@@ -22,7 +22,6 @@ USES=		ocaml:dune
 USE_GITHUB=	yes
 GH_ACCOUNT=	mirage
 GH_PROJECT=	ocaml-ipaddr
-USE_OCAML=		yes
 OCAML_PACKAGES=		ipaddr ipaddr-cstruct ipaddr-sexp
 OCAML_PACKAGES+=	macaddr macaddr-cstruct macaddr-sexp
 

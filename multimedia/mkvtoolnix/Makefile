@@ -1,5 +1,5 @@
 PORTNAME=	mkvtoolnix
-PORTVERSION=	85.0
+PORTVERSION=	97.0
 CATEGORIES=	multimedia audio
 MASTER_SITES=	https://www.bunkus.org/videotools/mkvtoolnix/sources/ \
 		https://mkvtoolnix.download/sources/
@@ -11,13 +11,15 @@ WWW=		https://www.bunkus.org/videotools/mkvtoolnix/
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/COPYING
 
+BROKEN_aarch64=	fails to build: IO::TimeoutError: Blocking operation timed out!
+
 BUILD_DEPENDS=	rake:devel/rubygem-rake \
 		docbook-xsl>=0:textproc/docbook-xsl \
 		xsltproc:textproc/libxslt
 LIB_DEPENDS=	libvorbis.so:audio/libvorbis \
 		libogg.so:audio/libogg \
 		libebml.so:textproc/libebml \
-		libboost_system.so:devel/boost-libs \
+		libboost_thread.so:devel/boost-libs \
 		libpugixml.so:textproc/pugixml \
 		libmatroska.so:multimedia/libmatroska \
 		libcmark.so:textproc/cmark \

@@ -1,6 +1,7 @@
 PORTNAME=	gorm
 DISTVERSIONPREFIX=	gorm-
 DISTVERSION=	1_3_1
+PORTREVISION=	1
 CATEGORIES=	devel gnustep
 
 MAINTAINER=	ports@FreeBSD.org
@@ -21,7 +22,7 @@ DEFAULT_LIBVERSION=	1.1.0
 
 .include <bsd.port.options.mk>
 
-.if ${OPSYS} == FreeBSD && ( ${OSVERSION} >= 1400091 || ( ${OSVERSION} >= 1302507 && ${OSVERSION} < 1400000 ))
+.if ${OPSYS} == FreeBSD
 CPPFLAGS+=	-Wno-error=incompatible-function-pointer-types
 .endif
 

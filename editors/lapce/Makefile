@@ -1,8 +1,7 @@
 PORTNAME=	lapce
 DISTVERSIONPREFIX=	v
-DISTVERSION=	0.4.0-94 # Cargo.lock patched: `make patch cargo-crates`
-DISTVERSIONSUFFIX=	-gdc9a24d8
-PORTREVISION=	1
+DISTVERSION=	0.4.6 # Cargo.lock patched: `make patch cargo-crates`
+PORTREVISION=	2
 CATEGORIES=	editors
 
 MAINTAINER=	eduardo@FreeBSD.org
@@ -17,7 +16,8 @@ NOT_FOR_ARCHS_REASON_i386=	doesn't build: [zstd-sys 2.0.1+zstd.1.5.2] AR_i686_un
 
 LIB_DEPENDS=	libssh2.so:security/libssh2 \
 		libgit2.so:devel/libgit2
-RUN_DEPENDS=	xdg-desktop-portal>0:deskutils/xdg-desktop-portal
+RUN_DEPENDS=	tree-sitter-grammars>0:textproc/tree-sitter-grammars \
+		xdg-desktop-portal>0:deskutils/xdg-desktop-portal
 
 USES=		cargo desktop-file-utils dos2unix gmake localbase:ldflags perl5 pkgconfig ssl xorg
 USE_GITHUB=	yes
@@ -36,12 +36,7 @@ PORTSCOUT=	skipv:0.6.0
 # first to not fetch openssl-src tarball and later to remove git2 ossl vendored feature.
 CARGO_ENV=	RUSTC_BOOTSTRAP=1 OPENSSL_NO_VENDOR=1
 
-# Do not LTO and strip binaries while WIP:
-# https://github.com/lapce/lapce/issues/2748
-LTO_UNSAFE=	yes
 post-install:
-#	${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/lapce
-#	${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/lapce-proxy
 	${MKDIR} ${STAGEDIR}${PREFIX}/share/pixmaps
 	${INSTALL_DATA} ${WRKSRC}/extra/images/logo.png \
 		${STAGEDIR}${PREFIX}/share/pixmaps/dev.lapce.lapce.png
@@ -50,5 +45,7 @@ post-install:
 
 post-patch:
 	@${REINPLACE_CMD} -e 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/cargo-crates/fontdb-0.16.2/src/lib.rs
+	@${REINPLACE_CMD} -e 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/cargo-crates/fontdb-0.23.0/src/lib.rs
+	@${REINPLACE_CMD} -e 's|%%DATADIR%%|${PREFIX}/share|g' ${WRKSRC}/lapce-core/src/directory.rs
 
 .include <bsd.port.mk>

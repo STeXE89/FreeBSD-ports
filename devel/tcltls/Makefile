@@ -33,7 +33,7 @@ OPTIONS_DEFINE=	DOCS
 
 .include <bsd.port.pre.mk>
 
-.if ${OPSYS} == FreeBSD && ( ${OSVERSION} >= 1400079 || ( ${OSVERSION} >= 1302505 && ${OSVERSION} < 1400000 ))
+.if ${OPSYS} == FreeBSD
 CFLAGS+=       -Wno-error=int-conversion
 .endif
 
@@ -47,7 +47,8 @@ post-configure:
 	${OPENSSLBASE}/bin/openssl dhparam -text 2048 | \
 	    ${OPENSSLBASE}/bin/openssl asn1parse | \
 	    ${SED} -E \
-		-e '/^ .*(0|5):d=/d' \
+		-e '/hl=4 l= 257 prim/bp' \
+		-e d -e :p \
 		-e 's/    4:d=1.*INTEGER *://' \
 		-e 's/([0-9A-H]{2})/0x\1, /g' \
 		-e 'w${WRKSRC}/generateddh.txt'

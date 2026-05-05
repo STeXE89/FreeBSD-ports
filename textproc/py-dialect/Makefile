@@ -1,5 +1,5 @@
 PORTNAME=	dialect
-DISTVERSION=	2.4.1
+DISTVERSION=	2.6.1
 CATEGORIES=	textproc gnome python
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
 
@@ -14,15 +14,15 @@ BUILD_DEPENDS=	appstreamcli:devel/appstream \
 		blueprint-compiler:devel/blueprint-compiler
 LIB_DEPENDS=	libsoup-3.0.so:devel/libsoup3 \
 		libsecret-1.so:security/libsecret
-RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}gTTS>0:audio/py-gtts@${PY_FLAVOR} \
-		${PYTHON_PKGNAMEPREFIX}beautifulsoup>0:www/py-beautifulsoup@${PY_FLAVOR}
+RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}gTTS>=2.5.4:audio/py-gtts@${PY_FLAVOR} \
+		${PYTHON_PKGNAMEPREFIX}beautifulsoup>=4.13.4:www/py-beautifulsoup@${PY_FLAVOR}
 
 USES=		desktop-file-utils gettext-tools gnome gstreamer meson \
 		pkgconfig python
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	dialect-app
-GH_TUPLE=	dialect-app:po:6db04f8783e4a99528837aeb3c8266673fc3ef17:po/po
+GH_TUPLE=	dialect-app:po:bd426bd3adc9917429290f4b6da378076ecf7e2e:po/po
 
 USE_GNOME=	glib20 gtk40 introspection:build libadwaita pygobject3
 GLIB_SCHEMAS=	app.drey.Dialect.gschema.xml
@@ -32,21 +32,15 @@ MAKE_ENV+=	PYTHONDONTWRITEBYTECODE=1
 
 NO_ARCH=	yes
 
-PORTDOCS=	README.md
+PORTDOCS=	CONTRIBUTING.md NEWS.md README.md
 
 OPTIONS_DEFINE=	DOCS
 
 post-patch:
-	${REINPLACE_CMD} -e 's/python3/${PYTHON_VERSION}/' ${WRKSRC}/meson.build
+	@${REINPLACE_CMD} -e 's/python3/${PYTHON_VERSION}/' ${WRKSRC}/meson.build
 
 post-install-DOCS-on:
-	${MKDIR} ${STAGEDIR}${DOCSDIR}
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
 	${INSTALL_MAN} ${PORTDOCS:S|^|${WRKSRC}/|} ${STAGEDIR}${DOCSDIR}
 
-.include <bsd.port.pre.mk>
-
-.if ${PYTHON_REL} < 31000
-IGNORE=		requires Python 3.10+
-.endif
-
-.include <bsd.port.post.mk>
+.include <bsd.port.mk>

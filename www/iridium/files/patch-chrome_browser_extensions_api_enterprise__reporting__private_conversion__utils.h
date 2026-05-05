@@ -1,4 +1,4 @@
---- chrome/browser/extensions/api/enterprise_reporting_private/conversion_utils.h.orig	2024-06-25 12:08:48 UTC
+--- chrome/browser/extensions/api/enterprise_reporting_private/conversion_utils.h.orig	2025-12-10 15:04:57 UTC
 +++ chrome/browser/extensions/api/enterprise_reporting_private/conversion_utils.h
 @@ -7,7 +7,7 @@
  

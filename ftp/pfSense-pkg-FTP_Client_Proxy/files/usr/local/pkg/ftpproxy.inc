@@ -3,7 +3,7 @@
  * ftpproxy.inc
  *
  * part of pfSense (https://www.pfsense.org)
- * Copyright (c) 2015-2024 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2015-2026 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+define('LOG_PREFIX_PKG_FTPPROXY', 'FTP Proxy');
 
 function sync_package_ftpproxy() {
 	$cf = config_get_path('installedpackages/ftpclientproxy/config/0');
@@ -34,7 +36,7 @@ function sync_package_ftpproxy() {
 	$interface_list = explode(",", $cf['localints']);
 	/* Bail if there is nothing to do */
 	if (empty($interface_list)) {
-		log_error("FTP Proxy cannot sync: No interfaces selected.");
+		logger(LOG_ERR, localize_text("Cannot sync: No interfaces selected."), LOG_PREFIX_PKG_FTPPROXY);
 		return;
 	}
 
@@ -128,7 +130,7 @@ function ftpproxy_generate_rules($type) {
 
 	/* Bail if there is nothing to do */
 	if (empty($interface_list)) {
-		log_error("FTP Proxy cannot sync: No interfaces selected.");
+		logger(LOG_ERR, localize_text("Cannot sync: No interfaces selected."), LOG_PREFIX_PKG_FTPPROXY);
 		return;
 	}
 

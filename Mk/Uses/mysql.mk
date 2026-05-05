@@ -60,10 +60,12 @@ DEFAULT_MYSQL_VER?=	${MYSQL_DEFAULT:S/.//}
 # When adding a version, please keep the comment in
 # Mk/bsd.default-versions.mk in sync.
 MYSQL80_LIBVER=		21
-MYSQL81_LIBVER=		22
 MYSQL84_LIBVER=		24
+MYSQL91_LIBVER=		24
+MYSQL94_LIBVER=		24
+MYSQL96_LIBVER=		24
 
-.  for v in 105 106 1011 114
+.  for v in 106 1011 114 118
 MYSQL${v}m_LIBVER=	3
 .  endfor
 
