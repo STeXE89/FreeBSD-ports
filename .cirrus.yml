@@ -1,0 +1,52 @@
+task:
+  name: Generic FreeBSD Ports Build
+
+  freebsd_instance:
+    image_family: freebsd-15-0-snap
+
+  env:
+    PORT_DIR: ""
+    BUILD_TARGET: package-recursive
+    CREATE_REPO: "1"
+    EXTRA_MAKE_ARGS: ""
+    PACKAGES_DIR: /tmp/packages
+    REPO_DIR: /tmp/ports-repo
+
+  install_script:
+    - pkg update -f
+    - pkg install -y git gmake pkgconf ca_root_nss
+
+  build_script:
+    - set -eux
+    - test -n "${PORT_DIR}"
+    - case "${PORT_DIR}" in */*) ;; *) echo "PORT_DIR must be in '<category>/<port>' format"; exit 1 ;; esac
+    - case "${PORT_DIR}" in /*|*..*|*//* ) echo "PORT_DIR contains invalid path elements"; exit 1 ;; esac
+    - test -d "${CIRRUS_WORKING_DIR}/${PORT_DIR}"
+    - test -f "${CIRRUS_WORKING_DIR}/${PORT_DIR}/Makefile"
+    - cd "${CIRRUS_WORKING_DIR}/${PORT_DIR}"
+    - make -DBATCH PACKAGES="${PACKAGES_DIR}" clean "${BUILD_TARGET}" ${EXTRA_MAKE_ARGS}
+    - |
+      if [ "${CREATE_REPO}" = "1" ]; then
+        mkdir -p "${REPO_DIR}"
+        find "${PACKAGES_DIR}" -type f -name '*.pkg' -exec cp -f {} "${REPO_DIR}/" \;
+        pkg repo "${REPO_DIR}"
+
+        PKG_NAMES=$(find "${REPO_DIR}" -maxdepth 1 -type f -name '*.pkg' -exec basename {} .pkg \; | sort)
+        test -n "${PKG_NAMES}"
+
+        PRIMARY_PKG=$(printf '%s\n' "${PKG_NAMES}" | head -n 1 | sed 's/[^A-Za-z0-9._-]/_/g')
+        PKG_SET_HASH=$(printf '%s\n' "${PKG_NAMES}" | sha256 | awk '{print $1}')
+        REPO_TARBALL="/tmp/repo-${PRIMARY_PKG}-${PKG_SET_HASH}.tar.gz"
+
+        tar -C "$(dirname "${REPO_DIR}")" -czf "${REPO_TARBALL}" "$(basename "${REPO_DIR}")"
+        printf '%s\n' "${REPO_TARBALL}" > /tmp/repo-tarball-path.txt
+      fi
+
+  packages_artifacts:
+    path: /tmp/packages/**/*
+
+  repo_tarball_artifacts:
+    path: /tmp/repo-*.tar.gz
+
+  repo_tarball_info_artifacts:
+    path: /tmp/repo-tarball-path.txt
