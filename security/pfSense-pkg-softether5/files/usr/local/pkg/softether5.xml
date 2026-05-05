@@ -35,7 +35,7 @@
 		<url>/vpn_softether5_server.php</url>
 	</menu>
 	<service>
-		<name>vpnsever</name>
+		<name>vpnserver</name>
 		<rcfile>vpnserver.sh</rcfile>
 		<executable>vpnserver</executable>
 		<description>SoftEther5 VPN Server</description>

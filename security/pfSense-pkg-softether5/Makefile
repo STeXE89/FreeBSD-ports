@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-softether5
 PORTVERSION=	5.02
-PORTREVISION=	3
+PORTREVISION=	4
 CATEGORIES=	security net-vpn
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -13,8 +13,7 @@ COMMENT=	pfSense package softether5
 
 LICENSE=	APACHE20
 
-RUN_DEPENDS=	softether5>=5.02:security/softether5 \
-		cpu_features>=0.9.0:devel/cpu_features
+RUN_DEPENDS=	softether5>=5.02:security/softether5
 
 NO_BUILD=	yes
 NO_MTREE=	yes
