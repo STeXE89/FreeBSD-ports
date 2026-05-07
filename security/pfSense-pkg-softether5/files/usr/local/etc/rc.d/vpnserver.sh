@@ -6,7 +6,7 @@ name="vpnserver"
 command="/usr/local/bin/vpnserver"
 
 piddir="/var/run/softether"
-datadir="/cf/softether"
+datadir="/cf/conf/softether"
 link_datadir="/var/db/softether"
 
 precmd() {
@@ -17,7 +17,7 @@ precmd() {
         mkdir -p ${datadir}
     fi
 
-    if [ ! -L "${link_datadir}" ]; then
+    if [ ! -L "${link_datadir}" ] && [ ! -e "${link_datadir}" ]; then
         ln -s ${datadir} ${link_datadir}
     fi
 }
