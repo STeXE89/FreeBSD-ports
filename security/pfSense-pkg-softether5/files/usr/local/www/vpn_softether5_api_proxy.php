@@ -16,6 +16,14 @@ function send_json($data) {
     exit;
 }
 
+// Delete temp files, then bail out with a JSON error.
+function send_json_error_cleanup(array $files, $error, $detail = null) {
+    foreach ($files as $f) { @unlink($f); }
+    $out = ['error' => $error];
+    if ($detail !== null) { $out['detail'] = $detail; }
+    send_json($out);
+}
+
 // Check for remote host/port for cascade connections
 $remote_host = trim((string)($_POST['remote_host'] ?? ''));
 $remote_port = (int)($_POST['remote_port'] ?? 0);
@@ -88,40 +96,42 @@ $vpncmd_available = file_exists($vpncmd_bin);
 // localhost without a port defaults to 443, which is pfSense's web server.
 $vpncmd_host = 'localhost:5555';
 
-// Hub-context commands must pipe "Hub <name>\n<cmd>\n" via stdin because
-// vpncmd has no command-line flag to pre-select a hub.
-// Template marker: starts with "HUB_CTX:" — processed by run_cli_fallback().
+// CLI command templates, keyed by JSON-RPC method name. Three template forms:
+//   'Cmd {Param}'           — server-level command, run as "vpncmd ... /SERVER /CMD <tpl>"
+//   'HUB_CTX:{HubName}:Cmd' — hub-context command, piped via stdin as "Hub <name>\n<cmd>\n"
+//                             (vpncmd has no command-line flag to pre-select a hub)
+//   'CERT_CTX' / 'CERT_REGEN_CTX' — special handlers in run_cli_fallback()
 $cli_map = [
     // Server-level commands (no hub context needed)
-    'EnumHub'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD HubList",
-    'CreateHub'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD HubCreate {HubName} /PASSWORD:{Password}",
-    'DeleteHub'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD HubDelete {HubName}",
-    'SetHubPassword'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD HubPasswordSet {HubName} /PASSWORD:{Password}",
-    'GetServerStatus'   => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerStatusGet",
-    'SetServerPassword'      => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerPasswordSet {Password}",
-    'SetServerAdminPassword' => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerPasswordSet {Password}",
+    'EnumHub'           => 'HubList',
+    'CreateHub'         => 'HubCreate {HubName} /PASSWORD:{Password}',
+    'DeleteHub'         => 'HubDelete {HubName}',
+    'SetHubPassword'    => 'HubPasswordSet {HubName} /PASSWORD:{Password}',
+    'GetServerStatus'   => 'ServerStatusGet',
+    'SetServerPassword'      => 'ServerPasswordSet {Password}',
+    'SetServerAdminPassword' => 'ServerPasswordSet {Password}',
     // Listener/Port commands
-    'EnumListener'      => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerList",
-    'AddListener'       => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerCreate {Port}",
-    'CreateListener'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerCreate {Port}",
-    'DeleteListener'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerDelete {Port}",
-    'EnableListener'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerEnable {Port}",
-    'DisableListener'   => "$vpncmd_bin $vpncmd_host /SERVER /CMD ListenerDisable {Port}",
+    'EnumListener'      => 'ListenerList',
+    'AddListener'       => 'ListenerCreate {Port}',
+    'CreateListener'    => 'ListenerCreate {Port}',
+    'DeleteListener'    => 'ListenerDelete {Port}',
+    'EnableListener'    => 'ListenerEnable {Port}',
+    'DisableListener'   => 'ListenerDisable {Port}',
     // Local Bridge commands (server-level)
-    'EnumLocalBridge'   => "$vpncmd_bin $vpncmd_host /SERVER /CMD BridgeList",
-    'CreateLocalBridge' => "$vpncmd_bin $vpncmd_host /SERVER /CMD BridgeCreate {HubName} /DEVICE:{Device} /TAP:{Mode}",
-    'DeleteLocalBridge' => "$vpncmd_bin $vpncmd_host /SERVER /CMD BridgeDelete {HubName} /DEVICE:{Device}",
+    'EnumLocalBridge'   => 'BridgeList',
+    'CreateLocalBridge' => 'BridgeCreate {HubName} /DEVICE:{Device} /TAP:{Mode}',
+    'DeleteLocalBridge' => 'BridgeDelete {HubName} /DEVICE:{Device}',
     // General/utility commands
-    'Check'             => "$vpncmd_bin $vpncmd_host /SERVER /CMD Check",
-    'About'             => "$vpncmd_bin $vpncmd_host /SERVER /CMD About",
-    'VersionGet'        => "$vpncmd_bin $vpncmd_host /SERVER /CMD VersionGet",
-    'ServerInfoGet'     => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerInfoGet",
+    'Check'             => 'Check',
+    'About'             => 'About',
+    'VersionGet'        => 'VersionGet',
+    'ServerInfoGet'     => 'ServerInfoGet',
     'ServerCertGet'          => 'CERT_CTX',
     'GetServerCertInfo'      => 'CERT_CTX',
     'GetServerCertPem'       => 'CERT_CTX',
     'ServerCertRegenerate'   => 'CERT_REGEN_CTX',
-    'GetServerInfo'          => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerInfoGet",
-    'ServerCertSet'     => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerCertSet /CERT:{Cert}",
+    'GetServerInfo'          => 'ServerInfoGet',
+    'ServerCertSet'     => 'ServerCertSet /CERT:{Cert}',
     // Hub-context commands: piped via stdin as "Hub {HubName}\n<cmd>\n"
     'EnumUser'          => 'HUB_CTX:{HubName}:UserList',
     'CreateUser'        => 'HUB_CTX:{HubName}:UserCreate {UserName} /GROUP:{Group} /REALNAME:{RealName} /NOTE:{Note}',
@@ -168,8 +178,8 @@ $cli_map = [
     // Hub online/offline (hub context commands)
     'SetHubOnline'      => 'HUB_CTX:{HubName}:Online',
     'SetHubOffline'     => 'HUB_CTX:{HubName}:Offline',
-    // Hub-context: connection table
-    'EnumConnection'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD ConnectionList",
+    // Server-level: connection table
+    'EnumConnection'    => 'ConnectionList',
     // Hub-context: MAC/IP table
     'DeleteMacTable'    => 'HUB_CTX:{HubName}:MacTableDelete {MacAddress}',
     // Hub-context: missing mappings
@@ -194,23 +204,23 @@ $cli_map = [
     'GetHubMsg'         => 'HUB_CTX:{HubName}:MsgGet',
     'SetHubMsg'         => 'HUB_CTX:{HubName}:MsgSet /MSG:{Msg}',
     // Server-level: missing mappings
-    'GetIPsecConfig'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD IPsecGet",
-    'SetIPsecConfig'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD IPsecSet /L2TP:{L2TP} /L2TPRAW:{L2TPRaw} /ETHERIP:{EtherIP} /PSK:{PSK} /DEFAULTHUB:{DefaultHub}",
-    'EnumEthernet'      => "$vpncmd_bin $vpncmd_host /SERVER /CMD NicList",
-    'EnumEth'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD NicList",
-    'AddLocalBridge'    => "$vpncmd_bin $vpncmd_host /SERVER /CMD BridgeCreate {HubNameLB} /DEVICE:{DeviceName} /TAP:{TapMode}",
-    'GetSysLog'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD SyslogGet",
-    'SetSysLog'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD SyslogSet /TYPE:{SyslogType} /HOST:{Hostname} /PORT:{Port}",
-    'GetOpenVpnSstpConfig' => "$vpncmd_bin $vpncmd_host /SERVER /CMD OpenVpnSstpGet",
-    'SetOpenVpnSstpConfig' => "$vpncmd_bin $vpncmd_host /SERVER /CMD OpenVpnSstpSet /OPENVPN:{OpenVPN} /SSTP:{SSTP}",
+    'GetIPsecConfig'    => 'IPsecGet',
+    'SetIPsecConfig'    => 'IPsecSet /L2TP:{L2TP} /L2TPRAW:{L2TPRaw} /ETHERIP:{EtherIP} /PSK:{PSK} /DEFAULTHUB:{DefaultHub}',
+    'EnumEthernet'      => 'NicList',
+    'EnumEth'           => 'NicList',
+    'AddLocalBridge'    => 'BridgeCreate {HubNameLB} /DEVICE:{DeviceName} /TAP:{TapMode}',
+    'GetSysLog'         => 'SyslogGet',
+    'SetSysLog'         => 'SyslogSet /TYPE:{SyslogType} /HOST:{Hostname} /PORT:{Port}',
+    'GetOpenVpnSstpConfig' => 'OpenVpnSstpGet',
+    'SetOpenVpnSstpConfig' => 'OpenVpnSstpSet /OPENVPN:{OpenVPN} /SSTP:{SSTP}',
 
-    'SetDDnsClientConfig' => "$vpncmd_bin $vpncmd_host /SERVER /CMD DynamicDnsSetHostname {Hostname}",
+    'SetDDnsClientConfig' => 'DynamicDnsSetHostname {Hostname}',
     // Server-level: maintenance
-    'RebootServer'      => "$vpncmd_bin $vpncmd_host /SERVER /CMD Reboot",
-    'GetConfig'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD ConfigGet",
-    'SetConfig'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD ConfigSet {ConfigFile}",
-    'FlushLog'          => "$vpncmd_bin $vpncmd_host /SERVER /CMD LogFlush",
-    'GetDDnsClientStatus' => "$vpncmd_bin $vpncmd_host /SERVER /CMD DynamicDnsGetStatus",
+    'RebootServer'      => 'Reboot',
+    'GetConfig'         => 'ConfigGet',
+    'SetConfig'         => 'ConfigSet {ConfigFile}',
+    'FlushLog'          => 'LogFlush',
+    'GetDDnsClientStatus' => 'DynamicDnsGetStatus',
     // Hub-context: admin/extended options
     'GetHubAdminOptions'    => 'HUB_CTX:{HubName}:AdminOptionList',
     'SetHubAdminOption'     => 'HUB_CTX:{HubName}:AdminOptionSet {Name} /VALUE:{Value}',
@@ -223,32 +233,32 @@ $cli_map = [
     // Hub-context: user expiry
     'SetUserExpires'        => 'HUB_CTX:{HubName}:UserExpiresSet {UserName} /EXPIRES:{Expires}',
     // Server-level: keep alive
-    'GetKeepConfig'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD KeepGet",
-    'SetKeepConfig'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD KeepSet /PROTO:{Protocol} /HOST:{Host} /PORT:{Port} /INTERVAL:{Interval}",
-    'KeepEnable'            => "$vpncmd_bin $vpncmd_host /SERVER /CMD KeepOn",
-    'KeepDisable'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD KeepOff",
+    'GetKeepConfig'         => 'KeepGet',
+    'SetKeepConfig'         => 'KeepSet /PROTO:{Protocol} /HOST:{Host} /PORT:{Port} /INTERVAL:{Interval}',
+    'KeepEnable'            => 'KeepOn',
+    'KeepDisable'           => 'KeepOff',
     // Server-level: VPN Azure
-    'GetAzureStatus'        => "$vpncmd_bin $vpncmd_host /SERVER /CMD VpnAzureGetStatus",
-    'SetAzureEnable'        => "$vpncmd_bin $vpncmd_host /SERVER /CMD VpnAzureSetEnable /ENABLE:{Enable}",
+    'GetAzureStatus'        => 'VpnAzureGetStatus',
+    'SetAzureEnable'        => 'VpnAzureSetEnable /ENABLE:{Enable}',
     // Server-level: VPN over ICMP/DNS
-    'GetVpnOverIcmpDns'     => "$vpncmd_bin $vpncmd_host /SERVER /CMD VpnOverIcmpDnsGet",
-    'SetVpnOverIcmpDns'     => "$vpncmd_bin $vpncmd_host /SERVER /CMD VpnOverIcmpDnsSet /ICMP:{IcmpEnable} /DNS:{DnsEnable}",
+    'GetVpnOverIcmpDns'     => 'VpnOverIcmpDnsGet',
+    'SetVpnOverIcmpDns'     => 'VpnOverIcmpDnsSet /ICMP:{IcmpEnable} /DNS:{DnsEnable}',
     // Server-level: SSL cipher
-    'GetServerCipher'       => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerCipherGet",
-    'SetServerCipher'       => "$vpncmd_bin $vpncmd_host /SERVER /CMD ServerCipherSet {Cipher}",
+    'GetServerCipher'       => 'ServerCipherGet',
+    'SetServerCipher'       => 'ServerCipherSet {Cipher}',
     // Server-level: log files
-    'EnumLogFile'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD LogFileList",
-    'ReadLogFile'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD LogFileGet {Path}",
+    'EnumLogFile'           => 'LogFileList',
+    'ReadLogFile'           => 'LogFileGet {Path}',
     // Server-level: L3 switches
-    'EnumL3Switch'          => "$vpncmd_bin $vpncmd_host /SERVER /CMD RouterList",
-    'AddL3Switch'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD RouterCreate {SwitchName}",
-    'DelL3Switch'           => "$vpncmd_bin $vpncmd_host /SERVER /CMD RouterDelete {SwitchName}",
-    'StartL3Switch'         => "$vpncmd_bin $vpncmd_host /SERVER /CMD RouterStart {SwitchName}",
-    'StopL3Switch'          => "$vpncmd_bin $vpncmd_host /SERVER /CMD RouterStop {SwitchName}",
+    'EnumL3Switch'          => 'RouterList',
+    'AddL3Switch'           => 'RouterCreate {SwitchName}',
+    'DelL3Switch'           => 'RouterDelete {SwitchName}',
+    'StartL3Switch'         => 'RouterStart {SwitchName}',
+    'StopL3Switch'          => 'RouterStop {SwitchName}',
     // Server-level: EtherIP
-    'EnumEtherIpClient'     => "$vpncmd_bin $vpncmd_host /SERVER /CMD EtherIpClientList",
-    'AddEtherIpClient'      => "$vpncmd_bin $vpncmd_host /SERVER /CMD EtherIpClientAdd /ID:{IpClientId} /HUB:{HubName} /USER:{UserName} /PASSWORD:{Password}",
-    'DeleteEtherIpClient'   => "$vpncmd_bin $vpncmd_host /SERVER /CMD EtherIpClientDelete /ID:{IpClientId}",
+    'EnumEtherIpClient'     => 'EtherIpClientList',
+    'AddEtherIpClient'      => 'EtherIpClientAdd /ID:{IpClientId} /HUB:{HubName} /USER:{UserName} /PASSWORD:{Password}',
+    'DeleteEtherIpClient'   => 'EtherIpClientDelete /ID:{IpClientId}',
     // Hub-context: access rule enable/disable
     'EnableAccess'          => 'HUB_CTX:{HubName}:AccessEnable {Id}',
     'DisableAccess'         => 'HUB_CTX:{HubName}:AccessDisable {Id}',
@@ -257,10 +267,10 @@ $cli_map = [
     'WgkAdd'                => 'HUB_CTX:{HubName}:WgkAdd /USER:{UserName} /KEY:{PublicKey}',
     'WgkDelete'             => 'HUB_CTX:{HubName}:WgkDelete /KEY:{Key}',
     // Server-level: OpenVPN config generator
-    'MakeOpenVpnConfigFile' => "$vpncmd_bin $vpncmd_host /SERVER /CMD OpenVpnMakeConfig",
+    'MakeOpenVpnConfigFile' => 'OpenVpnMakeConfig',
     // Server-level: protocol options
-    'GetProtoOptions'       => "$vpncmd_bin $vpncmd_host /SERVER /CMD ProtoOptionsGet {ProtoName}",
-    'SetProtoOptions'       => "$vpncmd_bin $vpncmd_host /SERVER /CMD ProtoOptionsSet {ProtoName} /NAME:{Name} /VALUE:{Value}",
+    'GetProtoOptions'       => 'ProtoOptionsGet {ProtoName}',
+    'SetProtoOptions'       => 'ProtoOptionsSet {ProtoName} /NAME:{Name} /VALUE:{Value}',
 ];
 
 // Resolve a template placeholder key against the params array.
@@ -306,23 +316,16 @@ function cli_resolve_param($k, $params) {
     return null;
 }
 
-// Replace {Placeholder} tokens with shell-escaped param values.
-function cli_template_substitute($template, $params) {
-    return preg_replace_callback('/\{([A-Za-z0-9_]+)\}/', function($m) use ($params) {
+// Replace {Placeholder} tokens with param values, shell-escaped by default.
+// Pass $escape = false for vpncmd script content written to a temp file.
+function cli_template_substitute($template, $params, $escape = true) {
+    return preg_replace_callback('/\{([A-Za-z0-9_]+)\}/', function($m) use ($params, $escape) {
         $v = cli_resolve_param($m[1], $params);
-        if ($v === null || $v === '') return '';
-        return is_array($v)
-            ? implode(' ', array_map('escapeshellarg', $v))
-            : escapeshellarg((string)$v);
-    }, $template);
-}
-
-// Raw (unescaped) substitution — for vpncmd script content written to a temp file.
-function cli_template_substitute_raw($template, $params) {
-    return preg_replace_callback('/\{([A-Za-z0-9_]+)\}/', function($m) use ($params) {
-        $v = cli_resolve_param($m[1], $params);
-        if ($v === null) return '';
-        return is_array($v) ? implode(' ', $v) : (string)$v;
+        if ($v === null || $v === '') { return ''; }
+        if (is_array($v)) {
+            return implode(' ', $escape ? array_map('escapeshellarg', $v) : $v);
+        }
+        return $escape ? escapeshellarg((string)$v) : (string)$v;
     }, $template);
 }
 
@@ -357,16 +360,10 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
         'AdminPassword'=> 'Password',    // CreateHub
         'Username'     => 'UserName',    // CreateUser (fallback variant)
         'Name'         => 'UserName',    // DeleteUser / GetUser
-        'GroupName'    => 'GroupName',   // SetUser
-        'RealName'     => 'RealName',    // SetUser
-        'Note'         => 'Note',        // SetUser
         'DeviceName'   => 'Device',      // LocalBridge
         'TapMode'      => 'Mode',        // LocalBridge tap flag
         'SessionName'  => 'SessionId',   // DisconnectSession
         'Ports'        => 'Port',        // EnumListener result field variant
-        'Id'           => 'Id',          // DeleteAccess
-        'MacAddress'   => 'MacAddress',  // DeleteMacTable
-        'IpAddress'    => 'IpAddress',   // DeleteIpTable
     ];
     foreach ($renames as $from => $to) {
         if (isset($normalized[$from]) && !isset($normalized[$to])) {
@@ -383,6 +380,12 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
     if (!function_exists('exec') || !is_callable('exec')) {
         $msg = $fallback_error['message'] ?? 'SoftEther API error (exec() disabled)';
         send_json(['error' => $msg, 'detail' => $fallback_error]);
+    }
+
+    // Methods that are structurally unsupported in this SoftEther build — return empty gracefully.
+    static $graceful_empty_methods = ['GetAzureStatus', 'GetDDnsClientStatus', 'EnumEth', 'EnumEthernet', 'WgkEnum'];
+    if (in_array($method, $graceful_empty_methods, true)) {
+        send_json(['result' => [], 'cli_fallback' => true]);
     }
 
     $template = $cli_map[$method];
@@ -450,8 +453,7 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
         // Generate private key
         exec("openssl genrsa -out " . escapeshellarg($key_file) . " $bits 2>&1", $_ko, $_kr);
         if ($_kr !== 0 || !filesize($key_file)) {
-            @unlink($key_file); @unlink($csr_file); @unlink($cert_file);
-            send_json(['error' => 'openssl genrsa failed', 'detail' => implode("\n", $_ko)]);
+            send_json_error_cleanup([$key_file, $csr_file, $cert_file], 'openssl genrsa failed', implode("\n", $_ko));
         }
 
         if ($signed_by) {
@@ -463,9 +465,8 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
             // Extract key block (RSA or PRIVATE KEY)
             preg_match('/(-----BEGIN (?:RSA )?PRIVATE KEY-----.*?-----END (?:RSA )?PRIVATE KEY-----)/s', $signed_by, $km);
             if (!$cm || !$km) {
-                @unlink($key_file); @unlink($csr_file); @unlink($cert_file);
-                @unlink($ca_cert_file); @unlink($ca_key_file);
-                send_json(['error' => 'Signing PEM must contain both a certificate and a private key']);
+                send_json_error_cleanup([$key_file, $csr_file, $cert_file, $ca_cert_file, $ca_key_file],
+                    'Signing PEM must contain both a certificate and a private key');
             }
             file_put_contents($ca_cert_file, $cm[1]);
             file_put_contents($ca_key_file,  $km[1]);
@@ -473,23 +474,20 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
             // Generate CSR from new key
             exec("openssl req -new -key " . escapeshellarg($key_file) . " -out " . escapeshellarg($csr_file) . " -subj $subj_esc 2>&1", $_co, $_cr);
             if ($_cr !== 0) {
-                @unlink($key_file); @unlink($csr_file); @unlink($cert_file);
-                @unlink($ca_cert_file); @unlink($ca_key_file);
-                send_json(['error' => 'openssl req (CSR) failed', 'detail' => implode("\n", $_co)]);
+                send_json_error_cleanup([$key_file, $csr_file, $cert_file, $ca_cert_file, $ca_key_file],
+                    'openssl req (CSR) failed', implode("\n", $_co));
             }
             // Sign CSR with CA
             exec("openssl x509 -req -in " . escapeshellarg($csr_file) . " -CA " . escapeshellarg($ca_cert_file) . " -CAkey " . escapeshellarg($ca_key_file) . " -out " . escapeshellarg($cert_file) . " -days $days$serial_flag -CAcreateserial 2>&1", $_co, $_cr);
             @unlink($ca_cert_file); @unlink($ca_key_file); @unlink($csr_file);
             if ($_cr !== 0 || !filesize($cert_file)) {
-                @unlink($key_file); @unlink($cert_file);
-                send_json(['error' => 'openssl x509 signing failed', 'detail' => implode("\n", $_co)]);
+                send_json_error_cleanup([$key_file, $cert_file], 'openssl x509 signing failed', implode("\n", $_co));
             }
         } else {
             // Self-signed
             exec("openssl req -new -x509 -key " . escapeshellarg($key_file) . " -out " . escapeshellarg($cert_file) . " -days $days -subj $subj_esc$serial_flag 2>&1", $_co, $_cr);
             if ($_cr !== 0 || !filesize($cert_file)) {
-                @unlink($key_file); @unlink($cert_file);
-                send_json(['error' => 'openssl req failed', 'detail' => implode("\n", $_co)]);
+                send_json_error_cleanup([$key_file, $cert_file], 'openssl req failed', implode("\n", $_co));
             }
         }
 
@@ -518,24 +516,16 @@ function run_cli_fallback($rpc_data, $cli_map, $vpncmd_pass, $vpncmd_available, 
         // Format: HUB_CTX:{HubName}:<vpncmd-command>
         $rest    = substr($template, 8);
         $colon   = strpos($rest, ':');
-        $hub_raw = cli_template_substitute_raw(substr($rest, 0, $colon), $params);
-        $cmd_raw = cli_template_substitute_raw(substr($rest, $colon + 1), $params);
+        $hub_raw = cli_template_substitute(substr($rest, 0, $colon), $params, false);
+        $cmd_raw = cli_template_substitute(substr($rest, $colon + 1), $params, false);
         $tmpfile = tempnam('/tmp', 'se_cli_');
         file_put_contents($tmpfile, "Hub $hub_raw\n$cmd_raw\nexit\n");
         $cli_cmd = "timeout 10 $vpncmd_bin $vpncmd_host /SERVER /PASSWORD:$pass_esc < " . escapeshellarg($tmpfile);
     } else {
-        $cli_cmd = cli_template_substitute($template, $params);
-        // /PASSWORD: must appear before /CMD in vpncmd syntax
-        if ($vpncmd_pass !== '') {
-            $cli_cmd = preg_replace('/(\s\/CMD\s)/', ' /PASSWORD:' . $pass_esc . '$1', $cli_cmd, 1);
-        }
-        $cli_cmd = 'timeout 10 ' . $cli_cmd . ' < /dev/null';
-    }
-
-    // Methods that are structurally unsupported in this SoftEther build — return empty gracefully.
-    static $graceful_empty_methods = ['GetAzureStatus', 'GetDDnsClientStatus', 'EnumEth', 'EnumEthernet', 'WgkEnum'];
-    if (in_array($method, $graceful_empty_methods, true)) {
-        send_json(['result' => [], 'cli_fallback' => true]);
+        // Server-level command. /PASSWORD: must appear before /CMD in vpncmd syntax.
+        $pass_part = ($vpncmd_pass !== '') ? " /PASSWORD:$pass_esc" : '';
+        $cli_cmd   = "timeout 10 $vpncmd_bin $vpncmd_host /SERVER{$pass_part} /CMD "
+                   . cli_template_substitute($template, $params) . ' < /dev/null';
     }
 
     $cli_output = [];

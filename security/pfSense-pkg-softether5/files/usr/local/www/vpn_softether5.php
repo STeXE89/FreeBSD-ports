@@ -36,7 +36,7 @@ if (!empty($_POST['action']) && isset($_POST['confirm']) && $_POST['confirm'] ==
 		@shell_exec("rm -f {$conf1} 2>/dev/null");
 		@shell_exec("rm -f {$conf2} 2>/dev/null");
 		$reset_msg = "{$label} configuration reset successfully.";
-		${"vpn{$svc}_status"} = 'stopped';
+		${"{$svc}_status"} = 'stopped'; // $vpnbridge_status / $vpnserver_status
 	}
 }
 
@@ -141,6 +141,13 @@ include("head.inc");
     border-radius: 4px;
     border-style: solid;
     border-width: 1px;
+}
+
+/* panel titles with a right-aligned action button */
+.se-title-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 /* section headers — border-bottom color applied by JS */
@@ -530,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-plug"></i> <?=gettext("Ports / Listeners")?></span>
 								<button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#createListenerModal"><i class="fa fa-plus"></i> <?=gettext("Add")?></button>
 							</h2>
@@ -544,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-ethernet"></i> <?=gettext("Interfaces / TAP / Local Bridge")?></span>
 								<button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#createTapModal"><i class="fa fa-plus"></i> <?=gettext("Add")?></button>
 							</h2>
@@ -558,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-random"></i> <?=gettext("Virtual L3 Switches")?></span>
 								<button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#createL3Modal"><i class="fa fa-plus"></i> <?=gettext("Add")?></button>
 							</h2>
@@ -572,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-exchange"></i> <?=gettext("EtherIP / L2TPv3 Clients")?></span>
 								<button type="button" class="btn btn-xs btn-success" data-toggle="modal" data-target="#addEtherIpModal"><i class="fa fa-plus"></i> <?=gettext("Add")?></button>
 							</h2>
@@ -590,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div role="tabpanel" class="tab-pane" id="srvTabCertificate">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><?=gettext("Server Certificate")?></span>
 								<div>
 									<button type="button" class="btn btn-xs btn-default" onclick="viewServerCert()" style="margin-right:4px;"><i class="fa fa-eye"></i> <?=gettext("View")?></button>
@@ -762,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div role="tabpanel" class="tab-pane" id="hubTabUsers">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-user"></i> <?=gettext("Users")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#createUserModal"><i class="fa fa-plus"></i> <?=gettext("Add User")?></button>
 							</h2>
@@ -776,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-group"></i> <?=gettext("Groups")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#createGroupModal"><i class="fa fa-plus"></i> <?=gettext("Add Group")?></button>
 							</h2>
@@ -815,7 +822,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<!-- NAT & DHCP: SecureNAT controls + NAT table + DHCP leases -->
 				<div role="tabpanel" class="tab-pane" id="hubTabNatDhcp">
 					<div class="panel panel-default">
-						<div class="panel-heading" style="display:flex;justify-content:space-between;align-items:center;">
+						<div class="panel-heading se-title-flex">
 							<ul class="nav nav-tabs panel-tabs" role="tablist" style="margin:0;border:none;flex:1;">
 								<li role="presentation" class="active"><a href="#tabNatTable"  role="tab" data-toggle="tab"><?=gettext("NAT Table")?></a></li>
 								<li role="presentation"><a href="#tabDhcpTable" role="tab" data-toggle="tab"><?=gettext("DHCP Leases")?></a></li>
@@ -842,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div role="tabpanel" class="tab-pane" id="hubTabSecurity">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-filter"></i> <?=gettext("Access List (Packet Filter)")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#addAccessModal" id="addAccessBtn"><i class="fa fa-plus"></i> <?=gettext("Add Rule")?></button>
 							</h2>
@@ -875,7 +882,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						<div class="col-sm-6 col-sm-offset-1">
 							<div class="panel panel-default">
 								<div class="panel-heading">
-									<h4 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+									<h4 class="panel-title se-title-flex">
 										<span><i class="fa fa-certificate"></i> <?=gettext("Trusted CA Certificates")?></span>
 										<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#addCaModal" style="font-size:11px;"><i class="fa fa-plus"></i> <?=gettext("Add CA")?></button>
 									</h4>
@@ -891,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h4 class="panel-title se-title-flex">
 								<span><i class="fa fa-ban"></i> <?=gettext("Certificate Revocation List (CRL)")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#addCrlModal"><i class="fa fa-plus"></i> <?=gettext("Add CRL")?></button>
 							</h4>
@@ -909,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				<div role="tabpanel" class="tab-pane" id="hubTabCascade">
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h2 class="panel-title se-title-flex">
 								<span><i class="fa fa-code-fork"></i> <?=gettext("Cascade Connections")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#createCascadeModal"><i class="fa fa-plus"></i> <?=gettext("Add Cascade")?></button>
 							</h2>
@@ -974,7 +981,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+							<h4 class="panel-title se-title-flex">
 								<span><i class="fa fa-shield"></i> <?=gettext("WireGuard Keys")?></span>
 								<button class="btn btn-xs btn-success" data-toggle="modal" data-target="#addWgkModal"><i class="fa fa-plus"></i> <?=gettext("Add Key")?></button>
 							</h4>
@@ -1055,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				<h2 class="panel-title" style="display:flex;justify-content:space-between;align-items:center;">
+				<h2 class="panel-title se-title-flex">
 					<span><?=gettext("Log Files")?></span>
 					<button class="btn btn-xs btn-default" onclick="refreshLogFiles()"><i class="fa fa-refresh"></i> <?=gettext("Refresh")?></button>
 				</h2>
@@ -1769,32 +1776,6 @@ var SOFTETHER_ERROR_CODES = {
 	33:'Object not found',34:'Timeout',35:'Routing error',36:'Connection failed',37:'Disconnected'
 };
 
-// Field-name aliases shared across sessions/MAC/IP tables
-var FIELD_TITLE_MAP = {
-	SessionName_str:'Session Name', Name_str:'Session Name',
-	Username_str:'User', UserName_str:'User',
-	Ip_str:'Client IP', IpAddress_ip:'Client IP',
-	Hostname_str:'Client Hostname', HostName_str:'Client Hostname',
-	MacAddress_str:'MAC Address', Mac_str:'MAC Address',
-	PortNumber_u32:'Port', Port_u32:'Port',
-	VlanId_u32:'VLAN', VLAN_u32:'VLAN',
-	Type_str:'Type', RemoteHostname_str:'Remote Host',
-	ClientProductName_str:'Client Product', ClientVersion_u32:'Client Version',
-	ActiveTime_str:'Active Time', ActiveTime_u32:'Active Time',
-	ConnectionStartedTime_dt:'Start Time', ConnectionStartedTime_u32:'Start Time',
-	MaxConnectionTime_u32:'Max Conn. Time',
-	AuthType_u32:'Auth Type', AuthUserName_str:'Auth User',
-	Authenticated_bool:'Authenticated',
-	LastCommTime_dt:'Last Comm. Time', LastCommTime_u32:'Last Comm. Time',
-	CreatedTime_dt:'Created', Created_dt:'Created',
-	UpdatedTime_dt:'Updated', Updated_dt:'Updated',
-	RemoteIP_str:'Remote IP', RemotePort_u32:'Remote Port',
-	LocalIP_str:'Local IP', LocalPort_u32:'Local Port',
-	BridgeMode_bool:'Bridge Mode', SecureNATMode_bool:'SecureNAT',
-	SessionKey_u32:'Session Key',Policy:'Policy',
-	VLAN_u32:'VLAN', VlanId_u32:'VLAN'
-};
-
 // ============================================================
 // UTILITIES
 // ============================================================
@@ -1805,8 +1786,8 @@ function escapeHtml(text) {
 		.replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 
+// Escape a value for embedding inside single-quoted inline JS attributes.
 function escapeAttr(text) {
-	// Use JSON stringify to safely quote any value for inline JS attributes
 	return String(text == null ? '' : text).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 }
 
@@ -1815,8 +1796,8 @@ function getErrorDescription(code) {
 }
 
 /**
- * Humanize a raw field value based on key naming conventions.
- * Defined once here - replaces three identical inline copies.
+ * Humanize a raw field value based on key naming conventions
+ * (MAC addresses, packed IPv4 ints, ISO/Unix timestamps).
  */
 function humanize(key, val) {
 	if (val == null) { return '-'; }
@@ -1856,12 +1837,155 @@ function humanize(key, val) {
 	return String(val);
 }
 
+function fmtBytes(n) {
+	if (n == null || isNaN(n)) { return '-'; }
+	if (n >= 1073741824) { return (n/1073741824).toFixed(2) + ' GB'; }
+	if (n >= 1048576)    { return (n/1048576).toFixed(2) + ' MB'; }
+	if (n >= 1024)       { return (n/1024).toFixed(1) + ' KB'; }
+	return n + ' B';
+}
+
+function fmtDuration(sec) {
+	if (!sec || isNaN(sec)) { return '-'; }
+	var d = Math.floor(sec/86400), h = Math.floor((sec%86400)/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+	return (d?d+'d ':'') + (h?h+'h ':'') + (m?m+'m ':'') + s + 's';
+}
+
+// ---- DOM shorthands ----
+
+function $id(id) { return document.getElementById(id); }
+
+// Trimmed string value of an input; '' if the element is missing.
+function val(id) {
+	var el = $id(id);
+	return el ? String(el.value || '').trim() : '';
+}
+
+// Untrimmed value (passwords may contain significant whitespace).
+function rawVal(id) {
+	var el = $id(id);
+	return el ? (el.value || '') : '';
+}
+
+// Integer value of an input; def when empty, invalid or zero.
+function intVal(id, def) {
+	return parseInt(rawVal(id), 10) || def || 0;
+}
+
+function isChecked(id) {
+	var el = $id(id);
+	return !!(el && el.checked);
+}
+
+// Set input value / checkbox state, ignoring missing elements.
+function setVal(id, v) { var el = $id(id); if (el) { el.value = v; } }
+function setChecked(id, on) { var el = $id(id); if (el) { el.checked = !!on; } }
+
+// ---- API result helpers ----
+
+// Human-readable detail from a call() result.
+function apiDetail(r) {
+	var d = r && r.detail;
+	if (d == null) { return 'API not available'; }
+	return (typeof d === 'string') ? d : JSON.stringify(d);
+}
+
+function showApiError(prefix, r) {
+	alert(prefix + ': ' + apiDetail(r));
+}
+
+// Extract an array payload from a call() result, trying each given key in order.
+function resultList(r) {
+	if (r.error || !r.result) { return []; }
+	for (var i = 1; i < arguments.length; i++) {
+		if (Array.isArray(r.result[arguments[i]])) { return r.result[arguments[i]]; }
+	}
+	return [];
+}
+
+// Confirm (optional), run one method (or a tryMethods chain), report errors,
+// then refresh. The workhorse behind the delete/toggle action buttons.
+async function confirmCall(message, methods, params, errorMsg, refresh) {
+	if (message && !confirm(message)) { return; }
+	var r = Array.isArray(methods) ? await tryMethods(methods, params) : await call(methods, params);
+	if (r.error) { showApiError(errorMsg, r); return; }
+	if (refresh) { await refresh(); }
+}
+
+// ---- Table rendering ----
+
+function emptyRow(colspan, msg) {
+	return '<tr><td colspan="' + colspan + '" class="text-muted">' + escapeHtml(msg) + '</td></tr>';
+}
+
+// Fill a tbody from a list; shows emptyMsg when the list is empty.
+// Optional headerHtml replaces the table's <thead> content.
+function fillTable(tbodyId, list, colspan, emptyMsg, rowFn, headerHtml) {
+	var tbody = $id(tbodyId);
+	if (!tbody) { return; }
+	if (headerHtml !== undefined) {
+		var thead = tbody.parentNode.querySelector('thead');
+		if (thead) { thead.innerHTML = headerHtml; }
+	}
+	tbody.innerHTML = list.map(rowFn).join('') || emptyRow(colspan, emptyMsg);
+}
+
+// Rows for a two-column key/value table (se-kv-table CSS styles the cells).
+function kvRows(rows, labelWidth) {
+	var style = labelWidth ? ' style="width:' + labelWidth + ';"' : '';
+	return rows.map(function(r) {
+		return '<tr><td' + style + '>' + escapeHtml(String(r[0])) + '</td><td>' + escapeHtml(String(r[1])) + '</td></tr>';
+	}).join('');
+}
+
+// <option> list for hubs returned by EnumHub.
+function hubOptionsHtml(hubs, placeholder) {
+	return (placeholder ? '<option value="">' + escapeHtml(placeholder) + '</option>' : '') +
+		hubs.map(function(h) {
+			var n = h.HubName_str || h.Name_str || h.HubName_utf || '';
+			return n ? '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>' : '';
+		}).join('');
+}
+
+// ---- Browser helpers ----
+
+// Trigger a download of generated content.
+function downloadBlob(data, filename, mime) {
+	var blob = (data instanceof Blob) ? data : new Blob([data], { type: mime || 'text/plain' });
+	var a = document.createElement('a');
+	a.href = URL.createObjectURL(blob);
+	a.download = filename;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(a.href);
+}
+
+// pfSense CSRF field (csrf-magic injects these globals into every page).
+function csrfField() {
+	return {
+		name:  (typeof csrfMagicName  !== 'undefined') ? csrfMagicName  : '__csrf_magic',
+		token: (typeof csrfMagicToken !== 'undefined') ? csrfMagicToken : ''
+	};
+}
+
+// POST body for the API proxy: CSRF token + JSON-RPC payload (+ extra fields).
+function proxyBody(method, params, extra) {
+	var csrf = csrfField();
+	var body = new URLSearchParams();
+	if (csrf.token) { body.append(csrf.name, csrf.token); }
+	Object.keys(extra || {}).forEach(function(k) { body.append(k, extra[k]); });
+	body.append('payload', JSON.stringify({ jsonrpc:'2.0', id:String(Date.now()), method:method, params:params || {} }));
+	return body;
+}
+
 // ============================================================
 // AUTO-REFRESH
 // ============================================================
 
 /**
- * Unified auto-refresh: replaces two sets of timer + busy-flag pairs.
+ * Periodic refresh that skips ticks while the page is hidden or a
+ * previous refresh is still running.
  * Usage: var r = new AutoRefresher(fn, seconds); r.start(); r.stop();
  */
 function AutoRefresher(fn, intervalSeconds) {
@@ -1887,30 +2011,31 @@ AutoRefresher.prototype.stop = function() {
 	if (this._timer) { clearInterval(this._timer); this._timer = null; }
 };
 
+// One refresh pass over every server-level panel plus the active hub.
+function refreshServerPanels() {
+	return Promise.all([
+		refreshServerStatus(), refreshListeners(), refreshIpsec(), refreshOpenVpnSstp(),
+		refreshSyslog(), refreshServerCert(), refreshKeepAlive(), refreshAzureIcmpDns(),
+		refreshServerCipher(), refreshL3Switches(), refreshEtherIpClients(), refreshHubData()
+	]);
+}
+
 var cascadeRefresher = new AutoRefresher(refreshCascadeTable, 5);
-var pageRefresher    = new AutoRefresher(function() {
-	return Promise.all([refreshServerStatus(), refreshListeners(), refreshIpsec(), refreshOpenVpnSstp(), refreshSyslog(), refreshServerCert(), refreshKeepAlive(), refreshAzureIcmpDns(), refreshServerCipher(), refreshL3Switches(), refreshEtherIpClients(), refreshHubData()]);
-}, 15);
+var pageRefresher    = new AutoRefresher(refreshServerPanels, 15);
 
 // ============================================================
 // API
 // ============================================================
 
 async function call(method, params) {
-	params = params || {};
-	var user = (document.getElementById('apiUser').value || '').trim() || 'Administrator';
-	var pass = document.getElementById('apiPass').value;
-	var csrfName  = (typeof csrfMagicName  !== 'undefined') ? csrfMagicName  : '__csrf_magic';
-	var csrfToken = (typeof csrfMagicToken !== 'undefined') ? csrfMagicToken : '';
-	var body = new URLSearchParams();
-	if (csrfToken) { body.append(csrfName, csrfToken); }
-	body.append('payload', JSON.stringify({ jsonrpc:'2.0', id:String(Date.now()), method:method, params:params }));
+	var user = val('apiUser') || 'Administrator';
+	var pass = rawVal('apiPass');
 	try {
 		var res = await fetch('/vpn_softether5_api_proxy.php', {
 			method: 'POST',
 			headers: { Authorization: 'Basic ' + btoa(user + ':' + pass) },
 			credentials: 'same-origin',
-			body: body
+			body: proxyBody(method, params)
 		});
 		var data = await res.json();
 		if (!res.ok || data.error) { return { error:true, detail: data.detail || data.error || data }; }
@@ -1988,17 +2113,11 @@ function disconnectApp() {
 
 function renderServerStatusTable(sr) {
 	if (!sr) {
-		document.getElementById('srvInfo').innerHTML = '<tr><td colspan="2">Server status unavailable.</td></tr>';
+		document.getElementById('srvInfo').innerHTML = emptyRow(2, 'Server status unavailable.');
 		return;
 	}
 	var srvTypeNames = {0:'Standalone Server', 1:'Farm Controller', 2:'Farm Member'};
 	function n(v) { var i = parseInt(v, 10); return (isNaN(i) || i < 0) ? 0 : i; }
-	function fmtUptime(sec) {
-		sec = parseInt(sec, 10);
-		if (!sec || isNaN(sec) || sec <= 0) { return '-'; }
-		var d = Math.floor(sec/86400), h = Math.floor((sec%86400)/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-		return (d?d+'d ':'') + (h?h+'h ':'') + (m?m+'m ':'') + s + 's';
-	}
 	// Normalise field names: HTTP API uses different keys than CLI
 	// Server Type: API=ServerType_u32 (int), CLI=ServerType_str
 	var srvType = sr.ServerType_str || srvTypeNames[sr.ServerType_u32] || '-';
@@ -2044,11 +2163,9 @@ function renderServerStatusTable(sr) {
 		['Server Started at',                              startedAt],
 		['Current Time',                                   currentTime],
 		['64 bit High-Precision Logical System Clock',     logicClock],
-		['Up Time',                                        fmtUptime(uptimeSec)],
+		['Up Time',                                        fmtDuration(Math.max(0, parseInt(uptimeSec, 10)))],
 	];
-	document.getElementById('srvInfo').innerHTML = rows.map(function(r) {
-		return '<tr><td style="width:60%;font-weight:bold;">' + escapeHtml(r[0]) + '</td><td style="word-break:break-word;">' + escapeHtml(String(r[1])) + '</td></tr>';
-	}).join('');
+	document.getElementById('srvInfo').innerHTML = kvRows(rows, '60%');
 }
 
 async function refreshServerStatus() {
@@ -2084,20 +2201,16 @@ async function initApp() {
 	}
 
 	var hubList = hubs.result.HubList;
-	var hubOptions = hubList.map(function(h) {
-		return '<option value="' + escapeHtml(h.HubName_str) + '">' + escapeHtml(h.HubName_str) + '</option>';
-	}).join('');
-
-	document.getElementById('hubSelector').innerHTML = hubOptions;
+	document.getElementById('hubSelector').innerHTML = hubOptionsHtml(hubList);
 
 	// Sync hub list into TAP/bridge modal
 	var tapHubSel = document.getElementById('newLocalBridgeHub');
 	if (tapHubSel) {
-		tapHubSel.innerHTML = '<option value="">(Select a hub...)</option>' + hubOptions;
+		tapHubSel.innerHTML = hubOptionsHtml(hubList, '(Select a hub...)');
 	}
 
 	currentHub = document.getElementById('hubSelector').value || '';
-	await Promise.all([refreshListeners(), refreshIpsec(), refreshOpenVpnSstp(), refreshSyslog(), refreshServerCert(), refreshKeepAlive(), refreshAzureIcmpDns(), refreshServerCipher(), refreshL3Switches(), refreshEtherIpClients(), refreshHubData()]);
+	await refreshServerPanels();
 
 	cascadeRefresher.start();
 	pageRefresher.start();
@@ -2195,34 +2308,20 @@ async function refreshHubInfo() {
 
 	if (!rows.length) { rows.push(['Hub Name', currentHub]); }
 
-	document.getElementById('hubInfo').innerHTML = rows.map(function(r) {
-		return '<tr><td style="width:45%;font-weight:bold;">' + escapeHtml(r[0]) + '</td><td style="word-break:break-word;">' + escapeHtml(r[1]) + '</td></tr>';
-	}).join('');
+	document.getElementById('hubInfo').innerHTML = kvRows(rows, '45%');
 }
 
 function clearHubTables() {
+	// tbody id -> colspan of its "No hub selected." placeholder row
 	var empties = {
-		hubInfo:      '<tr><td colspan="2" class="text-muted">No hub selected.</td></tr>',
-		userTable:    '<tr><td colspan="7" class="text-muted">No hub selected.</td></tr>',
-		groupTable:   '<tr><td colspan="5" class="text-muted">No hub selected.</td></tr>',
-		sessionTable: '<tr><td colspan="10" class="text-muted">No hub selected.</td></tr>',
-		macTable:     '<tr><td colspan="6" class="text-muted">No hub selected.</td></tr>',
-		ipTable:      '<tr><td colspan="7" class="text-muted">No hub selected.</td></tr>',
-		connTable:    '<tr><td colspan="6" class="text-muted">No hub selected.</td></tr>',
-		cascadeTable: '<tr><td colspan="7" class="text-muted">No hub selected.</td></tr>',
-		ifTable:      '<tr><td colspan="5" class="text-muted">No hub selected.</td></tr>',
-		accessTable:  '<tr><td colspan="10" class="text-muted">No hub selected.</td></tr>',
-		natTable:     '<tr><td colspan="6" class="text-muted">No hub selected.</td></tr>',
-		dhcpTable:    '<tr><td colspan="5" class="text-muted">No hub selected.</td></tr>',
-		caTable:         '<tr><td colspan="3" class="text-muted">No hub selected.</td></tr>',
-		adminOptionsTable: '<tr><td colspan="3" class="text-muted">No hub selected.</td></tr>',
-		extOptionsTable:   '<tr><td colspan="3" class="text-muted">No hub selected.</td></tr>',
-		crlTable:          '<tr><td colspan="4" class="text-muted">No hub selected.</td></tr>',
-		wgkTable:          '<tr><td colspan="3" class="text-muted">No hub selected.</td></tr>'
+		hubInfo: 2, userTable: 7, groupTable: 5, sessionTable: 10, macTable: 6,
+		ipTable: 7, connTable: 6, cascadeTable: 7, ifTable: 5, accessTable: 10,
+		natTable: 6, dhcpTable: 5, caTable: 3, adminOptionsTable: 3,
+		extOptionsTable: 3, crlTable: 4, wgkTable: 3
 	};
 	Object.keys(empties).forEach(function(id) {
 		var el = document.getElementById(id);
-		if (el) { el.innerHTML = empties[id]; }
+		if (el) { el.innerHTML = emptyRow(empties[id], 'No hub selected.'); }
 	});
 	var badge = document.getElementById('hubOnlineBadge');
 	if (badge) { badge.className = 'label'; badge.textContent = ''; }
@@ -2231,62 +2330,13 @@ function clearHubTables() {
 }
 
 // ============================================================
-// DYNAMIC TABLES (Sessions / MAC / IP)
-// Extracted shared logic - eliminates three near-identical functions
+// SESSIONS / MAC / IP TABLES
 // ============================================================
-
-/**
- * Build a dynamic table from an arbitrary list of objects.
- * @param {string}   tbodyId    - ID of the <tbody> to populate
- * @param {Array}    list       - data rows
- * @param {Object}   titleMap   - key->human title overrides
- * @param {Function} [extraCols]- optional fn(row)->'<td>...</td>' appended per row
- * @param {string}   emptyMsg   - fallback colspan message
- */
-function buildDynamicTable(tbodyId, list, titleMap, extraCols, emptyMsg) {
-	var allKeys = {};
-	list.forEach(function(row) { Object.keys(row).forEach(function(k) { allKeys[k] = true; }); });
-	var keys = Object.keys(allKeys);
-
-	var header = '<tr>' + keys.map(function(k) {
-		return '<th>' + escapeHtml(titleMap[k] || k) + '</th>';
-	}).join('') + (extraCols ? '<th>Actions</th>' : '') + '</tr>';
-
-	var rows = list.map(function(row) {
-		return '<tr>' +
-			keys.map(function(k) { return '<td>' + escapeHtml(humanize(k, row[k])) + '</td>'; }).join('') +
-			(extraCols ? extraCols(row) : '') +
-			'</tr>';
-	}).join('') || '<tr><td colspan="' + (keys.length + (extraCols ? 1 : 0)) + '">' + escapeHtml(emptyMsg) + '</td></tr>';
-
-	var tbody  = document.getElementById(tbodyId);
-	var table  = tbody.parentNode;
-	var thead  = table.querySelector('thead') || table.insertBefore(document.createElement('thead'), table.firstChild);
-	thead.innerHTML = header;
-	tbody.innerHTML = rows;
-}
-
-function fmtBytes(n) {
-	if (n == null || isNaN(n)) { return '-'; }
-	if (n >= 1073741824) { return (n/1073741824).toFixed(2) + ' GB'; }
-	if (n >= 1048576)    { return (n/1048576).toFixed(2) + ' MB'; }
-	if (n >= 1024)       { return (n/1024).toFixed(1) + ' KB'; }
-	return n + ' B';
-}
-function fmtDuration(sec) {
-	if (!sec || isNaN(sec)) { return '-'; }
-	var d = Math.floor(sec/86400), h = Math.floor((sec%86400)/3600), m = Math.floor((sec%3600)/60), s = sec%60;
-	return (d?d+'d ':'') + (h?h+'h ':'') + (m?m+'m ':'') + s + 's';
-}
 
 async function refreshSessions() {
 	var s = await call('EnumSession', { HubName_str: currentHub });
-	var list = (!s.error && s.result && Array.isArray(s.result.SessionList)) ? s.result.SessionList : [];
 	var now = Math.floor(Date.now()/1000);
-	var tbody = document.getElementById('sessionTable');
-	var thead = tbody.parentNode.querySelector('thead');
-	thead.innerHTML = '<tr><th>Session Name</th><th>User Name</th><th>Source IP</th><th>TCP Conns</th><th>Transfer (In)</th><th>Transfer (Out)</th><th>Duration</th><th>Client Name</th><th>Encryption</th><th>Actions</th></tr>';
-	tbody.innerHTML = list.map(function(sess) {
+	fillTable('sessionTable', resultList(s, 'SessionList'), 10, 'No active sessions.', function(sess) {
 		var name      = sess.Name_str || sess.SessionName_str || '-';
 		var user      = sess.Username_str || sess.AuthUsername_str || '-';
 		var srcIp     = humanize('ClientIp_ip', sess.ClientIp_ip !== undefined ? sess.ClientIp_ip : sess.RemoteIP_ip);
@@ -2311,16 +2361,12 @@ async function refreshSessions() {
 			'<td>' + escapeHtml(encrypt) + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="killSession(\'' + nameEsc + '\')" title="Disconnect"><i class="fa fa-times"></i></button></td>' +
 			'</tr>';
-	}).join('') || '<tr><td colspan="10" class="text-muted">No active sessions.</td></tr>';
+	}, '<tr><th>Session Name</th><th>User Name</th><th>Source IP</th><th>TCP Conns</th><th>Transfer (In)</th><th>Transfer (Out)</th><th>Duration</th><th>Client Name</th><th>Encryption</th><th>Actions</th></tr>');
 }
 
 async function refreshMacTable() {
 	var m = await call('EnumMacTable', { HubName_str: currentHub });
-	var list = (!m.error && m.result && Array.isArray(m.result.MacTable)) ? m.result.MacTable : [];
-	var tbody = document.getElementById('macTable');
-	var thead = tbody.parentNode.querySelector('thead');
-	thead.innerHTML = '<tr><th>Session Name</th><th>MAC Address</th><th>Created</th><th>Updated</th><th>Remote</th><th>Actions</th></tr>';
-	tbody.innerHTML = list.map(function(row) {
+	fillTable('macTable', resultList(m, 'MacTable'), 6, 'No MAC entries.', function(row) {
 		var mac = humanize('MacAddress_str', row.MacAddress_bin || row.MacAddress_str || '-');
 		var macEsc = escapeAttr(mac);
 		return '<tr>' +
@@ -2331,23 +2377,17 @@ async function refreshMacTable() {
 			'<td>' + (row.RemoteItem_bool ? '<span class="label label-info">Yes</span>' : 'No') + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteMacEntry(\'' + macEsc + '\')" title="Delete entry"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('') || '<tr><td colspan="6" class="text-muted">No MAC entries.</td></tr>';
+	}, '<tr><th>Session Name</th><th>MAC Address</th><th>Created</th><th>Updated</th><th>Remote</th><th>Actions</th></tr>');
 }
 
-async function deleteMacEntry(mac) {
-	if (!confirm('Delete MAC table entry for ' + mac + '?')) { return; }
-	var r = await call('DeleteMacTable', { HubName_str: currentHub, MacAddress_str: mac });
-	if (r.error) { alert('Error deleting MAC entry.'); return; }
-	await refreshMacTable();
+function deleteMacEntry(mac) {
+	return confirmCall('Delete MAC table entry for ' + mac + '?', 'DeleteMacTable',
+		{ HubName_str: currentHub, MacAddress_str: mac }, 'Error deleting MAC entry', refreshMacTable);
 }
 
 async function refreshIpTable() {
 	var i = await call('EnumIpTable', { HubName_str: currentHub });
-	var list = (!i.error && i.result && Array.isArray(i.result.IpTable)) ? i.result.IpTable : [];
-	var tbody = document.getElementById('ipTable');
-	var thead = tbody.parentNode.querySelector('thead');
-	thead.innerHTML = '<tr><th>Session Name</th><th>IP Address</th><th>Created</th><th>Updated</th><th>Remote</th><th>DHCP</th><th>Actions</th></tr>';
-	tbody.innerHTML = list.map(function(row) {
+	fillTable('ipTable', resultList(i, 'IpTable'), 7, 'No IP entries.', function(row) {
 		var ip = row.IpAddress_ip !== undefined ? humanize('IpAddress_ip', row.IpAddress_ip) : (row.IpAddress_str || '-');
 		var ipEsc = escapeAttr(ip);
 		return '<tr>' +
@@ -2359,14 +2399,12 @@ async function refreshIpTable() {
 			'<td>' + (row.DhcpTable_bool  ? '<span class="label label-success">Yes</span>' : 'No') + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteIpEntry(\'' + ipEsc + '\')" title="Delete entry"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('') || '<tr><td colspan="7" class="text-muted">No IP entries.</td></tr>';
+	}, '<tr><th>Session Name</th><th>IP Address</th><th>Created</th><th>Updated</th><th>Remote</th><th>DHCP</th><th>Actions</th></tr>');
 }
 
-async function deleteIpEntry(ip) {
-	if (!confirm('Delete IP table entry for ' + ip + '?')) { return; }
-	var r = await call('DeleteIpTable', { HubName_str: currentHub, IpAddress_str: ip });
-	if (r.error) { alert('Error deleting IP entry.'); return; }
-	await refreshIpTable();
+function deleteIpEntry(ip) {
+	return confirmCall('Delete IP table entry for ' + ip + '?', 'DeleteIpTable',
+		{ HubName_str: currentHub, IpAddress_str: ip }, 'Error deleting IP entry', refreshIpTable);
 }
 
 // ============================================================
@@ -2376,8 +2414,7 @@ async function deleteIpEntry(ip) {
 var AUTH_TYPE_NAMES = {0:'Anonymous', 1:'Password Auth.', 2:'Individual Cert.', 3:'Signed Cert.', 4:'RADIUS / NT Domain', 5:'NT Domain'};
 async function refreshUsers() {
 	var u = await call('EnumUser', { HubName_str: currentHub });
-	var users = (!u.error && u.result && Array.isArray(u.result.UserList)) ? u.result.UserList : [];
-	document.getElementById('userTable').innerHTML = users.map(function(usr) {
+	fillTable('userTable', resultList(u, 'UserList'), 12, 'No users.', function(usr) {
 		var authType = usr.AuthType_u32;
 		var authStr = (authType !== undefined && AUTH_TYPE_NAMES[authType]) ? AUTH_TYPE_NAMES[authType] : (authType !== undefined ? String(authType) : '-');
 		var lastLogin = usr.LastLoginTime_dt || usr.LastLoginTime_u32;
@@ -2406,14 +2443,13 @@ async function refreshUsers() {
 			'<button class="btn btn-xs btn-danger" onclick="delUser(\'' + escapeAttr(usr.Name_str||'') + '\')" title="Delete"><i class="fa fa-trash"></i></button>' +
 			'</td>' +
 			'</tr>';
-	}).join('') || '<tr><td colspan="12" class="text-muted">No users.</td></tr>';
+	});
 }
 
 async function refreshGroups() {
 	var g = await tryMethods(['EnumGroup','ListGroup'], { HubName_str: currentHub });
-	var groups = (!g.error && g.result && Array.isArray(g.result.GroupList)) ? g.result.GroupList : [];
-	groupsList = groups;
-	document.getElementById('groupTable').innerHTML = groups.map(function(grp) {
+	groupsList = resultList(g, 'GroupList');
+	fillTable('groupTable', groupsList, 5, 'No groups.', function(grp) {
 		var n = escapeAttr(grp.Name_str || '');
 		return '<tr>' +
 			'<td>' + escapeHtml(grp.Name_str || '-') + '</td>' +
@@ -2424,16 +2460,16 @@ async function refreshGroups() {
 			'<button class="btn btn-xs btn-warning" onclick="editGroup(\'' + n + '\')" title="Edit" style="margin-right:2px;"><i class="fa fa-edit"></i></button>' +
 			'<button class="btn btn-xs btn-danger"  onclick="delGroup(\'' + n + '\')"  title="Delete"><i class="fa fa-trash"></i></button>' +
 			'</td></tr>';
-	}).join('') || '<tr><td colspan="5" class="text-muted">No groups.</td></tr>';
+	});
 }
 
 async function createUser() {
-	var name   = document.getElementById('newUserName').value.trim();
-	var pass   = document.getElementById('newUserPass').value;
-	var real   = document.getElementById('newUserReal').value.trim();
-	var note   = document.getElementById('newUserNote').value.trim();
-	var group  = document.getElementById('newUserGroup').value;
-	var expiry = document.getElementById('newUserExpiry').value;
+	var name   = val('newUserName');
+	var pass = rawVal('newUserPass');
+	var real   = val('newUserReal');
+	var note   = val('newUserNote');
+	var group = rawVal('newUserGroup');
+	var expiry = rawVal('newUserExpiry');
 	if (!name) { alert('Username is required.'); return; }
 
 	var expiryTs = 0;
@@ -2447,7 +2483,7 @@ async function createUser() {
 		Note_utf: note,
 		Note_str: note,
 		GroupName_str: group,
-		AuthType_u32: parseInt(document.getElementById('newUserAuthType').value, 10),
+		AuthType_u32: parseInt(rawVal('newUserAuthType'), 10),
 		AuthData: { Password_str: pass },
 		Expires_u64: expiryTs
 	});
@@ -2462,15 +2498,13 @@ async function createUser() {
 
 	$('#createUserModal').modal('hide');
 	['newUserName','newUserPass','newUserReal','newUserNote','newUserExpiry'].forEach(function(id){ document.getElementById(id).value=''; });
-	document.getElementById('newUserGroup').value = '';
+	setVal('newUserGroup', '');
 	await refreshUsers();
 }
 
-async function delUser(name) {
-	if (!confirm("Delete user '" + name + "'?")) { return; }
-	var r = await call('DeleteUser', { HubName_str:currentHub, Name_str:name });
-	if (r.error) { alert('Error deleting user.'); return; }
-	await refreshUsers();
+function delUser(name) {
+	return confirmCall("Delete user '" + name + "'?", 'DeleteUser',
+		{ HubName_str:currentHub, Name_str:name }, 'Error deleting user', refreshUsers);
 }
 
 // ============================================================
@@ -2649,32 +2683,32 @@ async function applyGroupPolicies(groupName, prefix) {
 // HUB GROUPS
 // ============================================================
 async function createGroup() {
-	var name = document.getElementById('newGroupName').value.trim();
-	var real = document.getElementById('newGroupReal').value.trim();
-	var note = document.getElementById('newGroupNote').value.trim();
+	var name = val('newGroupName');
+	var real = val('newGroupReal');
+	var note = val('newGroupNote');
 	if (!name) { alert('Group name is required.'); return; }
 	var r = await tryMethods(['CreateGroup','AddGroup'], { HubName_str:currentHub, Name_str:name, Realname_utf:real, Note_utf:note, Group:name, RealName:real, Note:note });
 	if (r.error) { alert('Error creating group or API not available.'); return; }
 	await applyGroupPolicies(name, 'new');
 	$('#createGroupModal').modal('hide');
-	document.getElementById('newGroupName').value = '';
-	document.getElementById('newGroupReal').value = '';
-	document.getElementById('newGroupNote').value = '';
+	setVal('newGroupName', '');
+	setVal('newGroupReal', '');
+	setVal('newGroupNote', '');
 	await refreshGroups();
 }
 
 async function editGroup(name) {
 	var grp = groupsList.find(function(g) { return g.Name_str === name; });
-	document.getElementById('editGroupOldName').value = name;
-	document.getElementById('editGroupName').value    = name;
-	document.getElementById('editGroupReal').value    = grp ? (grp.Realname_utf || grp.RealName_str || '') : '';
-	document.getElementById('editGroupNote').value    = grp ? (grp.Note_utf || grp.Note_str || '') : '';
-	document.getElementById('editGroupStats').innerHTML = '<tr><td colspan="2" class="text-muted">Loading...</td></tr>';
+	setVal('editGroupOldName', name);
+	setVal('editGroupName', name);
+	setVal('editGroupReal', grp ? (grp.Realname_utf || grp.RealName_str || '') : '');
+	setVal('editGroupNote', grp ? (grp.Note_utf || grp.Note_str || '') : '');
+	document.getElementById('editGroupStats').innerHTML = emptyRow(2, 'Loading...');
 	initGroupPolicyUI('edit', null);
 	$('#editGroupModal').modal('show');
 	var r = await call('GetGroup', { HubName_str: currentHub, Name_str: name, Group: name });
 	var sr = (!r.error && r.result) ? r.result : {};
-	document.getElementById('editGroupNote').value = sr.Note_utf || sr.Note_str || document.getElementById('editGroupNote').value;
+	setVal('editGroupNote', sr.Note_utf || sr.Note_str || document.getElementById('editGroupNote').value);
 	// Load policies from _policies field populated by proxy
 	if (sr._policies) { initGroupPolicyUI('edit', sr._policies); }
 	function np(v) { var i = parseInt(v, 10); return isNaN(i) ? 0 : i; }
@@ -2688,54 +2722,48 @@ async function editGroup(name) {
 		['Incoming Broadcast Packets',    np(sr['Recv.BroadcastPackets_u64'] ?? sr['Recv.BroadcastCount_u64']).toLocaleString() + ' packets'],
 		['Incoming Broadcast Total Size', np(sr['Recv.BroadcastBytes_u64'])  .toLocaleString() + ' bytes'],
 	];
-	document.getElementById('editGroupStats').innerHTML = statsRows.map(function(row) {
-		return '<tr><td>' + escapeHtml(row[0]) + '</td><td>' + escapeHtml(row[1]) + '</td></tr>';
-	}).join('');
+	document.getElementById('editGroupStats').innerHTML = kvRows(statsRows);
 }
 
 async function saveEditGroup() {
-	var oldName = document.getElementById('editGroupOldName').value;
-	var real    = document.getElementById('editGroupReal').value.trim();
-	var note    = document.getElementById('editGroupNote').value.trim();
+	var oldName = rawVal('editGroupOldName');
+	var real    = val('editGroupReal');
+	var note    = val('editGroupNote');
 	var r = await tryMethods(['SetGroup'], { HubName_str:currentHub, Name_str:oldName, Realname_utf:real, Note_utf:note, Group:oldName, RealName:real, Note:note });
-	if (r.error) { alert('Error updating group: ' + (r.detail || 'API not available.')); return; }
+	if (r.error) { showApiError('Error updating group', r); return; }
 	await applyGroupPolicies(oldName, 'edit');
 	$('#editGroupModal').modal('hide');
 	await refreshGroups();
 }
 
-async function delGroup(name) {
-	if (!confirm("Delete group '" + name + "'?")) { return; }
-	var r = await tryMethods(['DeleteGroup','DelGroup'], { HubName_str:currentHub, Name_str:name });
-	if (r.error) { alert('Error deleting group or API not available.'); return; }
-	await refreshGroups();
+function delGroup(name) {
+	return confirmCall("Delete group '" + name + "'?", ['DeleteGroup','DelGroup'],
+		{ HubName_str:currentHub, Name_str:name }, 'Error deleting group', refreshGroups);
 }
 
-async function killSession(sessionName) {
-	if (!confirm('Disconnect this session?')) { return; }
-	var r = await call('KillSession', { HubName_str:currentHub, Name_str:sessionName, SessionName_str:sessionName });
-	if (r.error) { alert('Error disconnecting session.'); return; }
-	await refreshSessions();
+function killSession(sessionName) {
+	return confirmCall('Disconnect this session?', 'KillSession',
+		{ HubName_str:currentHub, Name_str:sessionName, SessionName_str:sessionName },
+		'Error disconnecting session', refreshSessions);
 }
 
 // ============================================================
 // HUB MANAGEMENT
 // ============================================================
 
-async function setHubOnline(online) {
+function setHubOnline(online) {
 	if (!currentHub) { return; }
-	var r = await tryMethods([online ? 'SetHubOnline' : 'SetHubOffline'], { HubName_str: currentHub });
-	if (r.error) { alert('Error: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
-	await refreshHubInfo();
+	return confirmCall(null, online ? 'SetHubOnline' : 'SetHubOffline',
+		{ HubName_str: currentHub }, 'Error changing hub state', refreshHubInfo);
 }
 
 async function saveHubPassword() {
-	var pwd = document.getElementById('hubNewPassword').value;
+	var pwd = rawVal('hubNewPassword');
 	if (!pwd) { alert('Password is required.'); return; }
 	var r = await call('SetHubPassword', { HubName_str: currentHub, Password_str: pwd });
-	if (r.error) { alert('Error setting hub password: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error setting hub password', r); return; }
 	$('#hubPasswordModal').modal('hide');
-	document.getElementById('hubNewPassword').value = '';
+	setVal('hubNewPassword', '');
 	alert('Hub password changed successfully.');
 }
 
@@ -2750,15 +2778,15 @@ async function editUser(name) {
 		usr = r.result;
 	} else {
 		var u = await call('EnumUser', { HubName_str: currentHub });
-		var list = (!u.error && u.result && Array.isArray(u.result.UserList)) ? u.result.UserList : [];
+		var list = resultList(u, 'UserList');
 		usr = list.find(function(u) { return u.Name_str === name; }) || { Name_str: name };
 	}
-	document.getElementById('editUserName').value        = usr.Name_str || name;
-	document.getElementById('editUserDisplayName').value = usr.Name_str || name;
-	document.getElementById('editUserReal').value        = usr.Realname_utf || usr.RealName_utf || usr.RealName_str || '';
+	setVal('editUserName', usr.Name_str || name);
+	setVal('editUserDisplayName', usr.Name_str || name);
+	setVal('editUserReal', usr.Realname_utf || usr.RealName_utf || usr.RealName_str || '');
 	var authSel = document.getElementById('editUserAuthType'); if (authSel && usr.AuthType_u32 !== undefined) { authSel.value = String(usr.AuthType_u32); }
-	document.getElementById('editUserNote').value        = usr.Note_utf || usr.Note_str || '';
-	document.getElementById('editUserPass').value        = '';
+	setVal('editUserNote', usr.Note_utf || usr.Note_str || '');
+	setVal('editUserPass', '');
 	var expiryEl = document.getElementById('editUserExpiry');
 	if (expiryEl) { expiryEl.value = usr.ExpiresTime_dt ? usr.ExpiresTime_dt.split('T')[0] : ''; }
 	var grpSel = document.getElementById('editUserGroup');
@@ -2775,26 +2803,26 @@ async function editUser(name) {
 }
 
 async function saveEditUser() {
-	var name  = document.getElementById('editUserName').value;
-	var real  = document.getElementById('editUserReal').value.trim();
-	var note  = document.getElementById('editUserNote').value.trim();
-	var group = document.getElementById('editUserGroup').value;
-	var pass  = document.getElementById('editUserPass').value;
+	var name = rawVal('editUserName');
+	var real  = val('editUserReal');
+	var note  = val('editUserNote');
+	var group = rawVal('editUserGroup');
+	var pass = rawVal('editUserPass');
 	var r = await tryMethods(['SetUser'], {
 		HubName_str: currentHub, Name_str: name,
 		RealName_utf: real, RealName_str: real,
 		Note_utf: note, Note_str: note,
-		GroupName_str: group, AuthType_u32: parseInt(document.getElementById('editUserAuthType').value, 10)
+		GroupName_str: group, AuthType_u32: parseInt(rawVal('editUserAuthType'), 10)
 	});
 	if (r.error) {
-		alert('Error updating user: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available'));
+		showApiError('Error updating user', r);
 		return;
 	}
 	if (pass) {
 		var rp = await call('SetUserPassword', { HubName_str: currentHub, Name_str: name, Password_str: pass });
 		if (rp.error) { alert('User updated but error setting password.'); }
 	}
-	var expiry = ((document.getElementById('editUserExpiry') || {}).value || '').trim();
+	var expiry = val('editUserExpiry');
 	if (expiry) {
 		await call('SetUserExpires', { HubName_str: currentHub, UserName: name, Name_str: name, Expires: expiry });
 	}
@@ -2823,15 +2851,10 @@ var PROTO_NAMES = {0:'All', 1:'ICMP', 6:'TCP', 17:'UDP', 58:'ICMPv6'};
 async function refreshAccessList() {
 	if (!currentHub) { return; }
 	var r = await call('GetAccessList', { HubName_str: currentHub });
-
-	var _raw = (!r.error && r.result) ? r.result : null;
-	var list = Array.isArray(_raw) ? _raw : (_raw && Array.isArray(_raw.AccessList) ? _raw.AccessList : []);
-	var tbody = document.getElementById('accessTable');
-	if (!list.length) {
-		tbody.innerHTML = '<tr><td colspan="10">No access rules. Pass-all by default.</td></tr>';
-		return;
-	}
-	tbody.innerHTML = list.slice().sort(function(a,b) { return (a.Priority_u32||0)-(b.Priority_u32||0); }).map(function(rule) {
+	// CLI fallback returns a bare array instead of { AccessList: [...] }
+	var list = (!r.error && Array.isArray(r.result)) ? r.result : resultList(r, 'AccessList');
+	list = list.slice().sort(function(a,b) { return (a.Priority_u32||0)-(b.Priority_u32||0); });
+	fillTable('accessTable', list, 10, 'No access rules. Pass-all by default.', function(rule) {
 		var srcIp   = rule.SrcIpAddress_ip   ? intToIp(rule.SrcIpAddress_ip)   : '0.0.0.0';
 		var srcMask = rule.SrcSubnetMask_ip   ? intToIp(rule.SrcSubnetMask_ip)  : '0.0.0.0';
 		var dstIp   = rule.DestIpAddress_ip   ? intToIp(rule.DestIpAddress_ip)  : '0.0.0.0';
@@ -2857,23 +2880,23 @@ async function refreshAccessList() {
 			'<button class="btn btn-xs btn-danger" onclick="deleteAccess(' + id + ')"><i class="fa fa-trash"></i></button>' +
 			'</td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 async function addAccess() {
-	var priority     = parseInt(document.getElementById('accPriority').value, 10) || 100;
-	var note         = document.getElementById('accNote').value.trim();
-	var discard      = document.getElementById('accAction').value === '1';
-	var active       = document.getElementById('accActive').checked;
-	var protocol     = parseInt(document.getElementById('accProtocol').value, 10);
-	var srcIp        = ipToInt(document.getElementById('accSrcIp').value);
-	var srcMask      = ipToInt(document.getElementById('accSrcMask').value);
-	var dstIp        = ipToInt(document.getElementById('accDstIp').value);
-	var dstMask      = ipToInt(document.getElementById('accDstMask').value);
-	var srcPortStart = parseInt(document.getElementById('accSrcPortStart').value, 10) || 0;
-	var srcPortEnd   = parseInt(document.getElementById('accSrcPortEnd').value, 10);
-	var dstPortStart = parseInt(document.getElementById('accDstPortStart').value, 10) || 0;
-	var dstPortEnd   = parseInt(document.getElementById('accDstPortEnd').value, 10);
+	var priority     = intVal('accPriority', 100);
+	var note         = val('accNote');
+	var discard      = rawVal('accAction') === '1';
+	var active = isChecked('accActive');
+	var protocol     = parseInt(rawVal('accProtocol'), 10);
+	var srcIp        = ipToInt(rawVal('accSrcIp'));
+	var srcMask      = ipToInt(rawVal('accSrcMask'));
+	var dstIp        = ipToInt(rawVal('accDstIp'));
+	var dstMask      = ipToInt(rawVal('accDstMask'));
+	var srcPortStart = intVal('accSrcPortStart', 0);
+	var srcPortEnd   = parseInt(rawVal('accSrcPortEnd'), 10);
+	var dstPortStart = intVal('accDstPortStart', 0);
+	var dstPortEnd   = parseInt(rawVal('accDstPortEnd'), 10);
 	if (isNaN(srcPortEnd)) { srcPortEnd = 65535; }
 	if (isNaN(dstPortEnd)) { dstPortEnd = 65535; }
 	var r = await call('AddAccess', {
@@ -2895,16 +2918,14 @@ async function addAccess() {
 		SrcPort: srcPortStart + '-' + srcPortEnd,
 		DstPort: dstPortStart + '-' + dstPortEnd
 	});
-	if (r.error) { alert('Error adding rule: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
+	if (r.error) { showApiError('Error adding rule', r); return; }
 	$('#addAccessModal').modal('hide');
 	await refreshAccessList();
 }
 
-async function deleteAccess(id) {
-	if (!confirm('Delete access rule #' + id + '?')) { return; }
-	var r = await call('DeleteAccess', { HubName_str: currentHub, Id_u32: id });
-	if (r.error) { alert('Error deleting rule: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
-	await refreshAccessList();
+function deleteAccess(id) {
+	return confirmCall('Delete access rule #' + id + '?', 'DeleteAccess',
+		{ HubName_str: currentHub, Id_u32: id }, 'Error deleting rule', refreshAccessList);
 }
 
 // ============================================================
@@ -2933,23 +2954,13 @@ async function refreshSecureNAT() {
 async function toggleSecureNAT(enable) {
 	var method = enable ? 'EnableSecureNat' : 'DisableSecureNat';
 	var r = await call(method, { HubName_str: currentHub });
-	if (r.error) { alert('Error: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
+	if (r.error) { showApiError('Error', r); return; }
 	await refreshSecureNAT();
 }
 
 async function refreshNatTable() {
 	var r = await call('EnumNat', { HubName_str: currentHub });
-	var list = (!r.error && r.result && Array.isArray(r.result.NatTable)) ? r.result.NatTable : [];
-	var tbody = document.getElementById('natTable');
-	if (!tbody) { return; }
-	var thead = tbody.parentNode.querySelector('thead');
-	if (!list.length) {
-		if (thead) { thead.innerHTML = ''; }
-		tbody.innerHTML = '<tr><td colspan="6">No NAT sessions.</td></tr>';
-		return;
-	}
-	if (thead) { thead.innerHTML = '<tr><th>Protocol</th><th>Source IP:Port</th><th>Dest IP:Port</th><th>Created</th><th>Last Comm</th><th>Sent/Recv</th></tr>'; }
-	tbody.innerHTML = list.map(function(row) {
+	fillTable('natTable', resultList(r, 'NatTable'), 6, 'No NAT sessions.', function(row) {
 		var proto   = PROTO_NAMES[row.Protocol_u32] || String(row.Protocol_u32||0);
 		var srcIp   = row.SrcIp_str || intToIp(row.SrcIp_ip) || '-';
 		var srcPort = row.SrcPort_u32 || '';
@@ -2963,22 +2974,12 @@ async function refreshNatTable() {
 			'<td>' + escapeHtml(humanize('LastCommTime_dt', row.LastCommTime_dt)) + '</td>' +
 			'<td>' + fmtBytes(row.SendSize_u64) + ' / ' + fmtBytes(row.RecvSize_u64) + '</td>' +
 			'</tr>';
-	}).join('');
+	}, '<tr><th>Protocol</th><th>Source IP:Port</th><th>Dest IP:Port</th><th>Created</th><th>Last Comm</th><th>Sent/Recv</th></tr>');
 }
 
 async function refreshDhcpTable() {
 	var r = await call('EnumDhcp', { HubName_str: currentHub });
-	var list = (!r.error && r.result && Array.isArray(r.result.DhcpTable)) ? r.result.DhcpTable : [];
-	var tbody = document.getElementById('dhcpTable');
-	if (!tbody) { return; }
-	var thead = tbody.parentNode.querySelector('thead');
-	if (!list.length) {
-		if (thead) { thead.innerHTML = ''; }
-		tbody.innerHTML = '<tr><td colspan="5">No DHCP leases.</td></tr>';
-		return;
-	}
-	if (thead) { thead.innerHTML = '<tr><th>MAC Address</th><th>IP Address</th><th>Hostname</th><th>Expiry</th><th>Session</th></tr>'; }
-	tbody.innerHTML = list.map(function(row) {
+	fillTable('dhcpTable', resultList(r, 'DhcpTable'), 5, 'No DHCP leases.', function(row) {
 		var mac = humanize('MacAddress_bin', row.MacAddress_bin || row.MacAddress_str || '-');
 		var ip  = row.IpAddress_str || intToIp(row.IpAddress_ip) || '-';
 		return '<tr>' +
@@ -2988,26 +2989,26 @@ async function refreshDhcpTable() {
 			'<td>' + escapeHtml(humanize('ExpiryTime_dt', row.ExpiryTime_dt || row.Expiry_dt)) + '</td>' +
 			'<td><code>' + escapeHtml(row.SessionName_str || '-') + '</code></td>' +
 			'</tr>';
-	}).join('');
+	}, '<tr><th>MAC Address</th><th>IP Address</th><th>Hostname</th><th>Expiry</th><th>Session</th></tr>');
 }
 
 async function showSecureNATSettings() {
 	var r = await tryMethods(['GetSecureNatOption'], { HubName_str: currentHub });
 	if (!r.error && r.result) {
 		var o = r.result;
-		document.getElementById('natUseNat').checked     = !(o.UseNat_bool === false);
-		document.getElementById('natMtu').value           = o.Mtu_u32 || 1500;
-		document.getElementById('natTcpTimeout').value    = o.NatTcpTimeout_u32 || 300;
-		document.getElementById('natUdpTimeout').value    = o.NatUdpTimeout_u32 || 60;
-		document.getElementById('natUseDhcp').checked    = !(o.UseDhcp_bool === false);
-		document.getElementById('natDhcpStart').value    = intToIp(o.DhcpLeaseIPStart_ip) || '192.168.30.10';
-		document.getElementById('natDhcpEnd').value      = intToIp(o.DhcpLeaseIPEnd_ip)   || '192.168.30.200';
-		document.getElementById('natDhcpMask').value     = intToIp(o.DhcpSubnetMask_ip)   || '255.255.255.0';
-		document.getElementById('natDhcpGw').value       = intToIp(o.DhcpGatewayAddress_ip)  || '';
-		document.getElementById('natDhcpDns1').value     = intToIp(o.DhcpDnsServerAddress_ip)  || '';
-		document.getElementById('natDhcpDns2').value     = intToIp(o.DhcpDnsServerAddress2_ip) || '';
-		document.getElementById('natDhcpDomain').value   = o.DhcpDomainName_str || '';
-		document.getElementById('natDhcpExpire').value   = o.DhcpExpireTimeSpan_u32 || 7200;
+		setChecked('natUseNat', !(o.UseNat_bool === false));
+		setVal('natMtu', o.Mtu_u32 || 1500);
+		setVal('natTcpTimeout', o.NatTcpTimeout_u32 || 300);
+		setVal('natUdpTimeout', o.NatUdpTimeout_u32 || 60);
+		setChecked('natUseDhcp', !(o.UseDhcp_bool === false));
+		setVal('natDhcpStart', intToIp(o.DhcpLeaseIPStart_ip) || '192.168.30.10');
+		setVal('natDhcpEnd', intToIp(o.DhcpLeaseIPEnd_ip)   || '192.168.30.200');
+		setVal('natDhcpMask', intToIp(o.DhcpSubnetMask_ip)   || '255.255.255.0');
+		setVal('natDhcpGw', intToIp(o.DhcpGatewayAddress_ip)  || '');
+		setVal('natDhcpDns1', intToIp(o.DhcpDnsServerAddress_ip)  || '');
+		setVal('natDhcpDns2', intToIp(o.DhcpDnsServerAddress2_ip) || '');
+		setVal('natDhcpDomain', o.DhcpDomainName_str || '');
+		setVal('natDhcpExpire', o.DhcpExpireTimeSpan_u32 || 7200);
 	}
 	$('#secureNATSettingsModal').modal('show');
 }
@@ -3015,22 +3016,22 @@ async function showSecureNATSettings() {
 async function saveSecureNATSettings() {
 	var r = await call('SetSecureNatOption', {
 		HubName_str:              currentHub,
-		UseNat_bool:              document.getElementById('natUseNat').checked,
-		Mtu_u32:                  parseInt(document.getElementById('natMtu').value, 10)         || 1500,
-		NatTcpTimeout_u32:        parseInt(document.getElementById('natTcpTimeout').value, 10)   || 300,
-		NatUdpTimeout_u32:        parseInt(document.getElementById('natUdpTimeout').value, 10)   || 60,
-		UseDhcp_bool:             document.getElementById('natUseDhcp').checked,
-		DhcpLeaseIPStart_ip:      ipToInt(document.getElementById('natDhcpStart').value),
-		DhcpLeaseIPEnd_ip:        ipToInt(document.getElementById('natDhcpEnd').value),
-		DhcpSubnetMask_ip:        ipToInt(document.getElementById('natDhcpMask').value),
-		DhcpGatewayAddress_ip:    ipToInt(document.getElementById('natDhcpGw').value),
-		DhcpDnsServerAddress_ip:  ipToInt(document.getElementById('natDhcpDns1').value),
-		DhcpDnsServerAddress2_ip: ipToInt(document.getElementById('natDhcpDns2').value),
-		DhcpDomainName_str:       document.getElementById('natDhcpDomain').value,
-		DhcpExpireTimeSpan_u32:   parseInt(document.getElementById('natDhcpExpire').value, 10) || 7200,
+		UseNat_bool:              isChecked('natUseNat'),
+		Mtu_u32:                  intVal('natMtu', 1500),
+		NatTcpTimeout_u32:        intVal('natTcpTimeout', 300),
+		NatUdpTimeout_u32:        intVal('natUdpTimeout', 60),
+		UseDhcp_bool:             isChecked('natUseDhcp'),
+		DhcpLeaseIPStart_ip:      ipToInt(rawVal('natDhcpStart')),
+		DhcpLeaseIPEnd_ip:        ipToInt(rawVal('natDhcpEnd')),
+		DhcpSubnetMask_ip:        ipToInt(rawVal('natDhcpMask')),
+		DhcpGatewayAddress_ip:    ipToInt(rawVal('natDhcpGw')),
+		DhcpDnsServerAddress_ip:  ipToInt(rawVal('natDhcpDns1')),
+		DhcpDnsServerAddress2_ip: ipToInt(rawVal('natDhcpDns2')),
+		DhcpDomainName_str:       rawVal('natDhcpDomain'),
+		DhcpExpireTimeSpan_u32:   intVal('natDhcpExpire', 7200),
 		SaveLog_bool:             true
 	});
-	if (r.error) { alert('Error saving SecureNAT settings: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
+	if (r.error) { showApiError('Error saving SecureNAT settings', r); return; }
 	$('#secureNATSettingsModal').modal('hide');
 	alert('SecureNAT settings saved.');
 }
@@ -3043,18 +3044,18 @@ async function refreshHubRadius() {
 	if (!currentHub) { return; }
 	var r = await call('GetHubRadius', { HubName_str: currentHub });
 	if (!r.error && r.result) {
-		document.getElementById('radiusServer').value = r.result.RadiusServerName_str || '';
-		document.getElementById('radiusPort').value   = r.result.RadiusPort_u32 || 1812;
-		document.getElementById('radiusSecret').value = '';
-		document.getElementById('radiusRetry').value  = r.result.RadiusRetryInterval_u32 || 500;
+		setVal('radiusServer', r.result.RadiusServerName_str || '');
+		setVal('radiusPort', r.result.RadiusPort_u32 || 1812);
+		setVal('radiusSecret', '');
+		setVal('radiusRetry', r.result.RadiusRetryInterval_u32 || 500);
 	}
 }
 
 async function saveHubRadius() {
-	var server = document.getElementById('radiusServer').value.trim();
-	var port   = parseInt(document.getElementById('radiusPort').value, 10) || 1812;
-	var secret = document.getElementById('radiusSecret').value;
-	var retry  = parseInt(document.getElementById('radiusRetry').value, 10) || 500;
+	var server = val('radiusServer');
+	var port   = intVal('radiusPort', 1812);
+	var secret = rawVal('radiusSecret');
+	var retry  = intVal('radiusRetry', 500);
 	var r = await call('SetHubRadius', {
 		HubName_str: currentHub,
 		RadiusServerName_str: server,
@@ -3062,7 +3063,7 @@ async function saveHubRadius() {
 		RadiusServerSecret_str: secret,
 		RadiusRetryInterval_u32: retry
 	});
-	if (r.error) { alert('Error saving RADIUS settings: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error saving RADIUS settings', r); return; }
 	alert('RADIUS settings saved.');
 }
 
@@ -3076,8 +3077,8 @@ async function clearHubRadius() {
 		RadiusRetryInterval_u32: 500
 	});
 	if (r.error) { alert('Error clearing RADIUS settings.'); return; }
-	document.getElementById('radiusServer').value = '';
-	document.getElementById('radiusSecret').value = '';
+	setVal('radiusServer', '');
+	setVal('radiusSecret', '');
 	alert('RADIUS configuration cleared.');
 }
 
@@ -3089,21 +3090,21 @@ async function refreshHubLog() {
 	if (!currentHub) { return; }
 	var r = await call('GetHubLog', { HubName_str: currentHub });
 	if (!r.error && r.result) {
-		document.getElementById('hubLogSecurity').checked = !(r.result.SaveSecurityLog_bool === false);
-		document.getElementById('hubLogPacket').checked   = !(r.result.SavePacketLog_bool === false);
-		document.getElementById('hubLogSecuritySwitch').value = r.result.SecurityLogSwitchType_u32 !== undefined ? r.result.SecurityLogSwitchType_u32 : 2;
+		setChecked('hubLogSecurity', !(r.result.SaveSecurityLog_bool === false));
+		setChecked('hubLogPacket', !(r.result.SavePacketLog_bool === false));
+		setVal('hubLogSecuritySwitch', r.result.SecurityLogSwitchType_u32 !== undefined ? r.result.SecurityLogSwitchType_u32 : 2);
 	}
 }
 
 async function saveHubLog() {
 	var r = await call('SetHubLog', {
 		HubName_str: currentHub,
-		SaveSecurityLog_bool:      document.getElementById('hubLogSecurity').checked,
-		SavePacketLog_bool:        document.getElementById('hubLogPacket').checked,
-		SecurityLogSwitchType_u32: parseInt(document.getElementById('hubLogSecuritySwitch').value, 10) || 2,
+		SaveSecurityLog_bool:      isChecked('hubLogSecurity'),
+		SavePacketLog_bool:        isChecked('hubLogPacket'),
+		SecurityLogSwitchType_u32: intVal('hubLogSecuritySwitch', 2),
 		PacketLogSwitchType_u32:   2
 	});
-	if (r.error) { alert('Error saving log settings: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error saving log settings', r); return; }
 	alert('Hub log settings saved.');
 }
 
@@ -3169,7 +3170,7 @@ function buildCascadeRows(list, detailsByName) {
 			'<button class="btn btn-xs btn-warning" onclick="editCascade(\'' + a + '\')" title="Edit" style="margin-right:2px;"><i class="fa fa-edit"></i></button>' +
 			'<button class="btn btn-xs btn-danger"  onclick="deleteCascade(\'' + a + '\')" title="Delete"><i class="fa fa-trash"></i></button>' +
 			'</td></tr>';
-	}).join('') || '<tr><td colspan="7" class="text-muted">No cascade connections.</td></tr>';
+	}).join('') || emptyRow(7, 'No cascade connections.');
 }
 
 async function fetchCascadeDetails(list) {
@@ -3183,28 +3184,23 @@ async function fetchCascadeDetails(list) {
 	return detailsByName;
 }
 
-// Full cascade refresh (called from refreshHubData)
-async function refreshCascades() {
-	return refreshCascadeTable();
-}
-
-// Lightweight cascade-only refresh (used by auto-refresher)
+// Cascade-only refresh (used by refreshHubData and the auto-refresher)
 async function refreshCascadeTable() {
 	if (!currentHub) { return; }
 	var c = await call('EnumLink', { HubName_str: currentHub });
-	var list = (!c.error && c.result && Array.isArray(c.result.LinkList)) ? c.result.LinkList : [];
+	var list = resultList(c, 'LinkList');
 	var detailsByName = await fetchCascadeDetails(list);
 	document.getElementById('cascadeTable').innerHTML = buildCascadeRows(list, detailsByName);
 	$('[data-toggle="tooltip"]').tooltip();
 }
 
 async function createCascade() {
-	var name    = document.getElementById('newCascadeName').value.trim();
-	var hub     = document.getElementById('newCascadeHub').value.trim();
-	var host    = document.getElementById('newCascadeHost').value.trim();
-	var port    = parseInt(document.getElementById('newCascadePort').value, 10) || 443;
-	var hubUser = document.getElementById('newCascadeHubUser').value.trim();
-	var hubPass = document.getElementById('newCascadeHubPass').value;
+	var name    = val('newCascadeName');
+	var hub     = val('newCascadeHub');
+	var host    = val('newCascadeHost');
+	var port    = intVal('newCascadePort', 443);
+	var hubUser = val('newCascadeHubUser');
+	var hubPass = rawVal('newCascadeHubPass');
 	if (!name || !hub || !host || !hubUser || !hubPass) {
 		alert('Connection name, target hub, hostname, hub user and hub password are required.');
 		return;
@@ -3212,7 +3208,7 @@ async function createCascade() {
 	var payload = buildCascadePayload(name, hub, host, port, hubUser, hubPass);
 	var r = await call('CreateLink', payload);
 	if (!r.error) { await applyCascadeAuthSettings(name, hub, host, port, hubUser, hubPass); }
-	if (r.error) { alert('Error creating cascade: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error creating cascade', r); return; }
 	$('#createCascadeModal').modal('hide');
 	['newCascadeName','newCascadeHub','newCascadeHost','newCascadePort','newCascadeUser','newCascadePass','newCascadeHubUser','newCascadeHubPass'].forEach(function(id) {
 		var el = document.getElementById(id);
@@ -3226,30 +3222,30 @@ async function editCascade(name) {
 	var casc = details && details.result ? details.result : null;
 	if (!casc) {
 		var c = await call('EnumLink', { HubName_str:currentHub });
-		var list = (c.result && Array.isArray(c.result.LinkList)) ? c.result.LinkList : [];
+		var list = resultList(c, 'LinkList');
 		casc = list.find(function(l) { return l.AccountName_utf === name; });
 	}
 	if (!casc) { return; }
-	document.getElementById('editCascadeOldName').value  = name;
-	document.getElementById('editCascadeName').value     = name;
-	document.getElementById('editCascadeHub').value      = casc.TargetHubName_str || casc.HubName_str || '';
-	document.getElementById('editCascadeHost').value     = casc.Hostname_str || '';
-	document.getElementById('editCascadePort').value     = casc.Port_u32 || 443;
-	document.getElementById('editCascadeUser').value     = 'Administrator';
-	document.getElementById('editCascadeHubUser').value  = casc.Username_str || casc.UserName_str || casc.HubUsername_utf || casc.HubUsername_str || '';
-	document.getElementById('editCascadePass').value     = '';
-	document.getElementById('editCascadeHubPass').value  = '';
+	setVal('editCascadeOldName', name);
+	setVal('editCascadeName', name);
+	setVal('editCascadeHub', casc.TargetHubName_str || casc.HubName_str || '');
+	setVal('editCascadeHost', casc.Hostname_str || '');
+	setVal('editCascadePort', casc.Port_u32 || 443);
+	setVal('editCascadeUser', 'Administrator');
+	setVal('editCascadeHubUser', casc.Username_str || casc.UserName_str || casc.HubUsername_utf || casc.HubUsername_str || '');
+	setVal('editCascadePass', '');
+	setVal('editCascadeHubPass', '');
 	$('#editCascadeModal').modal('show');
 }
 
 async function saveEditCascade() {
-	var oldName = document.getElementById('editCascadeOldName').value;
-	var newName = document.getElementById('editCascadeName').value.trim();
-	var hub     = document.getElementById('editCascadeHub').value.trim();
-	var host    = document.getElementById('editCascadeHost').value.trim();
-	var port    = parseInt(document.getElementById('editCascadePort').value, 10) || 443;
-	var hubUser = document.getElementById('editCascadeHubUser').value.trim();
-	var hubPass = document.getElementById('editCascadeHubPass').value;
+	var oldName = rawVal('editCascadeOldName');
+	var newName = val('editCascadeName');
+	var hub     = val('editCascadeHub');
+	var host    = val('editCascadeHost');
+	var port    = intVal('editCascadePort', 443);
+	var hubUser = val('editCascadeHubUser');
+	var hubPass = rawVal('editCascadeHubPass');
 	if (!newName || !hub || !host || !hubUser || !hubPass) {
 		alert('All fields are required except remote discovery password.');
 		return;
@@ -3262,17 +3258,14 @@ async function saveEditCascade() {
 	await refreshCascadeTable();
 }
 
-async function deleteCascade(name) {
-	if (!confirm("Delete cascade '" + name + "'?")) { return; }
-	var r = await call('DeleteLink', { HubName_str:currentHub, AccountName_utf:name });
-	if (r.error) { alert('Error deleting cascade or API not available.'); return; }
-	await refreshCascadeTable();
+function deleteCascade(name) {
+	return confirmCall("Delete cascade '" + name + "'?", 'DeleteLink',
+		{ HubName_str:currentHub, AccountName_utf:name }, 'Error deleting cascade', refreshCascadeTable);
 }
 
-async function toggleCascade(name, online) {
-	var r = await call(online ? 'SetLinkOnline' : 'SetLinkOffline', { HubName_str:currentHub, AccountName_utf:name });
-	if (r.error) { alert('Error changing cascade state or API not available.'); return; }
-	await refreshCascadeTable();
+function toggleCascade(name, online) {
+	return confirmCall(null, online ? 'SetLinkOnline' : 'SetLinkOffline',
+		{ HubName_str:currentHub, AccountName_utf:name }, 'Error changing cascade state', refreshCascadeTable);
 }
 
 function buildCascadePayload(name, hub, host, port, hubUser, hubPass) {
@@ -3296,8 +3289,7 @@ async function applyCascadeAuthSettings(accountName, targetHub, host, port, hubU
 
 async function refreshListeners() {
 	var l = await call('EnumListener');
-	var list = (!l.error && l.result && Array.isArray(l.result.ListenerList)) ? l.result.ListenerList : [];
-	document.getElementById('listenerTable').innerHTML = list.map(function(li) {
+	fillTable('listenerTable', resultList(l, 'ListenerList'), 3, 'No listeners.', function(li) {
 		var port    = li.Ports_u32 !== undefined ? li.Ports_u32 : li.Port_u32;
 		var enabled = !!(li.Enables_bool !== undefined ? li.Enables_bool : (li.Enable_bool || li.Enabled_bool));
 		var portStr = String(port !== undefined ? port : 0);
@@ -3337,52 +3329,49 @@ async function refreshListeners() {
 			'<button class="btn btn-xs btn-warning" onclick="editListener(' + portStr + ')"   title="' + (mgmt ? 'Management port cannot be modified' : 'Edit') + '" ' + (mgmt ? 'disabled' : '') + '><i class="fa fa-edit"></i></button> ' +
 			'<button class="btn btn-xs btn-danger"  onclick="deleteListener(' + portStr + ')" ' + (mgmt ? 'disabled title="Management port cannot be deleted"' : '') + '><i class="fa fa-trash"></i></button>' +
 			'</td></tr>';
-	}).join('') || '<tr><td colspan="3">No listeners.</td></tr>';
+	});
 }
 
 async function createListener() {
-	var port = parseInt(document.getElementById('newListenerPort').value, 10) || 0;
+	var port = intVal('newListenerPort', 0);
 	if (port === 5555) { alert('Port 5555 is reserved for pfSense management.'); return; }
 	var r = await call('AddListener', { Port_u32:port, Enable_bool:true });
-	if (r.error) { alert('Error adding listener.\n' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : '')); return; }
+	if (r.error) { showApiError('Error adding listener', r); return; }
 	$('#createListenerModal').modal('hide');
 	await refreshListeners();
 }
 
-async function editListener(port) {
-	document.getElementById('editListenerOldPort').value = port;
-	document.getElementById('editListenerPort').value    = port;
+function editListener(port) {
+	setVal('editListenerOldPort', port);
+	setVal('editListenerPort', port);
 	$('#editListenerModal').modal('show');
 }
 
 async function saveEditListener() {
-	var oldPort = parseInt(document.getElementById('editListenerOldPort').value, 10);
-	var newPort = parseInt(document.getElementById('editListenerPort').value, 10) || 0;
+	var oldPort = parseInt(rawVal('editListenerOldPort'), 10);
+	var newPort = intVal('editListenerPort', 0);
 	if (!newPort) { alert('Port is required.'); return; }
 	if (oldPort === 5555) { alert('Port 5555 is the pfSense management port and cannot be modified.'); return; }
 	if (newPort === 5555) { alert('Port 5555 is reserved for pfSense management and cannot be assigned.'); return; }
 	if (oldPort !== newPort) {
 		await call('DeleteListener', { Port_u32:oldPort });
 		var r = await call('AddListener', { Port_u32:newPort, Enable_bool:true });
-		if (r.error) { alert('Error updating listener.\n' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : '')); return; }
+		if (r.error) { showApiError('Error updating listener', r); return; }
 	}
 	$('#editListenerModal').modal('hide');
 	await refreshListeners();
 }
 
-async function toggleListener(port, enable) {
+function toggleListener(port, enable) {
 	if (Number(port) === 5555) { alert('Port 5555 is the pfSense management port and cannot be stopped.'); return; }
-	var r = await call('EnableListener', { Port_u32:Number(port), Enable_bool:!!enable });
-	if (r.error) { alert('Error updating listener state.'); return; }
-	await refreshListeners();
+	return confirmCall(null, 'EnableListener', { Port_u32:Number(port), Enable_bool:!!enable },
+		'Error updating listener state', refreshListeners);
 }
 
-async function deleteListener(port) {
+function deleteListener(port) {
 	if (Number(port) === 5555) { alert('Port 5555 is the pfSense management port and cannot be deleted.'); return; }
-	if (!confirm('Delete listener on port ' + port + '?')) { return; }
-	var r = await call('DeleteListener', { Port_u32:port });
-	if (r.error) { alert('Error deleting listener.'); return; }
-	await refreshListeners();
+	return confirmCall('Delete listener on port ' + port + '?', 'DeleteListener',
+		{ Port_u32:port }, 'Error deleting listener', refreshListeners);
 }
 
 // ============================================================
@@ -3394,33 +3383,28 @@ async function refreshIpsec() {
 	var hubSel = document.getElementById('ipsecDefaultHub');
 	if (hubSel) {
 		var hubs = await call('EnumHub');
-		var hubList = (!hubs.error && hubs.result && Array.isArray(hubs.result.HubList)) ? hubs.result.HubList : [];
-		hubSel.innerHTML = hubList.map(function(h) {
-			return '<option value="' + escapeHtml(h.HubName_str) + '">' + escapeHtml(h.HubName_str) + '</option>';
-		}).join('');
+		hubSel.innerHTML = hubOptionsHtml(resultList(hubs, 'HubList'));
 	}
 	var i = await call('GetIPsecConfig');
 	if (!i.error && i.result) {
-		var el = function(id) { return document.getElementById(id); };
-		if (el('l2tp_ipsec_on')) el('l2tp_ipsec_on').checked = !!i.result.L2TP_bool;
-		if (el('l2tp_raw_on'))   el('l2tp_raw_on').checked   = !!i.result.L2TP_Raw_bool;
-		if (el('etherip_on'))    el('etherip_on').checked    = !!i.result.EtherIP_bool;
-		if (el('ipsec_psk'))     el('ipsec_psk').value        = i.result.IPsec_Secret_str || '';
+		setChecked('l2tp_ipsec_on', i.result.L2TP_bool);
+		setChecked('l2tp_raw_on',   i.result.L2TP_Raw_bool);
+		setChecked('etherip_on',    i.result.EtherIP_bool);
+		setVal('ipsec_psk',         i.result.IPsec_Secret_str || '');
 		var defHub = i.result.L2TP_DefaultHub_str || '';
 		if (hubSel && defHub) { hubSel.value = defHub; }
 	}
 }
 
 async function saveIpsec() {
-	var el = function(id) { return document.getElementById(id); };
 	var r = await call('SetIPsecConfig', {
-		L2TP_bool:          el('l2tp_ipsec_on') ? el('l2tp_ipsec_on').checked : false,
-		L2TP_Raw_bool:      el('l2tp_raw_on')   ? el('l2tp_raw_on').checked   : false,
-		EtherIP_bool:       el('etherip_on')    ? el('etherip_on').checked    : false,
-		IPsec_Secret_str:   el('ipsec_psk')     ? el('ipsec_psk').value        : '',
-		L2TP_DefaultHub_str: el('ipsecDefaultHub') ? el('ipsecDefaultHub').value : (currentHub || ''),
+		L2TP_bool:           isChecked('l2tp_ipsec_on'),
+		L2TP_Raw_bool:       isChecked('l2tp_raw_on'),
+		EtherIP_bool:        isChecked('etherip_on'),
+		IPsec_Secret_str:    rawVal('ipsec_psk'),
+		L2TP_DefaultHub_str: rawVal('ipsecDefaultHub') || (currentHub || ''),
 	});
-	if (r.error) { alert('Error saving IPsec configuration.'); return; }
+	if (r.error) { showApiError('Error saving IPsec configuration', r); return; }
 	alert('IPsec configuration saved.');
 }
 
@@ -3429,14 +3413,14 @@ async function saveIpsec() {
 // ============================================================
 
 async function saveServerConfig() {
-	var pwd  = document.getElementById('newServerPassword').value;
-	var pwd2 = document.getElementById('newServerPasswordConfirm').value;
+	var pwd = rawVal('newServerPassword');
+	var pwd2 = rawVal('newServerPasswordConfirm');
 	if (!pwd)       { alert('Nothing to save. Set a new admin password first.'); return; }
 	if (pwd !== pwd2) { alert('Passwords do not match.'); return; }
 	var r = await tryMethods(['SetServerPassword','SetServerAdminPassword'], { Password_str:pwd });
 	if (r.error) { alert('Error saving server configuration or API not available.'); return; }
-	document.getElementById('newServerPassword').value        = '';
-	document.getElementById('newServerPasswordConfirm').value = '';
+	setVal('newServerPassword', '');
+	setVal('newServerPasswordConfirm', '');
 	alert('Server configuration saved.');
 }
 
@@ -3445,17 +3429,17 @@ async function saveServerConfig() {
 // ============================================================
 
 async function createHub() {
-	var name    = document.getElementById('newHubName').value.trim();
-	var pass    = document.getElementById('newHubPass').value;
-	var enabled = document.getElementById('newHubEnabled').checked;
+	var name    = val('newHubName');
+	var pass = rawVal('newHubPass');
+	var enabled = isChecked('newHubEnabled');
 	if (!name || !pass) { alert('Hub name and password are required.'); return; }
 	var r = await call('CreateHub', { HubName_str:name, AdminPassword_str:pass });
 	if (r.error) { alert('Error creating hub.'); return; }
 	if (!enabled) { await call('SetHubOffline', { HubName_str:name }); }
 	$('#createHubModal').modal('hide');
-	document.getElementById('newHubName').value = '';
-	document.getElementById('newHubPass').value = '';
-	document.getElementById('newHubEnabled').checked = true;
+	setVal('newHubName', '');
+	setVal('newHubPass', '');
+	setChecked('newHubEnabled', true);
 	await initApp();
 }
 
@@ -3473,15 +3457,10 @@ async function deleteHub() {
 async function refreshInterfaceTable() {
 	var r = await call('EnumLocalBridge');
 	if (r.error || !r.result) {
-		document.getElementById('ifTable').innerHTML = '<tr><td colspan="5">API not available or error.</td></tr>';
+		document.getElementById('ifTable').innerHTML = emptyRow(5, 'API not available or error.');
 		return;
 	}
-	var list = Array.isArray(r.result.LocalBridgeList) ? r.result.LocalBridgeList : [];
-	if (!list.length) {
-		document.getElementById('ifTable').innerHTML = '<tr><td colspan="5">No local bridge connections.</td></tr>';
-		return;
-	}
-	document.getElementById('ifTable').innerHTML = list.map(function(bridge) {
+	fillTable('ifTable', resultList(r, 'LocalBridgeList'), 5, 'No local bridge connections.', function(bridge) {
 		var deviceName = bridge.DeviceName_str || '-';
 		var hubName    = bridge.HubNameLB_str  || '-';
 		var tapMode    = !!bridge.TapMode_bool;
@@ -3508,7 +3487,7 @@ async function refreshInterfaceTable() {
 			'<td><span class="label ' + (tapMode ? 'label-info' : 'label-default') + '">' + (tapMode ? 'TAP Device' : 'Physical Adapter') + '</span></td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteLocalBridge(\'' + escapeAttr(hubName) + '\',\'' + escapeAttr(deviceName) + '\')" title="Delete"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 function toggleLocalBridgeDeviceInput() {
@@ -3564,8 +3543,8 @@ async function updateLocalBridgeDeviceList() {
 }
 
 async function createLocalBridge() {
-	var hubName      = (document.getElementById('newLocalBridgeHub').value || '').trim();
-	var type         = (document.getElementById('newLocalBridgeType').value || 'physical').trim();
+	var hubName      = val('newLocalBridgeHub');
+	var type         = (rawVal('newLocalBridgeType') || 'physical').trim();
 	var deviceSelect = document.getElementById('newLocalBridgeDeviceSelect');
 	var deviceText   = document.getElementById('newLocalBridgeDeviceText');
 	var selected     = deviceSelect ? String(deviceSelect.value || '').trim() : '';
@@ -3574,10 +3553,10 @@ async function createLocalBridge() {
 	if (!hubName)    { alert('Please select a hub.'); return; }
 	if (!deviceName) { alert(type === 'tap' ? 'Please enter a TAP device name.' : 'Please select or enter a physical interface name.'); return; }
 	var r = await call('AddLocalBridge', { HubNameLB_str:hubName, DeviceName_str:deviceName, TapMode_bool:(type==='tap') });
-	if (r.error) { alert('Error creating local bridge: ' + (r.detail ? JSON.stringify(r.detail) : 'Unknown error')); return; }
-	document.getElementById('newLocalBridgeHub').value        = '';
-	document.getElementById('newLocalBridgeType').value       = 'physical';
-	document.getElementById('newLocalBridgeDeviceText').value = '';
+	if (r.error) { showApiError('Error creating local bridge', r); return; }
+	setVal('newLocalBridgeHub', '');
+	setVal('newLocalBridgeType', 'physical');
+	setVal('newLocalBridgeDeviceText', '');
 	$('#createTapModal').modal('hide');
 	await refreshInterfaceTable();
 	alert((type === 'tap' ? 'TAP bridge' : 'Local bridge') + ' created successfully.');
@@ -3586,7 +3565,7 @@ async function createLocalBridge() {
 async function deleteLocalBridge(hubName, deviceName) {
 	if (!confirm('Delete bridge: ' + deviceName + ' from hub ' + hubName + '?')) { return; }
 	var r = await call('DeleteLocalBridge', { HubNameLB_str:hubName, DeviceName_str:deviceName });
-	if (r.error) { alert('Error deleting local bridge: ' + (r.detail ? JSON.stringify(r.detail) : 'Unknown error')); return; }
+	if (r.error) { showApiError('Error deleting local bridge', r); return; }
 	await refreshInterfaceTable();
 	alert('Local bridge deleted successfully.');
 }
@@ -3598,18 +3577,8 @@ async function deleteLocalBridge(hubName, deviceName) {
 async function refreshConnTable() {
 	if (!currentHub) { return; }
 	var r = await call('EnumConnection');
-	var list = (!r.error && r.result && Array.isArray(r.result.ConnectionList)) ? r.result.ConnectionList : [];
-	var tbody = document.getElementById('connTable');
-	if (!tbody) { return; }
-	var thead = tbody.parentNode.querySelector('thead');
-	if (!list.length) {
-		if (thead) { thead.innerHTML = ''; }
-		tbody.innerHTML = '<tr><td colspan="6">No TCP connections.</td></tr>';
-		return;
-	}
-	if (thead) { thead.innerHTML = '<tr><th>Name</th><th>Hostname</th><th>IP Address</th><th>Port</th><th>Type</th><th>Created</th></tr>'; }
 	var connTypes = {0:'Client', 1:'Admin', 2:'Server', 3:'Bridge', 4:'Layer3'};
-	tbody.innerHTML = list.map(function(row) {
+	fillTable('connTable', resultList(r, 'ConnectionList'), 6, 'No TCP connections.', function(row) {
 		var ip = row.RemoteIp_ip !== undefined ? humanize('RemoteIp_ip', row.RemoteIp_ip) : (row.RemoteIp_str || '-');
 		return '<tr>' +
 			'<td><code>' + escapeHtml(row.Name_str || '-') + '</code></td>' +
@@ -3619,7 +3588,7 @@ async function refreshConnTable() {
 			'<td>' + escapeHtml(connTypes[row.Type_u32] || String(row.Type_u32 || '-')) + '</td>' +
 			'<td>' + escapeHtml(humanize('CreatedTime_dt', row.ConnectedTime_dt || row.CreatedTime_dt)) + '</td>' +
 			'</tr>';
-	}).join('');
+	}, '<tr><th>Name</th><th>Hostname</th><th>IP Address</th><th>Port</th><th>Type</th><th>Created</th></tr>');
 }
 
 // ============================================================
@@ -3629,47 +3598,37 @@ async function refreshConnTable() {
 async function refreshCaList() {
 	if (!currentHub) { return; }
 	var r = await call('EnumCa', { HubName_str: currentHub });
-	var list = (!r.error && r.result && Array.isArray(r.result.CaList)) ? r.result.CaList : [];
-	var tbody = document.getElementById('caTable');
-	if (!tbody) { return; }
-	if (!list.length) {
-		tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No CA certificates.</td></tr>';
-		return;
-	}
-	tbody.innerHTML = list.map(function(ca) {
+	fillTable('caTable', resultList(r, 'CaList'), 3, 'No CA certificates.', function(ca) {
 		var key = ca.Key_u32 !== undefined ? ca.Key_u32 : (ca.CaId_u32 !== undefined ? ca.CaId_u32 : '');
 		var subj = ca.SubjectName_utf || ca.SubjectName_str || ca.Subject_str || '-';
 		var exp  = ca.Expires_dt || ca.ExpirationDate_dt || '';
 		var expStr = exp ? humanize('Expires_dt', exp) : '-';
-		var keyEsc = escapeAttr(String(key));
 		return '<tr>' +
 			'<td>' + escapeHtml(subj) + '</td>' +
 			'<td>' + escapeHtml(expStr) + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteCa(' + key + ')" title="Delete CA"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 async function addCa() {
-	var pem = (document.getElementById('caCertPem') || {}).value || '';
+	var pem = rawVal('caCertPem');
 	pem = pem.trim();
 	if (!pem) { alert('Please paste a PEM certificate.'); return; }
 	var b64 = btoa(pem);
 	var r = await call('AddCa', { HubName_str: currentHub, Cert_bin: b64 });
 	if (r.error) {
-		alert('Error adding CA certificate: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available'));
+		showApiError('Error adding CA certificate', r);
 		return;
 	}
 	$('#addCaModal').modal('hide');
-	document.getElementById('caCertPem').value = '';
+	setVal('caCertPem', '');
 	await refreshCaList();
 }
 
-async function deleteCa(key) {
-	if (!confirm('Delete CA certificate #' + key + '?')) { return; }
-	var r = await call('DeleteCa', { HubName_str: currentHub, Key_u32: key });
-	if (r.error) { alert('Error deleting CA certificate.'); return; }
-	await refreshCaList();
+function deleteCa(key) {
+	return confirmCall('Delete CA certificate #' + key + '?', 'DeleteCa',
+		{ HubName_str: currentHub, Key_u32: key }, 'Error deleting CA certificate', refreshCaList);
 }
 
 // ============================================================
@@ -3677,7 +3636,7 @@ async function deleteCa(key) {
 // ============================================================
 
 function onHubMsgToggle() {
-	var show = document.getElementById('hubSettingsShowMsg').checked;
+	var show = isChecked('hubSettingsShowMsg');
 	document.getElementById('hubSettingsMsgRow').style.display = show ? '' : 'none';
 }
 
@@ -3686,9 +3645,9 @@ async function openHubSettings() {
 	var r = await tryMethods(['GetHub', 'GetHubStatus'], { HubName_str: currentHub });
 	if (!r.error && r.result) {
 		var h = r.result;
-		document.getElementById('hubSettingsType').value = h.HubType_u32 !== undefined ? h.HubType_u32 : 0;
-		document.getElementById('hubSettingsMaxSessions').value = h.MaxSessionCount_u32 !== undefined ? h.MaxSessionCount_u32 : 0;
-		document.getElementById('hubSettingsNoEnum').checked = !!h.NoEnum_bool;
+		setVal('hubSettingsType', h.HubType_u32 !== undefined ? h.HubType_u32 : 0);
+		setVal('hubSettingsMaxSessions', h.MaxSessionCount_u32 !== undefined ? h.MaxSessionCount_u32 : 0);
+		setChecked('hubSettingsNoEnum', !!h.NoEnum_bool);
 	}
 	var rm = await call('GetHubMsg', { HubName_str: currentHub });
 	var msgText = '';
@@ -3696,25 +3655,25 @@ async function openHubSettings() {
 		msgText = rm.result.Msg_utf || rm.result.Msg_str || '';
 	}
 	var hasMsg = msgText.trim().length > 0;
-	document.getElementById('hubSettingsShowMsg').checked = hasMsg;
-	document.getElementById('hubSettingsMsg').value = msgText;
+	setChecked('hubSettingsShowMsg', hasMsg);
+	setVal('hubSettingsMsg', msgText);
 	document.getElementById('hubSettingsMsgRow').style.display = hasMsg ? '' : 'none';
 	$('#hubSettingsModal').modal('show');
 }
 
 async function saveHubSettings() {
-	var hubType    = parseInt(document.getElementById('hubSettingsType').value, 10) || 0;
-	var maxSess    = parseInt(document.getElementById('hubSettingsMaxSessions').value, 10) || 0;
-	var noEnum     = document.getElementById('hubSettingsNoEnum').checked;
+	var hubType    = intVal('hubSettingsType', 0);
+	var maxSess    = intVal('hubSettingsMaxSessions', 0);
+	var noEnum = isChecked('hubSettingsNoEnum');
 	var r = await call('SetHub', {
 		HubName_str: currentHub,
 		HubType_u32: hubType,
 		MaxSessionCount_u32: maxSess,
 		NoEnum_bool: noEnum
 	});
-	if (r.error) { alert('Error saving hub settings: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
-	var showMsg  = document.getElementById('hubSettingsShowMsg').checked;
-	var msgText  = showMsg ? (document.getElementById('hubSettingsMsg').value || '') : '';
+	if (r.error) { showApiError('Error saving hub settings', r); return; }
+	var showMsg = isChecked('hubSettingsShowMsg');
+	var msgText  = showMsg ? rawVal('hubSettingsMsg') : '';
 	await call('SetHubMsg', { HubName_str: currentHub, Msg_utf: msgText });
 	$('#hubSettingsModal').modal('hide');
 	await refreshHubInfo();
@@ -3725,36 +3684,27 @@ async function saveHubSettings() {
 // MAINTENANCE / SERVER ACTIONS
 // ============================================================
 
-async function rebootServer() {
-	if (!confirm('Reboot the VPN Server process? Active sessions will be disconnected.')) { return; }
-	var r = await call('RebootServer');
-	if (r.error) { alert('Reboot failed: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
-	alert('VPN Server is rebooting. Reconnect in a few seconds.');
-	disconnectApp();
+function rebootServer() {
+	return confirmCall('Reboot the VPN Server process? Active sessions will be disconnected.',
+		'RebootServer', {}, 'Reboot failed', function() {
+			alert('VPN Server is rebooting. Reconnect in a few seconds.');
+			disconnectApp();
+		});
 }
 
-async function flushServerLog() {
-	if (!confirm('Flush all server logs now?')) { return; }
-	var r = await call('FlushLog');
-	if (r.error) { alert('Error flushing log: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
-	alert('Log flushed.');
+function flushServerLog() {
+	return confirmCall('Flush all server logs now?', 'FlushLog', {}, 'Error flushing log',
+		function() { alert('Log flushed.'); });
 }
 
 async function downloadServerConfig() {
 	var r = await call('GetConfig');
-	if (r.error || !r.result) { alert('Error fetching config: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error || !r.result) { showApiError('Error fetching config', r); return; }
 	var cfg = r.result.FileBody_bin || r.result.Config_str || r.result.Body_str || JSON.stringify(r.result, null, 2);
 	if (r.result.FileBody_bin) {
 		try { cfg = atob(r.result.FileBody_bin); } catch(e) { cfg = r.result.FileBody_bin; }
 	}
-	var blob = new Blob([cfg], { type: 'text/plain' });
-	var a = document.createElement('a');
-	a.href = URL.createObjectURL(blob);
-	a.download = 'vpn_server_config.txt';
-	document.body.appendChild(a);
-	a.click();
-	document.body.removeChild(a);
-	URL.revokeObjectURL(a.href);
+	downloadBlob(cfg, 'vpn_server_config.txt');
 }
 
 // Wire up file-input preview for import modal
@@ -3787,7 +3737,7 @@ async function importServerConfig() {
 		var b64 = btoa(unescape(encodeURIComponent(content)));
 		var r = await call('SetConfig', { FileBody_bin: b64 });
 		if (r.error) {
-			alert('Import failed: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available'));
+			showApiError('Import failed', r);
 			return;
 		}
 		$('#importConfigModal').modal('hide');
@@ -3812,15 +3762,13 @@ async function refreshDdnsStatus() {
 	if (unsupported) { info.innerHTML = ''; if (wrap) { wrap.style.display = 'none'; } return; }
 	var d = r.result;
 	var rows = [];
-	function add(label, val) { if (val !== undefined && val !== null && val !== '') { rows.push([label, String(val)]); } }
+	function add(label, v) { if (v !== undefined && v !== null && v !== '') { rows.push([label, v]); } }
 	add('FQDN (IPv4)', d.DdnsFqdn_str || d.DdnsHostname_str);
 	add('FQDN (IPv6)', d.DdnsFqdnForIPv6_str);
 	add('Internet IP', d.CurrentPublicIp_str);
 	add('Internet IPv6', d.CurrentPublicIpV6_str);
 	add('Status', d.DdnsStatus_str);
-	info.innerHTML = rows.map(function(r) {
-		return '<tr><td>' + escapeHtml(r[0]) + '</td><td>' + escapeHtml(r[1]) + '</td></tr>';
-	}).join('');
+	info.innerHTML = kvRows(rows);
 	if (wrap) { wrap.style.display = rows.length ? '' : 'none'; }
 }
 
@@ -3840,10 +3788,9 @@ function resetConfiguration(target) {
 	form.method = 'POST';
 	form.action = window.location.href;
 
-	var csrfName  = (typeof csrfMagicName  !== 'undefined') ? csrfMagicName  : '__csrf_magic';
-	var csrfToken = (typeof csrfMagicToken !== 'undefined') ? csrfMagicToken : '';
+	var csrf = csrfField();
 	[
-		[csrfName, csrfToken],
+		[csrf.name, csrf.token],
 		['action',  (target === 'bridge') ? 'reset_bridge_config' : 'reset_server_config'],
 		['confirm', 'yes']
 	].forEach(function(pair) {
@@ -3876,8 +3823,8 @@ async function loadRemoteHubs(mode, forceReload) {
 	var g        = function(id) { var el = document.getElementById(prefix + id); return el ? el.value : ''; };
 	var host     = g('CascadeHost').trim();
 	var port     = parseInt(g('CascadePort'), 10) || 443;
-	var apiUser  = (document.getElementById('apiUser').value || '').trim() || 'Administrator';
-	var apiPass  = document.getElementById('apiPass').value || '';
+	var apiUser  = val('apiUser') || 'Administrator';
+	var apiPass  = rawVal('apiPass');
 	var modalUser = g('CascadeUser').trim();
 	var modalPass = g('CascadePass');
 	var hubSelect = document.getElementById(prefix + 'CascadeHub');
@@ -3888,13 +3835,7 @@ async function loadRemoteHubs(mode, forceReload) {
 	if (!host) { if (hubSelect) { hubSelect.innerHTML = '<option value="">(Enter hostname first)</option>'; hubSelect.dataset.lastHubLoadSignature = ''; } return; }
 	hubSelect.innerHTML = '<option value="">Loading...</option>';
 
-	var csrfName  = (typeof csrfMagicName  !== 'undefined') ? csrfMagicName  : '__csrf_magic';
-	var csrfToken = (typeof csrfMagicToken !== 'undefined') ? csrfMagicToken : '';
-	var body = new URLSearchParams();
-	if (csrfToken) { body.append(csrfName, csrfToken); }
-	body.append('remote_host', host);
-	body.append('remote_port', String(port));
-	body.append('payload', JSON.stringify({ jsonrpc:'2.0', id:String(Date.now()), method:'EnumHub', params:{} }));
+	var body = proxyBody('EnumHub', {}, { remote_host: host, remote_port: String(port) });
 
 	async function attempt(authHeader) {
 		var headers = authHeader ? { Authorization: authHeader } : {};
@@ -3925,11 +3866,8 @@ async function loadRemoteHubs(mode, forceReload) {
 	}
 
 	var hubs = (finalData.result && (finalData.result.HubList || finalData.result.Hubs)) || [];
-	hubSelect.innerHTML = '<option value="">-- Select a hub --</option>' +
-		hubs.map(function(h) {
-			var n = h.HubName_str || h.Name_str || h.HubName_utf || '';
-			return n ? '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>' : '';
-		}).join('') + (!hubs.length ? '<option value="" disabled>(No hubs found)</option>' : '');
+	hubSelect.innerHTML = hubOptionsHtml(hubs, '-- Select a hub --') +
+		(!hubs.length ? '<option value="" disabled>(No hubs found)</option>' : '');
 
 	if (prevValue) { hubSelect.value = prevValue; }
 	hubSelect.dataset.lastHubLoadSignature = sig;
@@ -3976,9 +3914,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				added[name] = true;
 			}
 			function processGroups(g) {
-				var groups = (!g.error && g.result && Array.isArray(g.result.GroupList)) ? g.result.GroupList
-						: (g.result && Array.isArray(g.result.Group)) ? g.result.Group
-						: (g.result && Array.isArray(g.result.Groups)) ? g.result.Groups : [];
+				var groups = resultList(g, 'GroupList', 'Group', 'Groups');
 				if (!groups.length && groupsList.length) { groups = groupsList; }
 				groups.forEach(function(grp) { addOpt(grp.Name_str || grp.GroupName_str || grp.Name_utf || ''); });
 			}
@@ -4084,23 +4020,20 @@ async function refreshOpenVpnSstp() {
 	var r = await call('GetOpenVpnSstpConfig');
 	if (r.error || !r.result) { return; }
 	var d = r.result;
-	var ovEl = document.getElementById('openvpn_on');
-	var stEl = document.getElementById('sstp_on');
-	var ptEl = document.getElementById('openvpn_ports');
-	if (ovEl) ovEl.checked = !!(d.EnableOpenVPN_bool || d.OpenVpnEnable_bool);
-	if (stEl) stEl.checked = !!(d.EnableSSTP_bool || d.SstpEnable_bool);
-	if (ptEl) ptEl.value = d.OpenVPNPortList_str || d.UdpPorts_str || '';
+	setChecked('openvpn_on', d.EnableOpenVPN_bool || d.OpenVpnEnable_bool);
+	setChecked('sstp_on',    d.EnableSSTP_bool || d.SstpEnable_bool);
+	setVal('openvpn_ports',  d.OpenVPNPortList_str || d.UdpPorts_str || '');
 }
 
 async function saveOpenVpnSstp() {
-	var ov    = !!((document.getElementById('openvpn_on') || {}).checked);
-	var st    = !!((document.getElementById('sstp_on') || {}).checked);
-	var ports = (((document.getElementById('openvpn_ports') || {}).value) || '').trim();
+	var ov    = isChecked('openvpn_on');
+	var st    = isChecked('sstp_on');
+	var ports = val('openvpn_ports');
 	var r = await call('SetOpenVpnSstpConfig', {
 		EnableOpenVPN_bool: ov, EnableSSTP_bool: st, OpenVPN_bool: ov, SSTP_bool: st,
 		OpenVPNPortList_str: ports, UdpPorts_str: ports
 	});
-	if (r.error) { alert('Error saving OpenVPN/SSTP: ' + (r.detail ? JSON.stringify(r.detail) : 'API error')); return; }
+	if (r.error) { showApiError('Error saving OpenVPN/SSTP', r); return; }
 	alert('Saved.');
 }
 
@@ -4112,20 +4045,17 @@ async function refreshSyslog() {
 	var r = await call('GetSysLog');
 	if (r.error || !r.result) { return; }
 	var d = r.result;
-	var typeEl = document.getElementById('syslogType');
-	var hostEl = document.getElementById('syslogHost');
-	var portEl = document.getElementById('syslogPort');
-	if (typeEl) typeEl.value = d.SaveType_u32 !== undefined ? d.SaveType_u32 : 0;
-	if (hostEl) hostEl.value = d.Hostname_str || '';
-	if (portEl) portEl.value = d.Port_u32 || 514;
+	setVal('syslogType', d.SaveType_u32 !== undefined ? d.SaveType_u32 : 0);
+	setVal('syslogHost', d.Hostname_str || '');
+	setVal('syslogPort', d.Port_u32 || 514);
 }
 
 async function saveSyslog() {
-	var type = parseInt(((document.getElementById('syslogType') || {}).value || '0'), 10);
-	var host = (((document.getElementById('syslogHost') || {}).value) || '').trim();
-	var port = parseInt(((document.getElementById('syslogPort') || {}).value || '514'), 10);
+	var type = intVal('syslogType', 0);
+	var host = val('syslogHost');
+	var port = intVal('syslogPort', 514);
 	var r = await call('SetSysLog', { SaveType_u32: type, Hostname_str: host, Port_u32: port });
-	if (r.error) { alert('Error saving syslog: ' + (r.detail ? JSON.stringify(r.detail) : 'API error')); return; }
+	if (r.error) { showApiError('Error saving syslog', r); return; }
 	alert('Syslog saved.');
 }
 
@@ -4138,19 +4068,19 @@ async function refreshServerCert() {
 	var tbody = document.getElementById('serverCertInfo');
 	if (!tbody) { return; }
 	if (r.error || !r.result) {
-		tbody.innerHTML = '<tr><td class="text-muted">Certificate info not available.</td></tr>';
+		tbody.innerHTML = emptyRow(2, 'Certificate info not available.');
 		return;
 	}
 	var d = r.result;
 	var rows = [];
-	function add(label, val) { if (val !== undefined && val !== null && String(val) !== '') rows.push('<tr><td style="width:35%;font-weight:bold;">' + escapeHtml(label) + '</td><td>' + escapeHtml(String(val)) + '</td></tr>'); }
+	function add(label, v) { if (v !== undefined && v !== null && String(v) !== '') { rows.push([label, v]); } }
 	add('Subject', d.SubjectName_utf || d.SubjectName_str || d.Subject_str);
 	add('Issuer', d.IssuerName_utf || d.IssuerName_str || d.Issuer_str);
 	add('Not Before', d.NotBefore_dt ? humanize('NotBefore_dt', d.NotBefore_dt) : '');
 	add('Not After', d.NotAfter_dt ? humanize('NotAfter_dt', d.NotAfter_dt) : (d.Expire_dt ? humanize('Expire_dt', d.Expire_dt) : ''));
 	add('Serial Number',     d.SerialNumber_str || d.Serial_str);
 	add('SHA-1 Fingerprint', d.Sha1Hash_bin ? d.Sha1Hash_bin : (d.Hash_bin || ''));
-	tbody.innerHTML = rows.join('') || '<tr><td class="text-muted">No certificate info.</td></tr>';
+	tbody.innerHTML = kvRows(rows, '35%') || emptyRow(2, 'No certificate info.');
 }
 
 async function uploadServerCert() {
@@ -4170,7 +4100,7 @@ async function uploadServerCert() {
 	if (!pem) { alert('Provide a certificate file or paste PEM text.'); return; }
 	var b64 = btoa(unescape(encodeURIComponent(pem)));
 	var r = await call('ServerCertSet', { Cert_bin: b64 });
-	if (r.error) { alert('Error uploading certificate: ' + (r.detail ? JSON.stringify(r.detail) : 'API error')); return; }
+	if (r.error) { showApiError('Error uploading certificate', r); return; }
 	$('#serverCertModal').modal('hide');
 	if (fileInput) { fileInput.value = ''; }
 	if (textarea)  { textarea.value = ''; }
@@ -4181,7 +4111,7 @@ async function uploadServerCert() {
 var _newCertSigningPem = null;
 
 function onNewCertTypeChange() {
-	var signed = document.getElementById('newCertTypeSigned').checked;
+	var signed = isChecked('newCertTypeSigned');
 	document.getElementById('newCertSigningRow').style.display = signed ? '' : 'none';
 	if (!signed) { _newCertSigningPem = null; document.getElementById('newCertSigningFileName').textContent = ''; }
 }
@@ -4209,46 +4139,46 @@ function initNewCertModal() {
 			}
 		});
 	}
-	document.getElementById('newCertTypeSelf').checked = true;
+	setChecked('newCertTypeSelf', true);
 	document.getElementById('newCertSigningRow').style.display = 'none';
 	_newCertSigningPem = null;
 	document.getElementById('newCertSigningFileName').textContent = '';
-	document.getElementById('newCertSigningFile').value = '';
-	document.getElementById('newCertCN').value = cn || (window.location.hostname || 'vpnserver');
-	document.getElementById('newCertO').value = '';
-	document.getElementById('newCertOU').value = '';
-	document.getElementById('newCertC').value = '';
-	document.getElementById('newCertST').value = '';
-	document.getElementById('newCertL').value = '';
-	document.getElementById('newCertSerial').value = '';
-	document.getElementById('newCertDays').value = '3650';
-	document.getElementById('newCertBits').value = '2048';
+	setVal('newCertSigningFile', '');
+	setVal('newCertCN', cn || (window.location.hostname || 'vpnserver'));
+	setVal('newCertO', '');
+	setVal('newCertOU', '');
+	setVal('newCertC', '');
+	setVal('newCertST', '');
+	setVal('newCertL', '');
+	setVal('newCertSerial', '');
+	setVal('newCertDays', '3650');
+	setVal('newCertBits', '2048');
 }
 
 async function submitNewServerCert() {
-	var cn = document.getElementById('newCertCN').value.trim();
+	var cn = val('newCertCN');
 	if (!cn) { alert('Common Name (CN) cannot be empty.'); return; }
-	var signed = document.getElementById('newCertTypeSigned').checked;
+	var signed = isChecked('newCertTypeSigned');
 	if (signed && !_newCertSigningPem) {
 		alert('Please load the signing Certificate and Private Key first.');
 		return;
 	}
 	var params = {
 		CN:         cn,
-		O:          document.getElementById('newCertO').value.trim(),
-		OU:         document.getElementById('newCertOU').value.trim(),
-		C:          document.getElementById('newCertC').value.trim(),
-		ST:         document.getElementById('newCertST').value.trim(),
-		L:          document.getElementById('newCertL').value.trim(),
-		Serial:     document.getElementById('newCertSerial').value.trim(),
-		Days:       parseInt(document.getElementById('newCertDays').value, 10) || 3650,
-		Bits:       parseInt(document.getElementById('newCertBits').value, 10) || 2048,
+		O:          val('newCertO'),
+		OU:         val('newCertOU'),
+		C:          val('newCertC'),
+		ST:         val('newCertST'),
+		L:          val('newCertL'),
+		Serial:     val('newCertSerial'),
+		Days:       intVal('newCertDays', 3650),
+		Bits:       intVal('newCertBits', 2048),
 		SignedBy:   signed ? (_newCertSigningPem || '') : '',
 	};
 	$('#newServerCertModal').modal('hide');
 	var r = await call('ServerCertRegenerate', params);
 	if (r.error) {
-		alert('Error creating certificate: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API error'));
+		showApiError('Error creating certificate', r);
 		return;
 	}
 	await refreshServerCert();
@@ -4278,14 +4208,7 @@ async function exportServerCert() {
 		alert('Could not retrieve certificate for export.');
 		return;
 	}
-	var blob = new Blob([r.result.Pem_str], { type: 'application/x-pem-file' });
-	var a = document.createElement('a');
-	a.href = URL.createObjectURL(blob);
-	a.download = 'softether_server.pem';
-	document.body.appendChild(a);
-	a.click();
-	document.body.removeChild(a);
-	URL.revokeObjectURL(a.href);
+	downloadBlob(r.result.Pem_str, 'softether_server.pem', 'application/x-pem-file');
 }
 
 // ============================================================
@@ -4293,13 +4216,13 @@ async function exportServerCert() {
 // ============================================================
 
 async function setDdnsHostname() {
-	var name = (((document.getElementById('ddnsHostname') || {}).value) || '').trim();
+	var name = val('ddnsHostname');
 	if (!name) { alert('Enter a hostname.'); return; }
 	var r = await call('SetDDnsClientConfig', { Hostname_str: name });
 	if (r.error) {
 		var code = r.detail && r.detail.code;
 		if (code === 33) { return; } // already shown inline notice
-		alert('Error setting DDNS hostname: ' + (r.detail ? JSON.stringify(r.detail) : 'API error'));
+		showApiError('Error setting DDNS hostname', r);
 		return;
 	}
 	alert('DDNS hostname updated.');
@@ -4307,67 +4230,46 @@ async function setDdnsHostname() {
 }
 
 // ============================================================
-// HUB ADMIN OPTIONS
+// HUB ADMIN / EXTENDED OPTIONS
 // ============================================================
+
+// Shared renderer for the Admin Options and Extended Options tables.
+// saveFnName is the global function the inline onchange handler calls.
+function renderHubOptionsTable(tbodyId, list, idPrefix, saveFnName, emptyMsg) {
+	fillTable(tbodyId, list, 3, emptyMsg, function(opt) {
+		var name   = opt.Name_str || opt.Name_utf || opt.OptionName_str || '-';
+		var optVal = opt.Value_u32 !== undefined ? opt.Value_u32 : (opt.Value_str !== undefined ? opt.Value_str : '-');
+		var desc   = opt.Descrption_utf || opt.Description_str || opt.Description_utf || '';
+		var nameEsc = escapeAttr(name);
+		var inputId = idPrefix + nameEsc.replace(/[^a-zA-Z0-9]/g, '_');
+		return '<tr>' +
+			'<td title="' + escapeHtml(desc) + '">' + escapeHtml(name) + '</td>' +
+			'<td><input type="number" id="' + inputId + '" class="form-control input-sm" value="' + escapeHtml(String(optVal)) + '" style="width:80px;" onchange="' + saveFnName + '(\'' + nameEsc + '\',this.value)"></td>' +
+			'<td style="white-space:nowrap;"><button class="btn btn-xs btn-warning" onclick="document.getElementById(\'' + inputId + '\').focus();document.getElementById(\'' + inputId + '\').select();" style="margin-right:2px;"><i class="fa fa-edit"></i></button></td></tr>';
+	});
+}
 
 async function refreshAdminOptions() {
 	if (!currentHub) { return; }
 	var r = await call('GetHubAdminOptions', { HubName_str: currentHub });
-	var raw  = (!r.error && r.result) ? r.result : null;
-	var list = Array.isArray(raw) ? raw
-	         : (raw && Array.isArray(raw.AdminOptionList)) ? raw.AdminOptionList : [];
-	var tbody = document.getElementById('adminOptionsTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No admin options available.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(opt) {
-		var name = opt.Name_str || opt.Name_utf || opt.OptionName_str || '-';
-		var val  = opt.Value_u32 !== undefined ? opt.Value_u32 : (opt.Value_str !== undefined ? opt.Value_str : '-');
-		var desc = opt.Descrption_utf || opt.Description_str || opt.Description_utf || '';
-		var nameEsc = escapeAttr(name);
-		var inputId = 'adminOpt_' + nameEsc.replace(/[^a-zA-Z0-9]/g, '_');
-		return '<tr>' +
-			'<td title="' + escapeHtml(desc) + '">' + escapeHtml(name) + '</td>' +
-			'<td><input type="number" id="' + inputId + '" class="form-control input-sm" value="' + escapeHtml(String(val)) + '" style="width:80px;" onchange="setAdminOption(\'' + nameEsc + '\',this.value)"></td>' +
-			'<td style="white-space:nowrap;"><button class="btn btn-xs btn-warning" onclick="document.getElementById(\'' + inputId + '\').focus();document.getElementById(\'' + inputId + '\').select();" style="margin-right:2px;"><i class="fa fa-edit"></i></button></td></tr>';
-	}).join('');
+	var list = (!r.error && Array.isArray(r.result)) ? r.result : resultList(r, 'AdminOptionList');
+	renderHubOptionsTable('adminOptionsTable', list, 'adminOpt_', 'setAdminOption', 'No admin options available.');
 }
-
-async function setAdminOption(name, value) {
-	var r = await call('SetHubAdminOption', { HubName_str: currentHub, Name_str: name, Value_u32: parseInt(value, 10) || 0 });
-	if (r.error) { alert('Error saving option: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); }
-}
-
-// ============================================================
-// HUB EXTENDED OPTIONS
-// ============================================================
 
 async function refreshExtOptions() {
 	if (!currentHub) { return; }
 	var r = await call('GetHubExtendedOptions', { HubName_str: currentHub });
-	var raw  = (!r.error && r.result) ? r.result : null;
-	var list = Array.isArray(raw) ? raw
-	         : (raw && Array.isArray(raw.ExtOptionList)) ? raw.ExtOptionList
-	         : (raw && Array.isArray(raw.AdminOptionList)) ? raw.AdminOptionList : [];
-	var tbody = document.getElementById('extOptionsTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No extended options available.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(opt) {
-		var name = opt.Name_str || opt.Name_utf || opt.OptionName_str || '-';
-		var val  = opt.Value_u32 !== undefined ? opt.Value_u32 : (opt.Value_str !== undefined ? opt.Value_str : '-');
-		var desc = opt.Descrption_utf || opt.Description_str || opt.Description_utf || '';
-		var nameEsc = escapeAttr(name);
-		var inputId = 'extOpt_' + nameEsc.replace(/[^a-zA-Z0-9]/g, '_');
-		return '<tr>' +
-			'<td title="' + escapeHtml(desc) + '">' + escapeHtml(name) + '</td>' +
-			'<td><input type="number" id="' + inputId + '" class="form-control input-sm" value="' + escapeHtml(String(val)) + '" style="width:80px;" onchange="setExtOption(\'' + nameEsc + '\',this.value)"></td>' +
-			'<td style="white-space:nowrap;"><button class="btn btn-xs btn-warning" onclick="document.getElementById(\'' + inputId + '\').focus();document.getElementById(\'' + inputId + '\').select();" style="margin-right:2px;"><i class="fa fa-edit"></i></button></td></tr>';
-	}).join('');
+	var list = (!r.error && Array.isArray(r.result)) ? r.result : resultList(r, 'ExtOptionList', 'AdminOptionList');
+	renderHubOptionsTable('extOptionsTable', list, 'extOpt_', 'setExtOption', 'No extended options available.');
 }
 
-async function setExtOption(name, value) {
-	var r = await call('SetHubExtendedOption', { HubName_str: currentHub, Name_str: name, Value_u32: parseInt(value, 10) || 0 });
-	if (r.error) { alert('Error saving option: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); }
+async function setHubOption(method, name, value) {
+	var r = await call(method, { HubName_str: currentHub, Name_str: name, Value_u32: parseInt(value, 10) || 0 });
+	if (r.error) { showApiError('Error saving option', r); }
 }
+
+function setAdminOption(name, value) { return setHubOption('SetHubAdminOption', name, value); }
+function setExtOption(name, value)   { return setHubOption('SetHubExtendedOption', name, value); }
 
 // ============================================================
 // HUB CRL
@@ -4376,11 +4278,7 @@ async function setExtOption(name, value) {
 async function refreshCrlList() {
 	if (!currentHub) { return; }
 	var r = await call('EnumCrl', { HubName_str: currentHub });
-	var list = (!r.error && r.result && Array.isArray(r.result.CrlList)) ? r.result.CrlList : [];
-	var tbody = document.getElementById('crlTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No CRL entries.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(crl) {
+	fillTable('crlTable', resultList(r, 'CrlList'), 4, 'No CRL entries.', function(crl) {
 		var key    = crl.Key_u32 !== undefined ? crl.Key_u32 : 0;
 		var cn     = crl.CnName_utf || crl.CnName_str || crl.CommonName_str || crl.SubjectName_utf || '-';
 		var serial = crl.Serial_str || crl.SerialNumber_str || '-';
@@ -4391,26 +4289,24 @@ async function refreshCrlList() {
 			'<td>' + escapeHtml(exp) + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteCrl(' + key + ')"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 async function addCrl() {
-	var cn     = ((document.getElementById('crlCn') || {}).value || '').trim();
-	var serial = ((document.getElementById('crlSerial') || {}).value || '').trim();
+	var cn     = val('crlCn');
+	var serial = val('crlSerial');
 	if (!cn && !serial) { alert('Enter a Common Name or serial number.'); return; }
 	var r = await call('AddCrl', { HubName_str: currentHub, CnName_utf: cn, Serial_str: serial });
-	if (r.error) { alert('Error adding CRL entry: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
+	if (r.error) { showApiError('Error adding CRL entry', r); return; }
 	$('#addCrlModal').modal('hide');
-	document.getElementById('crlCn').value = '';
-	document.getElementById('crlSerial').value = '';
+	setVal('crlCn', '');
+	setVal('crlSerial', '');
 	await refreshCrlList();
 }
 
-async function deleteCrl(key) {
-	if (!confirm('Delete CRL entry #' + key + '?')) { return; }
-	var r = await call('DeleteCrl', { HubName_str: currentHub, Key_u32: key });
-	if (r.error) { alert('Error deleting CRL entry.'); return; }
-	await refreshCrlList();
+function deleteCrl(key) {
+	return confirmCall('Delete CRL entry #' + key + '?', 'DeleteCrl',
+		{ HubName_str: currentHub, Key_u32: key }, 'Error deleting CRL entry', refreshCrlList);
 }
 
 // ============================================================
@@ -4421,24 +4317,19 @@ async function refreshKeepAlive() {
 	var r = await call('GetKeepConfig');
 	if (r.error || !r.result) { return; }
 	var d = r.result;
-	var enEl = document.getElementById('keepEnabled');
-	if (enEl) enEl.checked = !!(d.UseKeepConnect_bool || d.KeepEnabled_bool || d.Enable_bool);
-	var prEl = document.getElementById('keepProto');
-	if (prEl) prEl.value = (d.KeepConnectProtocol_u32 === 0 || d.Protocol_str === 'tcp') ? 'tcp' : 'udp';
-	var hEl = document.getElementById('keepHost');
-	if (hEl) hEl.value = d.KeepConnectHost_str || d.Host_str || '';
-	var pEl = document.getElementById('keepPort');
-	if (pEl) pEl.value = d.KeepConnectPort_u32 || d.Port_u32 || 80;
-	var iEl = document.getElementById('keepInterval');
-	if (iEl) iEl.value = d.KeepConnectInterval_u32 || d.Interval_u32 || 50;
+	setChecked('keepEnabled', d.UseKeepConnect_bool || d.KeepEnabled_bool || d.Enable_bool);
+	setVal('keepProto',    (d.KeepConnectProtocol_u32 === 0 || d.Protocol_str === 'tcp') ? 'tcp' : 'udp');
+	setVal('keepHost',     d.KeepConnectHost_str || d.Host_str || '');
+	setVal('keepPort',     d.KeepConnectPort_u32 || d.Port_u32 || 80);
+	setVal('keepInterval', d.KeepConnectInterval_u32 || d.Interval_u32 || 50);
 }
 
 async function saveKeepAlive() {
-	var enabled  = !!((document.getElementById('keepEnabled') || {}).checked);
-	var protocol = ((document.getElementById('keepProto') || {}).value || 'udp');
-	var host     = (((document.getElementById('keepHost') || {}).value) || '').trim();
-	var port     = parseInt(((document.getElementById('keepPort') || {}).value) || '80', 10);
-	var interval = parseInt(((document.getElementById('keepInterval') || {}).value) || '50', 10);
+	var enabled  = isChecked('keepEnabled');
+	var protocol = (rawVal('keepProto') || 'udp');
+	var host     = val('keepHost');
+	var port     = intVal('keepPort', 80);
+	var interval = intVal('keepInterval', 50);
 	await call(enabled ? 'KeepEnable' : 'KeepDisable');
 	var r = await call('SetKeepConfig', {
 		UseKeepConnect_bool: enabled,
@@ -4446,7 +4337,7 @@ async function saveKeepAlive() {
 		KeepConnectHost_str: host, KeepConnectPort_u32: port, KeepConnectInterval_u32: interval,
 		Protocol: protocol, Host: host, Port: String(port), Interval: String(interval)
 	});
-	if (r.error) { alert('Error saving Keep Alive: ' + (r.detail ? JSON.stringify(r.detail) : 'API error')); return; }
+	if (r.error) { showApiError('Error saving Keep Alive', r); return; }
 	alert('Keep Alive settings saved.');
 }
 
@@ -4489,9 +4380,9 @@ async function refreshAzureIcmpDns() {
 async function saveAzureIcmpDns() {
 	var btn = document.getElementById('azureIcmpSaveBtn');
 	if (btn && btn.disabled) { return; }
-	var azure = !!((document.getElementById('azureEnabled') || {}).checked);
-	var icmp  = !!((document.getElementById('icmpEnabled') || {}).checked);
-	var dns   = !!((document.getElementById('dnsEnabled') || {}).checked);
+	var azure = isChecked('azureEnabled');
+	var icmp  = isChecked('icmpEnabled');
+	var dns   = isChecked('dnsEnabled');
 	var r1 = await call('SetAzureEnable', { IsEnabled_bool: azure, Enable: azure ? 'yes' : 'no' });
 	var r2 = await call('SetVpnOverIcmpDns', { EnableVpnOverIcmp_bool: icmp, EnableVpnOverDns_bool: dns, IcmpEnable: icmp ? 'yes' : 'no', DnsEnable: dns ? 'yes' : 'no' });
 	var err1 = r1.error && r1.detail && r1.detail.code !== 33;
@@ -4524,10 +4415,10 @@ async function refreshServerCipher() {
 }
 
 async function saveServerCipher() {
-	var cipher = (((document.getElementById('sslCipher') || {}).value) || '').trim();
+	var cipher = val('sslCipher');
 	if (!cipher) { return; }
 	var r = await call('SetServerCipher', { String_str: cipher, Cipher: cipher });
-	if (r.error) { alert('Error saving cipher: ' + (r.detail ? JSON.stringify(r.detail) : 'API error')); return; }
+	if (r.error) { showApiError('Error saving cipher', r); return; }
 	alert('SSL cipher saved.');
 }
 
@@ -4537,12 +4428,9 @@ async function saveServerCipher() {
 
 async function refreshLogFiles() {
 	var tbody = document.getElementById('logFilesTable');
-	if (tbody) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted">Loading...</td></tr>'; }
+	if (tbody) { tbody.innerHTML = emptyRow(4, 'Loading...'); }
 	var r = await call('EnumLogFile');
-	var list = (!r.error && r.result && Array.isArray(r.result.LogFileList)) ? r.result.LogFileList : [];
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No log files found.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(f) {
+	fillTable('logFilesTable', resultList(r, 'LogFileList'), 4, 'No log files found.', function(f) {
 		var path   = f.FilePath_str || f.FileName_str || f.Name_str || '-';
 		var server = f.ServerName_str || '-';
 		var size   = f.FileSize_u32 !== undefined ? fmtBytes(f.FileSize_u32) : '-';
@@ -4553,7 +4441,7 @@ async function refreshLogFiles() {
 			'<td>' + escapeHtml(size) + '</td>' +
 			'<td><button class="btn btn-xs btn-default" onclick="viewLogFile(\'' + pathEsc + '\')" title="View"><i class="fa fa-eye"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 // ============================================================
@@ -4562,12 +4450,7 @@ async function refreshLogFiles() {
 
 async function refreshL3Switches() {
 	var r = await call('EnumL3Switch');
-	var list = (!r.error && r.result && Array.isArray(r.result.SwitchList)) ? r.result.SwitchList
-	         : (!r.error && r.result && Array.isArray(r.result.L3SwitchList)) ? r.result.L3SwitchList : [];
-	var tbody = document.getElementById('l3SwitchTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No L3 switches.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(sw) {
+	fillTable('l3SwitchTable', resultList(r, 'SwitchList', 'L3SwitchList'), 4, 'No L3 switches.', function(sw) {
 		var name    = sw.Name_str || sw.SwitchName_str || '-';
 		var online  = !!(sw.Online_bool || sw.Active_bool || sw.Running_bool);
 		var ifCount = sw.InterfaceCount_u32 !== undefined ? sw.InterfaceCount_u32 : '-';
@@ -4580,30 +4463,27 @@ async function refreshL3Switches() {
 			'<button class="btn btn-xs btn-' + (online ? 'warning' : 'success') + '" onclick="toggleL3Switch(\'' + nameEsc + '\',' + !online + ')" style="margin-right:2px;">' + (online ? '<i class="fa-solid fa-stop icon-embed-btn"></i> Stop' : '<i class="fa-solid fa-play icon-embed-btn"></i> Start') + '</button>' +
 			'<button class="btn btn-xs btn-danger" onclick="delL3Switch(\'' + nameEsc + '\')"><i class="fa fa-trash"></i></button>' +
 			'</td></tr>';
-	}).join('');
+	});
 }
 
 async function addL3Switch() {
-	var name = ((document.getElementById('newL3Name') || {}).value || '').trim();
+	var name = val('newL3Name');
 	if (!name) { alert('Switch name is required.'); return; }
 	var r = await call('AddL3Switch', { SwitchName: name, SwitchName_str: name });
-	if (r.error) { alert('Error creating L3 switch: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error creating L3 switch', r); return; }
 	$('#createL3Modal').modal('hide');
-	document.getElementById('newL3Name').value = '';
+	setVal('newL3Name', '');
 	await refreshL3Switches();
 }
 
-async function delL3Switch(name) {
-	if (!confirm("Delete L3 switch '" + name + "'?")) { return; }
-	var r = await call('DelL3Switch', { SwitchName: name, SwitchName_str: name });
-	if (r.error) { alert('Error deleting L3 switch.'); return; }
-	await refreshL3Switches();
+function delL3Switch(name) {
+	return confirmCall("Delete L3 switch '" + name + "'?", 'DelL3Switch',
+		{ SwitchName: name, SwitchName_str: name }, 'Error deleting L3 switch', refreshL3Switches);
 }
 
-async function toggleL3Switch(name, start) {
-	var r = await call(start ? 'StartL3Switch' : 'StopL3Switch', { SwitchName: name, SwitchName_str: name });
-	if (r.error) { alert('Error: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
-	await refreshL3Switches();
+function toggleL3Switch(name, start) {
+	return confirmCall(null, start ? 'StartL3Switch' : 'StopL3Switch',
+		{ SwitchName: name, SwitchName_str: name }, 'Error toggling L3 switch', refreshL3Switches);
 }
 
 // ============================================================
@@ -4612,11 +4492,7 @@ async function toggleL3Switch(name, start) {
 
 async function refreshEtherIpClients() {
 	var r = await call('EnumEtherIpClient');
-	var list = (!r.error && r.result && Array.isArray(r.result.EtherIpClientList)) ? r.result.EtherIpClientList : [];
-	var tbody = document.getElementById('etherIpTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No EtherIP clients.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(c) {
+	fillTable('etherIpTable', resultList(r, 'EtherIpClientList'), 4, 'No EtherIP clients.', function(c) {
 		var id   = c.Id_str || c.IpClientId_str || c.EtherIpId_str || '-';
 		var hub  = c.HubName_str || c.VirtualHubName_str || '-';
 		var user = c.UserName_str || c.Username_str || '-';
@@ -4627,38 +4503,34 @@ async function refreshEtherIpClients() {
 			'<td>' + escapeHtml(user) + '</td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteEtherIpClient(\'' + idEsc + '\')"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 async function addEtherIpClient() {
-	var id   = ((document.getElementById('etherIpId')   || {}).value || '').trim() || '*';
-	var hub  = ((document.getElementById('etherIpHub')  || {}).value || '').trim();
-	var user = ((document.getElementById('etherIpUser') || {}).value || '').trim();
-	var pass = ((document.getElementById('etherIpPass') || {}).value || '');
+	var id   = val('etherIpId') || '*';
+	var hub  = val('etherIpHub');
+	var user = val('etherIpUser');
+	var pass = rawVal('etherIpPass');
 	if (!hub || !user) { alert('Hub and username are required.'); return; }
 	var r = await call('AddEtherIpClient', { IpClientId: id, IpClientId_str: id, HubName_str: hub, UserName_str: user, Password_str: pass });
-	if (r.error) { alert('Error adding EtherIP client: ' + (r.detail ? JSON.stringify(r.detail) : 'API not available')); return; }
+	if (r.error) { showApiError('Error adding EtherIP client', r); return; }
 	$('#addEtherIpModal').modal('hide');
 	['etherIpId','etherIpHub','etherIpUser','etherIpPass'].forEach(function(id) { var el = document.getElementById(id); if (el) el.value = ''; });
 	await refreshEtherIpClients();
 }
 
-async function deleteEtherIpClient(id) {
-	if (!confirm("Delete EtherIP client '" + id + "'?")) { return; }
-	var r = await call('DeleteEtherIpClient', { IpClientId: id, IpClientId_str: id });
-	if (r.error) { alert('Error deleting EtherIP client.'); return; }
-	await refreshEtherIpClients();
+function deleteEtherIpClient(id) {
+	return confirmCall("Delete EtherIP client '" + id + "'?", 'DeleteEtherIpClient',
+		{ IpClientId: id, IpClientId_str: id }, 'Error deleting EtherIP client', refreshEtherIpClients);
 }
 
 // ============================================================
 // ACCESS RULE TOGGLE
 // ============================================================
 
-async function toggleAccess(id, enable) {
-	var method = enable ? 'EnableAccess' : 'DisableAccess';
-	var r = await call(method, { HubName_str: currentHub, Id_u32: id, Id: String(id) });
-	if (r.error) { alert('Error toggling access rule: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
-	await refreshAccessList();
+function toggleAccess(id, enable) {
+	return confirmCall(null, enable ? 'EnableAccess' : 'DisableAccess',
+		{ HubName_str: currentHub, Id_u32: id, Id: String(id) }, 'Error toggling access rule', refreshAccessList);
 }
 
 // ============================================================
@@ -4668,12 +4540,9 @@ async function toggleAccess(id, enable) {
 async function refreshWgkList() {
 	if (!currentHub) { return; }
 	var r = await call('WgkEnum', { HubName_str: currentHub });
-	var _raw = (!r.error && r.result) ? r.result : null;
-	var list = Array.isArray(_raw) ? _raw : (_raw && Array.isArray(_raw.WgkList) ? _raw.WgkList : []);
-	var tbody = document.getElementById('wgkTable');
-	if (!tbody) { return; }
-	if (!list.length) { tbody.innerHTML = '<tr><td colspan="3" class="text-muted">No WireGuard keys.</td></tr>'; return; }
-	tbody.innerHTML = list.map(function(wgk) {
+	// CLI fallback returns a bare array instead of { WgkList: [...] }
+	var list = (!r.error && Array.isArray(r.result)) ? r.result : resultList(r, 'WgkList');
+	fillTable('wgkTable', list, 3, 'No WireGuard keys.', function(wgk) {
 		var user = wgk.UserName_str || wgk.Username_str || '-';
 		var key  = wgk.Key_str || wgk.PublicKey_str || wgk.WgPublicKey_str || '-';
 		var keyId = escapeAttr(key);
@@ -4683,26 +4552,24 @@ async function refreshWgkList() {
 			'<td><code title="' + escapeHtml(key) + '">' + escapeHtml(short) + '</code></td>' +
 			'<td><button class="btn btn-xs btn-danger" onclick="deleteWgk(\'' + keyId + '\')"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
-	}).join('');
+	});
 }
 
 async function addWgk() {
-	var user   = ((document.getElementById('wgkUser') || {}).value || '').trim();
-	var pubkey = ((document.getElementById('wgkPublicKey') || {}).value || '').trim();
+	var user   = val('wgkUser');
+	var pubkey = val('wgkPublicKey');
 	if (!user || !pubkey) { alert('Username and public key are required.'); return; }
 	var r = await call('WgkAdd', { HubName_str: currentHub, UserName_str: user, PublicKey: pubkey, PublicKey_str: pubkey });
-	if (r.error) { alert('Error adding WireGuard key: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available')); return; }
+	if (r.error) { showApiError('Error adding WireGuard key', r); return; }
 	$('#addWgkModal').modal('hide');
-	document.getElementById('wgkUser').value = '';
-	document.getElementById('wgkPublicKey').value = '';
+	setVal('wgkUser', '');
+	setVal('wgkPublicKey', '');
 	await refreshWgkList();
 }
 
-async function deleteWgk(key) {
-	if (!confirm('Delete WireGuard key?')) { return; }
-	var r = await call('WgkDelete', { HubName_str: currentHub, Key_str: key, Key: key });
-	if (r.error) { alert('Error deleting WireGuard key.'); return; }
-	await refreshWgkList();
+function deleteWgk(key) {
+	return confirmCall('Delete WireGuard key?', 'WgkDelete',
+		{ HubName_str: currentHub, Key_str: key, Key: key }, 'Error deleting WireGuard key', refreshWgkList);
 }
 
 // ============================================================
@@ -4716,7 +4583,7 @@ async function downloadOpenVpnConfig() {
 		if (detail.code === 142 || (typeof detail === 'string' && detail.indexOf('142') !== -1)) {
 			alert('OpenVPN is not enabled on this server.\nPlease enable it first in the Server tab → OpenVPN / SSTP settings.');
 		} else {
-			alert('Error generating OpenVPN config: ' + (r.detail ? (typeof r.detail === 'string' ? r.detail : JSON.stringify(r.detail)) : 'API not available'));
+			showApiError('Error generating OpenVPN config', r);
 		}
 		return;
 	}
@@ -4729,14 +4596,7 @@ async function downloadOpenVpnConfig() {
 		var binary = atob(data);
 		var bytes = new Uint8Array(binary.length);
 		for (var i = 0; i < binary.length; i++) { bytes[i] = binary.charCodeAt(i); }
-		var blob = new Blob([bytes], { type: 'application/zip' });
-		var a = document.createElement('a');
-		a.href = URL.createObjectURL(blob);
-		a.download = 'openvpn_config.zip';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(a.href);
+		downloadBlob(new Blob([bytes], { type: 'application/zip' }), 'openvpn_config.zip');
 	} catch(e) {
 		alert('Error processing config data: ' + e.message);
 	}
