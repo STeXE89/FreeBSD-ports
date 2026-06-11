@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-softether5
 PORTVERSION=	5.02
-PORTREVISION=	5
+PORTREVISION=	6
 CATEGORIES=	security net-vpn
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -32,16 +32,19 @@ do-install:
 	${MKDIR} ${STAGEDIR}${DATADIR}
 	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/pkg/softether5.xml \
 		${STAGEDIR}${PREFIX}/pkg
-	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnserver.sh \
-		${STAGEDIR}${PREFIX}/etc/rc.d
-	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnbridge.sh \
-		${STAGEDIR}${PREFIX}/etc/rc.d
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/vpn_softether5_server.php \
+	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnserver \
+		${STAGEDIR}${PREFIX}/etc/rc.d/vpnserver
+	${INSTALL_DATA} -m 0755 ${FILESDIR}${PREFIX}/etc/rc.d/vpnbridge \
+		${STAGEDIR}${PREFIX}/etc/rc.d/vpnbridge
+	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/www/vpn_softether5.php \
 		${STAGEDIR}${PREFIX}/www
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/vpn_softether5_bridge.php \
+	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/www/vpn_softether5_api_proxy.php \
 		${STAGEDIR}${PREFIX}/www
-	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
+	${INSTALL_DATA} -m 0644 ${FILESDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${DATADIR}
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/shortcuts
+	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/www/shortcuts/pkg_softether5.inc \
+		${STAGEDIR}${PREFIX}/www/shortcuts/pkg_softether5.inc
 	@${REINPLACE_CMD} -i '' -e "s|%%PKGVERSION%%|${PKGVERSION}|" \
 		${STAGEDIR}${DATADIR}/info.xml \
 		${STAGEDIR}${PREFIX}/pkg/softether5.xml

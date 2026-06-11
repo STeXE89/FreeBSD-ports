@@ -31,22 +31,28 @@
 	<menu>
 		<name>SoftEther5</name>
 		<section>VPN</section>
+		<configfile>softether5.xml</configfile>
 		<tooltiptext></tooltiptext>
-		<url>/vpn_softether5_server.php</url>
+		<url>/vpn_softether5.php</url>
+	</menu>
+	<menu>
+		<name>SoftEther5</name>
+		<section>Services</section>
+		<configfile>softether5.xml</configfile>
+		<tooltiptext></tooltiptext>
+		<url>/vpn_softether5.php</url>
 	</menu>
 	<service>
 		<name>vpnserver</name>
-		<rcfile>vpnserver.sh</rcfile>
+		<rcfile>vpnserver</rcfile>
 		<executable>vpnserver</executable>
 		<description>SoftEther5 VPN Server</description>
-		<starts_on_sync></starts_on_sync>
 	</service>
 	<service>
 		<name>vpnbridge</name>
-		<rcfile>vpnbridge.sh</rcfile>
+		<rcfile>vpnbridge</rcfile>
 		<executable>vpnbridge</executable>
 		<description>SoftEther5 VPN Bridge</description>
-		<starts_on_sync></starts_on_sync>
 	</service>
 </packagegui>
 
